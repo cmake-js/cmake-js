@@ -1,0 +1,10 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "dependencies": {
+    "bluebird": "^2.9.14",
+    "cli": "^0.6.5",
+    "lodash": "^3.5.0",
+    "which": "^1.0.9"
+  }
+}
