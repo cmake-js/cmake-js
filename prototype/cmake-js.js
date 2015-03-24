@@ -1,3 +1,11 @@
+/*
+Notes:
+Architecture:
+    http://stackoverflow.com/questions/5334095/cmake-multiarchitecture-compilation
+MSBuild location:
+    http://blogs.msdn.com/b/visualstudio/archive/2013/07/24/msbuild-is-now-part-of-visual-studio.aspx
+ */
+
 var Bluebird = require("bluebird");
 var cli = require("cli");
 cli.enable("status");
@@ -8,7 +16,7 @@ var _ = require("lodash");
 
 // Include:
 function getUserHome() {
-    return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+    return process.env[(process.platform == "win32") ? "USERPROFILE" : "HOME"];
 }
 
 var nodeH = path.join(getUserHome(), ".node-gyp/1.6.2/src");
