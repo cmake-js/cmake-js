@@ -1,5 +1,5 @@
 "use strict";
-/* global describe,id */
+/* global describe,it */
 
 var Bluebird = require("bluebird");
 var rimraf = Bluebird.promisify(require("rimraf"));
