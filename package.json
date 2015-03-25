@@ -6,6 +6,12 @@
     "cli": "^0.6.5",
     "is-iojs": "^1.0.1",
     "lodash": "^3.5.0",
+    "memory-stream": "0.0.3",
+    "mkdirp": "^0.5.0",
+    "npmlog": "^1.2.0",
+    "request": "^2.54.0",
+    "rimraf": "^2.3.2",
+    "tar": "^1.0.3",
     "url-join": "0.0.1",
     "which": "^1.0.9"
   }
