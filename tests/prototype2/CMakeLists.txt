@@ -4,6 +4,6 @@ project (addon2)
 
 include_directories(${CMAKE_JS_INC})
 
-add_library(addon2 SHARED src/addon.cpp)
+add_library(${PROJECT_NAME} SHARED src/addon.cpp)
 
-target_link_libraries(addon2 ${CMAKE_JS_LIB})
+target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})

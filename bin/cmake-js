@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+"use strict";
+
+var log = require("npmlog");
+
+var version = require('../package').version;
+var yargs = require("yargs")
+    .usage("CMake.js " + version + "\n\nUsage: $0 <command> [options]")
+    .version(function() {
+        return version;
+    })
+    .command("install", "Installs Node.js/io.js distribution files if needed")
+    .command("configure", "Configures CMake project")
+    .command("build", "Builds the project")
+    .command("clean", "Cleans the project directory")
+    .command("reconfigure", "Cleans the project directory then configures CMake project")
+    .command("reconfigure", "Cleans the project directory then builds the project")
+    .options({
+        "h": {
+            alias: "help",
+            demand: false,
+            describe: "shows this screen",
+            type: "boolean"
+        }
+    });
+
+var argv = yargs.argv;
+
+console.warn(argv);
+
+if (argv.h) {
+    console.info(yargs.help());
+    return;
+}
+
+//console.log(yargs.help());

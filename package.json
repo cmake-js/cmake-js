@@ -1,6 +1,29 @@
 {
-  "name": "application-name",
-  "version": "0.0.1",
+  "name": "cmake-js",
+  "description": "CMake.js a Node.js/io.js native addon build tool",
+  "keywords": [
+    "native",
+    "addon",
+    "module",
+    "c",
+    "c++",
+    "bindings",
+    "build",
+    "cmake"
+  ],
+  "version": "0.8.0",
+  "author": "Gábor Mező aka unbornchikken",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/unbornchikken/cmake-js.git"
+  },
+  "preferGlobal": true,
+  "bin": "./bin/cmake-js",
+  "main": "./lib/buildSystem.js",
+  "engines": {
+    "node": ">= 0.10.0",
+    "iojs": ">= 1.0.0"
+  },
   "dependencies": {
     "bluebird": "^2.9.15",
     "cli": "^0.6.5",
