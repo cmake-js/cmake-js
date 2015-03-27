@@ -25,7 +25,7 @@ describe("CMake", function () {
         cmake.rebuild()
             .then(function () {
                 var addon = require("./prototype/build/Release/addon.node");
-                assert.equal(addon.add(3, 5), 8);
+                assert.equal(addon.add(3, 5), 3 + 5);
             })
             .nodeify(done);
     });
@@ -33,13 +33,13 @@ describe("CMake", function () {
     it("should rebuild prototype if cwd is the source directory", function (done) {
         this.timeout(30000);
         var cwd = process.cwd();
-        process.chdir(path.resolve(path.join(__dirname, "./prototype")));
+        process.chdir(path.resolve(path.join(__dirname, "./prototype2")));
         var cmake = new CMake();
         cmake.rebuild()
             .then(function () {
                 process.chdir(cwd);
-                var addon = require("./prototype/build/Release/addon.node");
-                assert.equal(addon.add(3, 5), 8);
+                var addon = require("./prototype2/build/Release/addon2.node");
+                assert.equal(addon.add(5, 6), 5 * 6);
             })
             .finally(function() {
                 process.chdir(cwd);
