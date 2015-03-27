@@ -2,7 +2,7 @@
 /* global describe,it */
 
 var Bluebird = require("bluebird");
-var rimraf = Bluebird.promisify(require("rimraf"));
+var fs = Bluebird.promisifyAll(require("fs-extra"));
 var dist = require("../lib/dist");
 var assert = require("assert");
 
@@ -13,7 +13,7 @@ describe("dist", function () {
         it("should download dist files if needed", function (done) {
             this.timeout(30000);
             console.log("Internal path: " + dist.internalPath);
-            rimraf(dist.internalPath)
+            fs.deleteAsync(dist.internalPath)
                 .then(function () {
                     assert(dist.downloaded === false);
                     return dist.ensureDownloaded();
