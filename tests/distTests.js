@@ -6,7 +6,7 @@ var fs = Bluebird.promisifyAll(require("fs-extra"));
 var dist = require("../lib/dist");
 var assert = require("assert");
 
-var testDownload = process.env.TEST_DWONLOAD === "1";
+var testDownload = process.env.TEST_DOWNLOAD === "1";
 
 describe("dist", function () {
     if (testDownload) {
