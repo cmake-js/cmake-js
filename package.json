@@ -2,11 +2,11 @@
   "name": "application-name",
   "version": "0.0.1",
   "dependencies": {
-    "bluebird": "^2.9.14",
+    "bluebird": "^2.9.15",
     "cli": "^0.6.5",
     "fs-extra": "^0.16.5",
     "is-iojs": "^1.0.1",
-    "lodash": "^3.5.0",
+    "lodash": "^3.6.0",
     "memory-stream": "0.0.3",
     "npmlog": "^1.2.0",
     "request": "^2.54.0",

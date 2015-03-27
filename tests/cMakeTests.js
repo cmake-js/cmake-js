@@ -17,7 +17,7 @@ describe("CMake", function () {
             .nodeify(done);
     });
 
-    it("should rebuild prototype", function (done) {
+    it("should rebuild prototype with explicit directory option specified", function (done) {
         this.timeout(30000);
         var cmake = new CMake({
             directory: path.resolve(path.join(__dirname, "./prototype"))
@@ -26,6 +26,23 @@ describe("CMake", function () {
             .then(function () {
                 var addon = require("./prototype/build/Release/addon.node");
                 assert.equal(addon.add(3, 5), 8);
+            })
+            .nodeify(done);
+    });
+
+    it("should rebuild prototype if cwd is the source directory", function (done) {
+        this.timeout(30000);
+        var cwd = process.cwd();
+        process.chdir(path.resolve(path.join(__dirname, "./prototype")));
+        var cmake = new CMake();
+        cmake.rebuild()
+            .then(function () {
+                process.chdir(cwd);
+                var addon = require("./prototype/build/Release/addon.node");
+                assert.equal(addon.add(3, 5), 8);
+            })
+            .finally(function() {
+                process.chdir(cwd);
             })
             .nodeify(done);
     });
