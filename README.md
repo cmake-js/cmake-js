@@ -2,7 +2,7 @@
 
 **CMake.js** - a Node.js/io.js native addon build tool.
 
-Readme and tutorials are gonna be available soon. Until then please refer the help and take a looka at the example project sin the tests directory.
+Readme and tutorials are gonna be available soon. Until then please refer the help and take a look at the example projects in the tests directory.
 
 Install:
 
