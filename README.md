@@ -1,4 +1,5 @@
-# cmake-js
-CMake based build system for Node/io.js for developing native addons
+# CMake.js
+
+CMake.js a Node.js/io.js native addon build tool.
 
 Soon ... ;)
