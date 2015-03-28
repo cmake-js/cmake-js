@@ -3,7 +3,7 @@
 
 var log = require("npmlog");
 
-var version = require('../package').version;
+var version = require("../package").version;
 var yargs = require("yargs")
     .usage("CMake.js " + version + "\n\nUsage: $0 <command> [options]")
     .version(function() {
