@@ -2,33 +2,146 @@
 "use strict";
 
 var log = require("npmlog");
+var _ = require("lodash");
+var BuildSystem = require("../lib/buildSystem");
+var util = require("util");
 
 var version = require("../package").version;
+var logLevels = ["silly", "verbose", "info", "http", "warn", "error"];
 var yargs = require("yargs")
     .usage("CMake.js " + version + "\n\nUsage: $0 [<command>] [options]")
-    .version(function() { return version; })
+    .version(function () {
+        return version;
+    })
     .command("install", "Installs Node.js/io.js distribution files if needed")
     .command("configure", "Configures CMake project")
+    .command("print-configure", "Prints the configuration command")
     .command("build", "Builds the project")
+    .command("print-build", "Prints the build command")
     .command("clean", "Cleans the project directory")
-    .command("reconfigure", "Cleans the project directory then configures CMake project")
-    .command("reconfigure", "Cleans the project directory then builds the project")
+    .command("print-clean", "PRints the clean command")
+    .command("reconfigure", "Cleans the project directory then configures the project")
+    .command("rebuild", "Cleans the project directory then builds the project")
     .options({
-        "h": {
+        h: {
             alias: "help",
             demand: false,
-            describe: "shows this screen",
+            describe: "show this screen",
+            type: "boolean"
+        },
+        l: {
+            alias: "log-level",
+            demand: false,
+            describe: "sets log level (" + logLevels.join(", ") + "), default is info",
+            type: "string"
+        },
+        d: {
+            alias: "directory",
+            demand: false,
+            describe: "CMake project's directory (where CMakeLists.txt located)",
+            type: "string"
+        },
+        debug: {
+            demand: false,
+            describe: "builds debug configuration",
+            type: "boolean"
+        },
+        cp: {
+            alias: "cmake-path",
+            demand: false,
+            describe: "path of CMake executable",
+            type: "string"
+        },
+        pm: {
+            alias: "prefer-make",
+            demand: false,
+            describe: "use Unix Makefiles even if Ninja is available (Posix)",
+            type: "boolean"
+        },
+        pg: {
+            alias: "prefer-gcc",
+            demand: false,
+            describe: "use GNU compiler even if Clang is available (Posix)",
             type: "boolean"
         }
-    });
 
+    });
 var argv = yargs.argv;
 
-console.warn(argv);
+// If help, then print and exit:
 
 if (argv.h) {
     console.info(yargs.help());
     return;
 }
 
-//console.log(yargs.help());
+// Setup log level:
+
+if (argv.l && _.contains(logLevels, argv.l)) {
+    log.level = argv.l;
+    log.resume();
+}
+
+log.silly("CMD", "argv:");
+log.silly("CMD", util.inspect(argv));
+
+log.verbose("CMD", "Parsing arguments");
+
+var options = {
+    directory: argv.directory || null,
+    debug: argv.debug,
+    cmakePath: argv.cp || null,
+    preferMake: argv.pm,
+    preferGcc: argv.pg
+};
+
+log.verbose("CMD", "options:");
+log.verbose("CMD", util.inspect(options));
+
+log.verbose("CMD", "Running command: " + (_.first(argv._) || "build"));
+
+var buildSystem = new BuildSystem(options);
+
+function ifCommand(command, f) {
+    if (_.contains(argv._, command)) {
+        f();
+        return true;
+    }
+    return false;
+}
+
+function install() { buildSystem.install(); }
+function configure() { buildSystem.configure(); }
+function printConfigure() {
+    buildSystem.getConfigureCommand()
+        .then(function (command) {
+            console.info(command);
+        });
+}
+function build() { buildSystem.build(); }
+function printBuild() {
+    buildSystem.getBuildCommand()
+        .then(function (command) {
+            console.info(command);
+        });
+}
+function clean() { buildSystem.clean(); }
+function printClean() {
+    buildSystem.getCleanCommand()
+        .then(function (command) {
+            console.info(command);
+        });
+}
+function reconfigure() { buildSystem.reconfigure(); }
+function rebuild() { buildSystem.rebuild(); }
+
+var done = ifCommand("install", install);
+done = done || ifCommand("configure", configure);
+done = done || ifCommand("print-configure", printConfigure);
+done = done || ifCommand("build", build);
+done = done || ifCommand("print-build", printBuild);
+done = done || ifCommand("clean", clean);
+done = done || ifCommand("print-clean", printClean);
+done = done || ifCommand("reconfigure", reconfigure);
+done = done || ifCommand("rebuild", rebuild);
+if (!done) { build(); }
