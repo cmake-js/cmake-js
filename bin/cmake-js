@@ -6,9 +6,7 @@ var log = require("npmlog");
 var version = require("../package").version;
 var yargs = require("yargs")
     .usage("CMake.js " + version + "\n\nUsage: $0 <command> [options]")
-    .version(function() {
-        return version;
-    })
+    .version(function() { return version; })
     .command("install", "Installs Node.js/io.js distribution files if needed")
     .command("configure", "Configures CMake project")
     .command("build", "Builds the project")
