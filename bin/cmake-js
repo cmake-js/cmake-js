@@ -59,7 +59,7 @@ var yargs = require("yargs")
             type: "boolean"
         },
         pg: {
-            alias: "prefer-gcc",
+            alias: "prefer-gnu",
             demand: false,
             describe: "use GNU compiler even if Clang is available (Posix)",
             type: "boolean"
@@ -82,23 +82,23 @@ if (argv.l && _.contains(logLevels, argv.l)) {
     log.resume();
 }
 
-log.silly("CMD", "argv:");
-log.silly("CMD", util.inspect(argv));
+log.silly("CON", "argv:");
+log.silly("CON", util.inspect(argv));
 
-log.verbose("CMD", "Parsing arguments");
+log.verbose("CON", "Parsing arguments");
 
 var options = {
     directory: argv.directory || null,
     debug: argv.debug,
     cmakePath: argv.cp || null,
     preferMake: argv.pm,
-    preferGcc: argv.pg
+    preferGnu: argv.pg
 };
 
-log.verbose("CMD", "options:");
-log.verbose("CMD", util.inspect(options));
+log.verbose("CON", "options:");
+log.verbose("CON", util.inspect(options));
 
-log.verbose("CMD", "Running command: " + (_.first(argv._) || "build"));
+log.verbose("CON", "Running command: " + (_.first(argv._) || "build"));
 
 var buildSystem = new BuildSystem(options);
 
