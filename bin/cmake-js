@@ -41,24 +41,25 @@ var yargs = require("yargs")
             describe: "CMake project's directory (where CMakeLists.txt located)",
             type: "string"
         },
-        debug: {
+        D: {
+            alias: "debug",
             demand: false,
             describe: "builds debug configuration",
             type: "boolean"
         },
-        cp: {
+        c: {
             alias: "cmake-path",
             demand: false,
             describe: "path of CMake executable",
             type: "string"
         },
-        pm: {
+        m: {
             alias: "prefer-make",
             demand: false,
             describe: "use Unix Makefiles even if Ninja is available (Posix)",
             type: "boolean"
         },
-        pg: {
+        g: {
             alias: "prefer-gnu",
             demand: false,
             describe: "use GNU compiler even if Clang is available (Posix)",
@@ -98,12 +99,14 @@ var options = {
 log.verbose("CON", "options:");
 log.verbose("CON", util.inspect(options));
 
-log.verbose("CON", "Running command: " + (_.first(argv._) || "build"));
+var command = _.first(argv._) || "build";
+
+log.verbose("CON", "Running command: " + command);
 
 var buildSystem = new BuildSystem(options);
 
-function ifCommand(command, f) {
-    if (_.contains(argv._, command)) {
+function ifCommand(c, f) {
+    if (c === command) {
         f();
         return true;
     }
@@ -144,4 +147,11 @@ done = done || ifCommand("clean", clean);
 done = done || ifCommand("print-clean", printClean);
 done = done || ifCommand("reconfigure", reconfigure);
 done = done || ifCommand("rebuild", rebuild);
-if (!done) { build(); }
+if (!done) {
+    if (command) {
+        log.error("COM", "Unknown command: " + command);
+    }
+    else {
+        build();
+    }
+}
