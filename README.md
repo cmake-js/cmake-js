@@ -98,5 +98,11 @@ cmake-js --help
 - A proper C/C++ compiler toolchain of the given platform
     - **Windows**: a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/en-us/news/vs2013-community-vs.aspx) version works well)             
     - **Unix/Posix**: 
-        - GCC or Clang (Clang will be picked if both present)
-        - Make or Ninja (Ninja will be picked if both present)
+        - Clang or GCC (Clang will be picked if both present)
+        - Ninja or Make (Ninja will be picked if both present)
+        
+## Tutorials
+
+### Creating a native module by using CMake.js 
+
+
