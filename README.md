@@ -34,11 +34,13 @@ but this is not a two way operation, if you tune your settings or setup in the I
 you have to propagate changes back to gyp files by hand.
 
 7. Gyp itself isn't capable to build node modules, 
-there is fair amount custom JS code in node-gyp module to make it capable to doing so. 
-So supporting advanced build features like Ninja generators is impossible without extra development effort added to node-gyp. 
+there is fair amount custom JS code in node-gyp module to make it capable to doing so 
+(that's why it named as Generate Your Project not Build Your Project). 
+So supporting advanced build features like Ninja generators is impossible without extra development effort added to node-gyp
+(see [node-gyp PR #429](https://github.com/TooTallNate/node-gyp/pull/429)). 
 It looks like [node-gyp support itself eats up development resources](https://github.com/TooTallNate/node-gyp/issues),
-so there won't be new features like this added in the near future. 
-So with node-gyp you are stuck to good old Make which makes build times very long while working on large modules. 
+so there won't be new features like this added or merged in the near future. 
+So with node-gyp you are stuck to good old Make which makes build times very long while working on large modules.
  
 So, let's take a look at CMake compared to the above bulletpoints.
 
@@ -49,11 +51,13 @@ and it isn't likely to be abandoned in the near future.
 
 2. It's a native software having no dependencies to any runtime.
 
-3. Right now CMake have all of the feaures that 
+3. Right now CMake have all of the features that 
 [was missing when development of gyp started](https://code.google.com/p/gyp/wiki/GypVsCMake), and on top of that
-it still have those features that gyp doesn't have since then.
+it still have those features that gyp doesn't have since then. 
+It has an own module ecosystem with [internal modules](http://www.cmake.org/cmake/help/v3.2/manual/cmake-modules.7.html), 
+and with 3rd party gems like [Compile Time Reducer (Cotire)](https://github.com/sakra/cotire).
 
-4. CMake have a [very good detailed documentation](http://www.cmake.org/documentation/), 
+4. CMake have an [excellent documentation](http://www.cmake.org/documentation/), 
 lots of [tutorials](https://www.google.hu/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=cmake%20tutorial), 
 and [example code](https://www.google.hu/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=cmake+example).
 
@@ -62,22 +66,37 @@ or it has CMake build files somewhere,
 for example: [Shark](http://image.diku.dk/shark/sphinx_pages/build/html/rest_sources/getting_started/installation.html),
 [Lua](https://github.com/LuaDist/lua), [SDL](http://wiki.libsdl.org/Installation). 
 If not, [there are converters](http://www.cmake.org/Wiki/CMake#Converters_from_other_buildsystems_to_CMake) 
-that helps you to create CMake files from other formats.
+that helps you to create CMake files from other project formats.
 
-6. CMake is widely supported by all mayor cross platform C++ IDEs 
+6. CMake is widely supported by mayor cross platform C++ IDEs 
 like: [QtCreator](http://doc.qt.io/qtcreator/creator-project-cmake.html), [KDevelop](https://www.kdevelop.org/) 
 and the upcoming [CLion](https://www.jetbrains.com/clion/#cmake-support) from JetBrains. 
 With CMake.js you are gonna be able to develop Node.js addons by using those, 
 even you have the ability to use features like integrated debugging. 
 
-Install:
+7. CMake.js module doesn't build your project, CMake does. 
+All of its commands (configure, build, clean, etc.) are simple CMake invocations without involving JS magic anywhere.
+Even you can print CMake command line with CMake.js module for each command (eg.: cmake-js print-configure, cmake-js print-build, cmake-js print-clean).
+This means supporting new features of a given native build system (like new version of Ninja or Visual Studio) 
+won't involve developer efforts from CMake.js side, installing new version of CMake will be enough.
+
+## Installation
 
 ```
 npm install -g cmake-js
 ```
 
-Help:
+**Help:**
 
 ```
 cmake-js --help
 ```
+
+**Requirements:**
+
+- [CMake](http://www.cmake.org/download/)
+- A proper C/C++ compiler toolchain of the given platform
+    - **Windows**: a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/en-us/news/vs2013-community-vs.aspx) version works well)             
+    - **Unix/Posix**: 
+        - GCC or Clang (Clang will be picked if both present)
+        - Make or Ninja (Ninja will be picked if both present)
