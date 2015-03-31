@@ -78,7 +78,7 @@ even you have the ability to use features like integrated debugging.
 All of its commands (configure, build, clean, etc.) are simple CMake invocations without involving JS magic anywhere.
 Even you can print CMake command line with CMake.js module for each command (eg.: cmake-js print-configure, cmake-js print-build, cmake-js print-clean).
 This means supporting new features of a given native build system (like new version of Ninja or Visual Studio) 
-won't involve developer efforts from CMake.js side, installing new version of CMake will be enough.
+won't involve developer efforts from CMake.js side, installing new versions of CMake will be enough.
 
 ## Installation
 
