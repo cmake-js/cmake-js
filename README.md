@@ -59,7 +59,7 @@ and with 3rd party gems like [Compile Time Reducer (Cotire)](https://github.com/
 
 4. CMake have an [excellent documentation](http://www.cmake.org/documentation/), 
 lots of [tutorials](https://www.google.hu/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=cmake%20tutorial), 
-and [example code](https://www.google.hu/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=cmake+example).
+and [examples](https://www.google.hu/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=cmake+example).
 
 5. If you pick a native cross platform library, there is a very good chance that is uses CMake as of its build system,
 or it has CMake build files somewhere, 
@@ -103,6 +103,5 @@ cmake-js --help
         
 ## Tutorials
 
-### Creating a native module by using CMake.js 
-
+### Creating a native module by using CMake.js and NAN
 
