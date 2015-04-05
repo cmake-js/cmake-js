@@ -105,3 +105,4 @@ cmake-js --help
 
 ### Creating a native module by using CMake.js and NAN
 
+Gonna be available soon!
