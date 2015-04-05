@@ -135,6 +135,4 @@ Please refer to the `--help` for the lists of available commands (they are like 
         
 ## Tutorials
 
-### Creating a native module by using CMake.js and NAN
-
-[It's in the wiki.](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01---Creating-a-native-module-by-using-CMake.js-and-NAN)
+- [Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01---Creating-a-native-module-by-using-CMake.js-and-NAN)
