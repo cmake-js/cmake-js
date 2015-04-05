@@ -113,30 +113,36 @@ function ifCommand(c, f) {
     return false;
 }
 
-function install() { buildSystem.install(); }
-function configure() { buildSystem.configure(); }
+function exitOnError(promise) {
+    promise.catch(function() {
+        process.exit(1);
+    });
+}
+
+function install() { exitOnError(buildSystem.install()); }
+function configure() { exitOnError(buildSystem.configure()); }
 function printConfigure() {
-    buildSystem.getConfigureCommand()
+    exitOnError(buildSystem.getConfigureCommand()
         .then(function (command) {
             console.info(command);
-        });
+        }));
 }
 function build() { buildSystem.build(); }
 function printBuild() {
-    buildSystem.getBuildCommand()
+    exitOnError(buildSystem.getBuildCommand()
         .then(function (command) {
             console.info(command);
-        });
+        }));
 }
 function clean() { buildSystem.clean(); }
 function printClean() {
-    buildSystem.getCleanCommand()
+    exitOnError(buildSystem.getCleanCommand()
         .then(function (command) {
             console.info(command);
-        });
+        }));
 }
-function reconfigure() { buildSystem.reconfigure(); }
-function rebuild() { buildSystem.rebuild(); }
+function reconfigure() { exitOnError(buildSystem.reconfigure()); }
+function rebuild() { exitOnError(buildSystem.rebuild()); }
 
 var done = ifCommand("install", install);
 done = done || ifCommand("configure", configure);
@@ -150,6 +156,7 @@ done = done || ifCommand("rebuild", rebuild);
 if (!done) {
     if (command) {
         log.error("COM", "Unknown command: " + command);
+        process.exit(1);
     }
     else {
         build();
