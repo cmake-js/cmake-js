@@ -100,9 +100,41 @@ cmake-js --help
     - **Unix/Posix**: 
         - Clang or GCC (Clang will be picked if both present)
         - Ninja or Make (Ninja will be picked if both present)
+
+## Usage
+
+In a nutshell. *(For more complete documentation please see [the first tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01---Creating-a-native-module-by-using-CMake.js-and-NAN).)*
+
+- Install cmake-js for you module `npm install --save cmake-js`
+- Put a CMakeLists.txt file into you module root with this minimal required content:
+
+```cmake
+project (<your-addon-name-here>)
+include_directories(${CMAKE_JS_INC})
+file(GLOB SOURCE_FILES "<your-source files-location-here>")
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
+target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
+```
+
+- Add the following into your package.json scripts section:
+
+```json
+"scripts": {
+    "install": "./node_modules/.bin/cmake-js rebuild"
+  }
+```
+
+In your module folder you can access cmake-js commands if you install cmake-js globally:
+
+```
+npm install -g cmake-js
+```
+
+Please refer to the `--help` for the lists of available commands (they are like in `node-gyp`).
         
 ## Tutorials
 
 ### Creating a native module by using CMake.js and NAN
 
-Gonna be available soon!
+[It's in the wiki.](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01---Creating-a-native-module-by-using-CMake.js-and-NAN)
