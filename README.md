@@ -1,3 +1,7 @@
+# HELP WANTED: TESTING ON MAC
+
+If anyone has a chance to test this stuff running on Mac that would be greatly appreciated. Please report any issue that you found.
+
 # CMake.js (MIT)
 
 ## WTF?
