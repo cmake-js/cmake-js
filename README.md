@@ -135,7 +135,7 @@ In your module folder you can access cmake-js commands if you install cmake-js g
 npm install -g cmake-js
 ```
 
-Please refer to the `--help` for the lists of available commands (they are like in `node-gyp`).
+Please refer to the `--help` for the lists of available commands (they are like commands in `node-gyp`).
         
 ## Tutorials
 
