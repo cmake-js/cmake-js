@@ -139,4 +139,5 @@ Please refer to the `--help` for the lists of available commands (they are like 
         
 ## Tutorials
 
-- [Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01---Creating-a-native-module-by-using-CMake.js-and-NAN)
+- [TUTORIAL 01 Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01---Creating-a-native-module-by-using-CMake.js-and-NAN)
+- [TUTORIAL 02 Creating CMake.js based native addons with QT Creator](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-02---Creating-CMake.js-based-native-addons-with-QT-Creator)
