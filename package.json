@@ -11,7 +11,7 @@
     "build",
     "cmake"
   ],
-  "version": "0.8.6",
+  "version": "0.8.7",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
