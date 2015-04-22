@@ -91,9 +91,9 @@ log.verbose("CON", "Parsing arguments");
 var options = {
     directory: argv.directory || null,
     debug: argv.debug,
-    cmakePath: argv.cp || null,
-    preferMake: argv.pm,
-    preferGnu: argv.pg
+    cmakePath: argv.c || null,
+    preferMake: argv.m,
+    preferGnu: argv.g
 };
 
 log.verbose("CON", "options:");
