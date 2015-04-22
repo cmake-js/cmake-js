@@ -1,7 +1,3 @@
-# HELP WANTED: TESTING ON MAC
-
-If anyone has a chance to test this stuff running on Mac that would be greatly appreciated. Please [report any issue](https://github.com/unbornchikken/cmake-js/issues/1) that you found.
-
 # CMake.js (MIT)
 
 ## WTF?
