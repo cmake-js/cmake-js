@@ -11,7 +11,7 @@
     "build",
     "cmake"
   ],
-  "version": "0.8.8",
+  "version": "0.9.0",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
@@ -38,5 +38,8 @@
     "url-join": "0.0.1",
     "which": "^1.0.9",
     "yargs": "^3.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.4"
   }
 }
