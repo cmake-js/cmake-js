@@ -68,7 +68,7 @@ for example: [Shark](http://image.diku.dk/shark/sphinx_pages/build/html/rest_sou
 If not, [there are converters](http://www.cmake.org/Wiki/CMake#Converters_from_other_buildsystems_to_CMake) 
 that helps you to create CMake files from other project formats.
 
-6. CMake is widely supported by mayor cross platform C++ IDEs 
+6. CMake is widely supported by major cross platform C++ IDEs 
 like: [QtCreator](http://doc.qt.io/qtcreator/creator-project-cmake.html), [KDevelop](https://www.kdevelop.org/) 
 and the upcoming [CLion](https://www.jetbrains.com/clion/#cmake-support) from JetBrains. 
 With CMake.js you are gonna be able to develop Node.js addons by using those, 
