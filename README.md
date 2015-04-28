@@ -27,7 +27,7 @@ but far from what can be called for a good product documentation.
 5. If you wanna port a native library to node as an addon, 
 there is a (very-very) good chance that it doesn't use gyp for its build system, 
 you have to make gyp binding by hand, which is really hard or nearly impossible considering the previous bulletpoint.
-Also you have to be and expert of the given build system **and** gyp to do it right.
+Also you have to be an expert of the given build system **and** gyp to do it right.
 
 6. There is no IDE that supports gyp as a native project format. Gyp can be used to generate IDE projects, 
 but this is not a two way operation, if you tune your settings or setup in the IDE, 
@@ -121,7 +121,7 @@ target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
 ```json
 "scripts": {
-    "install": "node ./node_modules/.bin/cmake-js rebuild"
+    "install": "node ./node_modules/cmake-js/bin/cmake-js rebuild"
   }
 ```
 
