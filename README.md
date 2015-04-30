@@ -1,6 +1,6 @@
 # CMake.js (MIT)
 
-## WTF?
+## About
 CMake.js is a Node.js/io.js native addon build tool which works *exactly* like 
 [node-gyp](https://github.com/TooTallNate/node-gyp), 
 but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), 
