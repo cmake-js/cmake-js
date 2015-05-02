@@ -3,7 +3,7 @@
 
 var Bluebird = require("bluebird");
 var fs = Bluebird.promisifyAll(require("fs-extra"));
-var dist = require("../lib/dist");
+var Dist = require("../lib/dist");
 var assert = require("assert");
 
 var testDownload = process.env.TEST_DOWNLOAD === "1";
@@ -11,7 +11,8 @@ var testDownload = process.env.TEST_DOWNLOAD === "1";
 describe("dist", function () {
     if (testDownload) {
         it("should download dist files if needed", function (done) {
-            this.timeout(30000);
+            this.timeout(60000);
+            var dist = new Dist();
             console.log("Internal path: " + dist.internalPath);
             fs.deleteAsync(dist.internalPath)
                 .then(function () {
