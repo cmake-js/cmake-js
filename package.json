@@ -1,6 +1,7 @@
 {
   "name": "cmake-js",
   "description": "CMake.js - a Node.js/io.js native addon build tool",
+  "license" : "MIT",
   "keywords": [
     "native",
     "addon",
@@ -9,9 +10,10 @@
     "c++",
     "bindings",
     "build",
-    "cmake"
+    "cmake",
+    "nw.js"
   ],
-  "version": "0.9.2",
+  "version": "0.9.5",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
