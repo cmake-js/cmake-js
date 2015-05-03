@@ -128,6 +128,8 @@ target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
   }
 ```
 
+#### Commandline
+
 In your module folder you can access cmake-js commands if you install cmake-js globally:
 
 ```
