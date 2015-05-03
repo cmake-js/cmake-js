@@ -1,10 +1,11 @@
 # CMake.js (MIT)
 
 ## About
-CMake.js is a Node.js/io.js native addon build tool which works *exactly* like 
-[node-gyp](https://github.com/TooTallNate/node-gyp), 
-but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), 
-it is based on [CMake](http://cmake.org) build system.
+CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes: 
+
+- Node.js 0.10+
+- io.js
+- nw.js (all CMake.js based native modules are compatible with nw.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required)
 
 ## Why CMake?
 Nearly every native addon is using node-gyp today, so what's wrong with it?
@@ -103,15 +104,17 @@ cmake-js --help
 
 ## Usage
 
+### General
+
 In a nutshell. *(For more complete documentation please see [the first tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)*
 
 - Install cmake-js for you module `npm install --save cmake-js`
 - Put a CMakeLists.txt file into you module root with this minimal required content:
 
 ```cmake
-project (<your-addon-name-here>)
+project (your-addon-name-here)
 include_directories(${CMAKE_JS_INC})
-file(GLOB SOURCE_FILES "<your-source files-location-here>")
+file(GLOB SOURCE_FILES "your-source files-location-here")
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
@@ -132,8 +135,71 @@ npm install -g cmake-js
 ```
 
 Please refer to the `--help` for the lists of available commands (they are like commands in `node-gyp`).
-        
+
+### Runtimes
+
+You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` key in `config` section of the root application's `package.json` file, eg.:
+
+```json
+{
+  "name": "ta-taram-taram",
+  "description": "pa-param-pam-pam",
+  "version": "1.0.0",
+  "main": "app.js",
+  "config": {
+    "cmake-js": {
+      "runtime": "node",
+      "runtimeVersion": "0.12.0",
+      "arch": "ia32"
+    }
+  }
+}
+```
+
+Available settings:
+
+- **runtime**: application's target runtime, possible values are: 
+	- `node`: Node.js
+	- `iojs`: io.js
+	- `nw`: nw.js
+- **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
+- **arch**: architecutre of appication's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems C++ toolset's architecture's gonna be used despite of this setting.*
+
+#### nw.js
+
+To make compatible your nw.js application with any CMake.js based modules, write the following to your application's package.json file:
+
+**on Windows**:
+
+```json
+{
+  "config": {
+    "cmake-js": {
+      "runtime": "nw",
+      "runtimeVersion": "nw.js-version-here",
+      "arch": "enter-nw.js-runtime's-architecture-here"
+    }
+  }
+}
+```
+
+**on Posix**:
+
+```json
+{
+  "config": {
+    "cmake-js": {
+      "runtime": "nw",
+      "runtimeVersion": "nw.js-version-here"
+    }
+  }
+}
+```
+
+That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with nw.js out-of-the-box. For more complete documentation please see [the third tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js).
+
 ## Tutorials
 
 - [TUTORIAL 01 Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN)
 - [TUTORIAL 02 Creating CMake.js based native addons with Qt Creator](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-02-Creating-CMake.js-based-native-addons-with-QT-Creator)
+- [TUTORIAL 03 Using CMake.js based native modules with nw.js](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js)
