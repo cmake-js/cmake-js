@@ -163,31 +163,18 @@ Available settings:
 	- `iojs`: io.js
 	- `nw`: nw.js
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
-- **arch**: architecutre of appication's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems C++ toolset's architecture's gonna be used despite of this setting.*
+- **arch**: architecutre of appication's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems C++ toolset's architecture's gonna be used despite of this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose the matching nw.js toolset.*
 
 #### nw.js
 
 To make compatible your nw.js application with any CMake.js based modules, write the following to your application's package.json file:
-
-**on Windows**:
 
 ```json
 {
   "cmake-js": {
     "runtime": "nw",
     "runtimeVersion": "nw.js-version-here",
-    "arch": "enter-nw.js-runtime's-architecture-here"
-  }
-}
-```
-
-**on Posix**:
-
-```json
-{
-  "cmake-js": {
-    "runtime": "nw",
-    "runtimeVersion": "nw.js-version-here"
+    "arch": "whatever-setting-is-appropriate-for-your-application's-windows-build"
   }
 }
 ```
