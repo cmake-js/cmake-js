@@ -140,7 +140,7 @@ Please refer to the `--help` for the lists of available commands (they are like 
 
 ### Runtimes
 
-You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` key in `config` section of the root application's `package.json` file, eg.:
+You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` the in application's root `package.json` file, eg.:
 
 ```json
 {
@@ -148,12 +148,10 @@ You can configure runtimes for compiling target for all depending CMake.js modul
   "description": "pa-param-pam-pam",
   "version": "1.0.0",
   "main": "app.js",
-  "config": {
-    "cmake-js": {
-      "runtime": "node",
-      "runtimeVersion": "0.12.0",
-      "arch": "ia32"
-    }
+  "cmake-js": {
+    "runtime": "node",
+    "runtimeVersion": "0.12.0",
+    "arch": "ia32"
   }
 }
 ```
@@ -175,12 +173,10 @@ To make compatible your nw.js application with any CMake.js based modules, write
 
 ```json
 {
-  "config": {
-    "cmake-js": {
-      "runtime": "nw",
-      "runtimeVersion": "nw.js-version-here",
-      "arch": "enter-nw.js-runtime's-architecture-here"
-    }
+  "cmake-js": {
+    "runtime": "nw",
+    "runtimeVersion": "nw.js-version-here",
+    "arch": "enter-nw.js-runtime's-architecture-here"
   }
 }
 ```
@@ -189,11 +185,9 @@ To make compatible your nw.js application with any CMake.js based modules, write
 
 ```json
 {
-  "config": {
-    "cmake-js": {
-      "runtime": "nw",
-      "runtimeVersion": "nw.js-version-here"
-    }
+  "cmake-js": {
+    "runtime": "nw",
+    "runtimeVersion": "nw.js-version-here"
   }
 }
 ```
