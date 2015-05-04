@@ -163,7 +163,7 @@ Available settings:
 	- `iojs`: io.js
 	- `nw`: nw.js
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
-- **arch**: architecutre of appication's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems C++ toolset's architecture's gonna be used despite of this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
+- **arch**: architecutre of appication's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite of this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
 
 #### nw.js
 
