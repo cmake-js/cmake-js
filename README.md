@@ -140,7 +140,7 @@ Please refer to the `--help` for the lists of available commands (they are like 
 
 ### Runtimes
 
-You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` the in application's root `package.json` file, eg.:
+You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` key in the application's root `package.json` file, eg.:
 
 ```json
 {
