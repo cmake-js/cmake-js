@@ -205,3 +205,8 @@ That's it. There is nothing else to do either on the application's or on the mod
 - [TUTORIAL 01 Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN)
 - [TUTORIAL 02 Creating CMake.js based native addons with Qt Creator](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-02-Creating-CMake.js-based-native-addons-with-QT-Creator)
 - [TUTORIAL 03 Using CMake.js based native modules with nw.js](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js)
+
+## In the works
+
+- **Boost** ;)
+- community driven binary distribution service (distUR.net)
