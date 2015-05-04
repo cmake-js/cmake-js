@@ -208,5 +208,4 @@ That's it. There is nothing else to do either on the application's or on the mod
 
 ## In the works
 
-- **Boost** ;)
-- community driven binary distribution service (distUR.net)
+- Boost ;)
