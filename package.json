@@ -19,7 +19,6 @@
     "type": "git",
     "url": "git://github.com/unbornchikken/cmake-js.git"
   },
-  "preferGlobal": true,
   "bin": "./bin/cmake-js",
   "main": "./lib/index.js",
   "engines": {
