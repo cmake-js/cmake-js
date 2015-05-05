@@ -21,7 +21,7 @@
   },
   "preferGlobal": true,
   "bin": "./bin/cmake-js",
-  "main": "./lib/buildSystem.js",
+  "main": "./lib/index.js",
   "engines": {
     "node": ">= 0.10.0",
     "iojs": ">= 1.0.0"
