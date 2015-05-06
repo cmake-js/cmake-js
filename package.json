@@ -13,7 +13,7 @@
     "cmake",
     "nw.js"
   ],
-  "version": "0.10.0",
+  "version": "0.10.1",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
