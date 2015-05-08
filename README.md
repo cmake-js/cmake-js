@@ -7,6 +7,10 @@ CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [
 - io.js
 - nw.js (all CMake.js based native modules are compatible with nw.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required)
 
+### Supported native libraries
+
+- **Boost**: it's supported by a separate module called boost-lib, that manages Boost dependencies, downloads and installs appropriate Boost versions from Github, and compiles its required libraries automatically. See the [readme](https://github.com/unbornchikken/boost-lib) and the [tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-04-Creating-CMake.js-based-native-modules-with-Boost-dependency).
+
 ## Why CMake?
 Nearly every native addon is using node-gyp today, so what's wrong with it?
 
@@ -186,7 +190,4 @@ That's it. There is nothing else to do either on the application's or on the mod
 - [TUTORIAL 01 Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN)
 - [TUTORIAL 02 Creating CMake.js based native addons with Qt Creator](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-02-Creating-CMake.js-based-native-addons-with-QT-Creator)
 - [TUTORIAL 03 Using CMake.js based native modules with nw.js](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js)
-
-## In the works
-
-- [Boost](https://github.com/unbornchikken/boost-lib) ;)
+- [TUTORIAL 04 Creating CMake.js based native modules with Boost dependency](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-04-Creating-CMake.js-based-native-modules-with-Boost-dependency)
