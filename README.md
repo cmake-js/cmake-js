@@ -6,6 +6,7 @@ CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [
 - Node.js 0.10+
 - io.js
 - nw.js (all CMake.js based native modules are compatible with nw.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required)
+- Electron (formerly atom-shell)
 
 ### Supported native libraries
 
