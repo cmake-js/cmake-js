@@ -11,9 +11,11 @@
     "bindings",
     "build",
     "cmake",
-    "nw.js"
+    "nw.js",
+    "electron",
+    "boost"
   ],
-  "version": "0.10.4",
+  "version": "0.11.0",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
