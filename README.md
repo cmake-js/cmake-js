@@ -188,7 +188,7 @@ That's it. There is nothing else to do either on the application's or on the mod
 
 #### Electron
 
-To make compatible your Electorn application with any CMake.js based modules, write the following to your application's package.json file:
+To make compatible your Electron application with any CMake.js based modules, write the following to your application's package.json file:
 
 ```json
 {
