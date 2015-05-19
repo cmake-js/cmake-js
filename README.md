@@ -5,8 +5,8 @@ CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [
 
 - Node.js 0.10+
 - io.js
-- nw.js (all CMake.js based native modules are compatible with nw.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required)
-- Electron (formerly atom-shell)
+- [NW.js](https://github.com/nwjs/nw.js): all CMake.js based native modules are compatible with nw.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required
+- [Electron](https://github.com/atom/electron) (formerly known as atom-shell): out-of-the-box build support, [no post build steps required like with node-gyp](https://github.com/atom/electron/blob/master/docs/tutorial/using-native-node-modules.md)
 
 ### Supported native libraries
 
@@ -170,9 +170,9 @@ Available settings:
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
 - **arch**: architecutre of appication's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite of this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
 
-#### nw.js
+#### NW.js
 
-To make compatible your nw.js application with any CMake.js based modules, write the following to your application's package.json file:
+To make compatible your NW.js application with any CMake.js based modules, write the following to your application's package.json file:
 
 ```json
 {
@@ -184,7 +184,23 @@ To make compatible your nw.js application with any CMake.js based modules, write
 }
 ```
 
-That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with nw.js out-of-the-box. For more complete documentation please see [the third tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js).
+That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with NW.js out-of-the-box. For more complete documentation please see [the third tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js).
+
+#### Electorn
+
+To make compatible your Electorn application with any CMake.js based modules, write the following to your application's package.json file:
+
+```json
+{
+  "cmake-js": {
+    "runtime": "electron",
+    "runtimeVersion": "electron-runtime-version-here",
+    "arch": "whatever-setting-is-appropriate-for-your-application's-windows-build"
+  }
+}
+```
+
+That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with Electron out-of-the-box.
 
 #### Important
 
@@ -194,5 +210,9 @@ It is importand to understand that this setting is have to be configured in the 
 
 - [TUTORIAL 01 Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN)
 - [TUTORIAL 02 Creating CMake.js based native addons with Qt Creator](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-02-Creating-CMake.js-based-native-addons-with-QT-Creator)
-- [TUTORIAL 03 Using CMake.js based native modules with nw.js](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js)
+- [TUTORIAL 03 Using CMake.js based native modules with NW.js](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js)
 - [TUTORIAL 04 Creating CMake.js based native modules with Boost dependency](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-04-Creating-CMake.js-based-native-modules-with-Boost-dependency)
+
+## Credits
+
+- [Ivshti (Ivo Georgiev)](https://github.com/Ivshti) - Electron support
