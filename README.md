@@ -129,7 +129,7 @@ target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
 ```json
 "scripts": {
-    "install": "node ./node_modules/cmake-js/bin/cmake-js rebuild"
+    "install": "cmake-js rebuild"
   }
 ```
 
