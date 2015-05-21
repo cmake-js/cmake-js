@@ -15,7 +15,7 @@ CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [
 ## Why CMake?
 Nearly every native addon is using node-gyp today, so what's wrong with it?
 
-1. Fist of all, Google, the creator of the gyp platform is moving
+1. First of all, Google, the creator of the gyp platform is moving
 towards its new build system called [gn](https://code.google.com/p/chromium/wiki/gn), 
 which means gyp's days of support are counted. (Just for the record, despite the announced gn switch, 
 there is [Bazel](https://github.com/google/bazel) in the works, so sooner or later gn will be dropped in favor of it - IMHO.)
@@ -48,7 +48,7 @@ It looks like [node-gyp support itself eats up development resources](https://gi
 so there won't be new features like this added or merged in the near future. 
 So with node-gyp you are stuck to good old Make which makes build times very long while working on large modules.
  
-So, let's take a look at CMake compared to the above bulletpoints.
+So, let's take a look at CMake compared to the above bullet points.
 
 1. Cmake is quite mature and very widely used, making it quite stable and convenient. It's used by projects like 
 [Blender](http://wiki.blender.org/index.php/Dev:Doc/Building_Blender/Linux/Ubuntu/CMake), 
@@ -168,7 +168,7 @@ Available settings:
 	- `iojs`: io.js
 	- `nw`: nw.js
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
-- **arch**: architecutre of appication's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite of this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
+- **arch**: architecutre of application's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite of this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
 
 #### NW.js
 
@@ -204,7 +204,7 @@ That's it. There is nothing else to do either on the application's or on the mod
 
 #### Important
 
-It is importand to understand that this setting is have to be configured in the **application's root package.json file**. If you're creating a native module targeting nw.js for example, then **do not specify anything** in your module's package.json. It's the actual application's decision to specify its runtime, your module's just compatible anything that was mentioned in the [About chapter](#about). Actually defining `cmake-js` key in your module's package.json file may lead to an error. Why? If you set it up to use nw.js 0.12.1 for example, then when it gets compiled during development time (to run its unit tests for example) it's gonna be compiled against io.js 1.2 runtime. But if you're having io.js 34.0.1 at the commandline then, which is binary incompatible with 1.2, then your unit tests will fail for sure. So it is advised to not use cmake-js target settings in your module's package.json, because that way CMake.js will use that you have, and your tests will pass.
+It is important to understand that this setting is to be configured in the **application's root package.json file**. If you're creating a native module targeting nw.js for example, then **do not specify anything** in your module's package.json. It's the actual application's decision to specify its runtime, your module's just compatible anything that was mentioned in the [About chapter](#about). Actually defining `cmake-js` key in your module's package.json file may lead to an error. Why? If you set it up to use nw.js 0.12.1 for example, then when it gets compiled during development time (to run its unit tests for example) it's gonna be compiled against io.js 1.2 runtime. But if you're having io.js 34.0.1 at the commandline then, which is binary incompatible with 1.2, then your unit tests will fail for sure. So it is advised to not use cmake-js target settings in your module's package.json, because that way CMake.js will use that you have, and your tests will pass.
 
 ## Tutorials
 
