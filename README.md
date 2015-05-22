@@ -113,7 +113,7 @@ cmake-js --help
 
 In a nutshell. *(For more complete documentation please see [the first tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)*
 
-- Install cmake-js for you module `npm install --save cmake-js`
+- Install cmake-js for your module `npm install --save cmake-js`
 - Put a CMakeLists.txt file into you module root with this minimal required content:
 
 ```cmake
