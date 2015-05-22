@@ -55,15 +55,15 @@ So, let's take a look at CMake compared to the above bullet points.
 [LLVM](http://llvm.org/docs/CMake.html), [MySQL or Netflix](http://www.cmake.org/success/),
 and it isn't likely to be abandoned in the near future. 
 
-2. It's a native software having no dependencies to any runtime.
+2. It's native software, having no dependencies to any runtime.
 
-3. Right now CMake have all of the features that 
-[was missing when development of gyp started](https://code.google.com/p/gyp/wiki/GypVsCMake), and on top of that
-it still have those features that gyp doesn't have since then. 
+3. Right now CMake has all of the features that 
+[were missing when development of gyp started](https://code.google.com/p/gyp/wiki/GypVsCMake), and on top of that
+it still has those features that gyp didn't have since then. 
 It has an own module ecosystem with [internal modules](http://www.cmake.org/cmake/help/v3.2/manual/cmake-modules.7.html), 
 and with 3rd party gems like [Compile Time Reducer (Cotire)](https://github.com/sakra/cotire).
 
-4. CMake have an [excellent documentation](http://www.cmake.org/documentation/), 
+4. CMake has [excellent documentation](http://www.cmake.org/documentation/), 
 lots of [tutorials](https://www.google.hu/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=cmake%20tutorial), 
 and [examples](https://www.google.hu/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=cmake+example).
 
