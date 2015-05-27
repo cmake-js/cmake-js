@@ -39,7 +39,7 @@ describe("CMake", function () {
             .then(function () {
                 process.chdir(cwd);
                 var addon = require("./prototype2/build/Release/addon2.node");
-                assert.equal(addon.add(5, 6), 5 * 6);
+                assert.equal(addon.mul(5, 6), 5 * 6);
             })
             .finally(function() {
                 process.chdir(cwd);
@@ -47,7 +47,7 @@ describe("CMake", function () {
             .nodeify(done);
     });
 
-    it.only("should run with old compilers pre c++11", function (done) {
+    it("should run with old compilers pre c++11", function (done) {
         this.timeout(30000);
         var cwd = process.cwd();
         process.chdir(path.resolve(path.join(__dirname, "./prototype2")));
