@@ -82,6 +82,12 @@ var yargs = require("yargs")
            demand: false,
            describe: "the runtime version to use",
            type: "string"
+        },
+        A: {
+           alias: "arch",
+           demand: false,
+           describe: "the architecture to build in",
+           type: "string"
         }
     });
 var argv = yargs.argv;
@@ -113,7 +119,8 @@ var options = {
     preferGnu: argv.g,
     forceNoC11: argv.o,
     runtime: argv.r,
-    runtimeVersion: argv.rv
+    runtimeVersion: argv.rv,
+    arch: argv.A
 };
 
 log.verbose("CON", "options:");
