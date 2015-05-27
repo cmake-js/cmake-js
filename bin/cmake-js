@@ -70,8 +70,19 @@ var yargs = require("yargs")
             demand: false,
             describe: "do not force the c++11 flag, for compatibility with older systems",
             type: "boolean"
+        },
+        r: {
+           alias: "runtime",
+           demand: false,
+           describe: "the runtime to use",
+           type: "string" 
+  	},
+        rv: {
+           alias: "runtime-version",
+           demand: false,
+           describe: "the runtime version to use",
+           type: "string"
         }
-
     });
 var argv = yargs.argv;
 
@@ -100,7 +111,9 @@ var options = {
     cmakePath: argv.c || null,
     preferMake: argv.m,
     preferGnu: argv.g,
-    forceNoC11: argv.o
+    forceNoC11: argv.o,
+    runtime: argv.r,
+    runtimeVersion: argv.rv
 };
 
 log.verbose("CON", "options:");
