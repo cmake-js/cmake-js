@@ -66,7 +66,7 @@ var yargs = require("yargs")
             type: "boolean"
         },
         o: {
-            alias: "pre-c++11",
+            alias: "prec11",
             demand: false,
             describe: "do not force the c++11 flag, for compatibility with older systems",
             type: "boolean"
