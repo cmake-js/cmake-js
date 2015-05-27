@@ -13,15 +13,15 @@ var yargs = require("yargs")
     .version(function () {
         return version;
     })
-    .command("install", "Installs Node.js/io.js distribution files if needed")
-    .command("configure", "Configures CMake project")
-    .command("print-configure", "Prints the configuration command")
-    .command("build", "Builds the project")
-    .command("print-build", "Prints the build command")
-    .command("clean", "Cleans the project directory")
-    .command("print-clean", "PRints the clean command")
-    .command("reconfigure", "Cleans the project directory then configures the project")
-    .command("rebuild", "Cleans the project directory then builds the project")
+    .command("install", "Install Node.js/io.js distribution files if needed")
+    .command("configure", "Configure CMake project")
+    .command("print-configure", "Print the configuration command")
+    .command("build", "Build the project")
+    .command("print-build", "Print the build command")
+    .command("clean", "Clean the project directory")
+    .command("print-clean", "Print the clean command")
+    .command("reconfigure", "Clean the project directory then configure the project")
+    .command("rebuild", "Clean the project directory then build the project")
     .options({
         h: {
             alias: "help",
@@ -32,19 +32,19 @@ var yargs = require("yargs")
         l: {
             alias: "log-level",
             demand: false,
-            describe: "sets log level (" + logLevels.join(", ") + "), default is info",
+            describe: "set log level (" + logLevels.join(", ") + "), default is info",
             type: "string"
         },
         d: {
             alias: "directory",
             demand: false,
-            describe: "CMake project's directory (where CMakeLists.txt located)",
+            describe: "specify CMake project's directory (where CMakeLists.txt located)",
             type: "string"
         },
         D: {
             alias: "debug",
             demand: false,
-            describe: "builds debug configuration",
+            describe: "build debug configuration",
             type: "boolean"
         },
         c: {
@@ -72,22 +72,22 @@ var yargs = require("yargs")
             type: "boolean"
         },
         r: {
-           alias: "runtime",
-           demand: false,
-           describe: "the runtime to use",
-           type: "string" 
-  	},
-        v: {
-           alias: "runtime-version",
-           demand: false,
-           describe: "the runtime version to use",
-           type: "string"
+            alias: "runtime",
+            demand: false,
+            describe: "the runtime to use",
+            type: "string"
         },
-        A: {
-           alias: "arch",
-           demand: false,
-           describe: "the architecture to build in",
-           type: "string"
+        v: {
+            alias: "runtime-version",
+            demand: false,
+            describe: "the runtime version to use",
+            type: "string"
+        },
+        a: {
+            alias: "arch",
+            demand: false,
+            describe: "the architecture to build in",
+            type: "string"
         }
     });
 var argv = yargs.argv;
@@ -141,7 +141,7 @@ function ifCommand(c, f) {
 }
 
 function exitOnError(promise) {
-    promise.catch(function() {
+    promise.catch(function () {
         process.exit(1);
     });
 }

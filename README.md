@@ -169,8 +169,17 @@ Available settings:
 	- `node`: Node.js
 	- `iojs`: io.js
 	- `nw`: nw.js
+	- `electron`: Electron
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
 - **arch**: architecutre of application's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite of this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
+
+#### Runtime options in CMakeLists.txt
+
+The actual node runtime parameters are detectable in CMakeLists.txt files, the following variables are set:
+
+- **NODE_RUNTIME**: `"node"`, `"iojs"`, `"nw"`, `"electron"`
+- **NODE_RUNTIMEVERSION**: for example: `"0.12.1"`
+- **NODE_ARCH**: `"x64"`, `"ia32"`, `"arm"`
 
 #### NW.js
 

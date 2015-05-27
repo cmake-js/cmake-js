@@ -13,7 +13,7 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 
-void Add(const FunctionCallbackInfo<Value>& args) {
+void Mul(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
 
   if (args.Length() < 2) {
@@ -35,7 +35,7 @@ void Add(const FunctionCallbackInfo<Value>& args) {
 }
 
 void Init(Local<Object> exports) {
-  NODE_SET_METHOD(exports, "add", Add);
+  NODE_SET_METHOD(exports, "mul", Mul);
 }
 
 NODE_MODULE(addon, Init)
