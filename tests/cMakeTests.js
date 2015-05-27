@@ -46,4 +46,16 @@ describe("CMake", function () {
             })
             .nodeify(done);
     });
+
+    it.only("should run with old compilers pre c++11", function (done) {
+        this.timeout(30000);
+        var cwd = process.cwd();
+        process.chdir(path.resolve(path.join(__dirname, "./prototype2")));
+        var cmake = new CMake({forceNoC11:true});
+        cmake.getConfigureCommand()
+            .then(function(command) {
+                assert.equal(command.indexOf("-std=c++11"), -1, "c++11 still forced");
+            })
+            .nodeify(done);
+    });
 });
