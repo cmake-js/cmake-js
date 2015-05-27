@@ -143,6 +143,8 @@ npm install -g cmake-js
 
 Please refer to the `--help` for the lists of available commands (they are like commands in `node-gyp`).
 
+You can override the project default runtimes via `--runtime` and `--runtime-version`, such as: `--runtime=electron --runtime-version=0.26.0`. See below for more info on runtimes.
+
 ### Runtimes
 
 You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` key in the application's root `package.json` file, eg.:
