@@ -216,3 +216,4 @@ It is important to understand that this setting is to be configured in the **app
 ## Credits
 
 - [Ivshti (Ivo Georgiev)](https://github.com/Ivshti) - Electron support
+- [Johan (JohanvdWest)](https://github.com/JohanvdWest) - option for supporting pre C++11 compilers
