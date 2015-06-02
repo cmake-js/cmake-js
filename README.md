@@ -145,6 +145,44 @@ Please refer to the `--help` for the lists of available commands (they are like 
 
 You can override the project default runtimes via `--runtime` and `--runtime-version`, such as: `--runtime=electron --runtime-version=0.26.0`. See below for more info on runtimes.
 
+### NPM Config Integration
+
+You can set npm configuration options for CMake.js.
+
+For all users (global):
+
+```
+npm config set cmake_<key> <value> --global
+```
+
+For current user:
+
+```
+npm config set cmake_<key> <value>
+```
+
+CMake.js will set a variable named uppercase `"<key>"` to `<value>`. User's setting will **overwrite** globals.
+
+Example:
+
+Enter at command prompt:
+
+```
+npm config set cmake_bubu="kittyfck" 
+```
+
+Then write to your CMakeLists.txt the following:
+
+```cmake
+message (STATUS ${BUBU})
+```
+
+This will print during configure:
+
+```
+--- kittyfck
+```
+
 ### Runtimes
 
 You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` key in the application's root `package.json` file, eg.:
