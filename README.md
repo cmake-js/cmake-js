@@ -161,7 +161,7 @@ For current user:
 npm config set cmake_<key> <value>
 ```
 
-CMake.js will set a variable named uppercase `"<key>"` to `<value>`. User's setting will **overwrite** globals.
+CMake.js will set a variable named uppercase `"<key>"` to `<value>` (with -D<key>="<value>"). User's setting will **overwrite** globals.
 
 Example:
 
