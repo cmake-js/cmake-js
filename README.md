@@ -163,7 +163,7 @@ npm config set cmake_<key> <value>
 
 CMake.js will set a variable named uppercase `"<key>"` to `<value>` (by using `-D<key>="<value>"` option). User's settings will **overwrite** globals.
 
-Example:
+#### Example:
 
 Enter at command prompt:
 
