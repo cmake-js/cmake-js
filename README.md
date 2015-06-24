@@ -262,9 +262,9 @@ It is important to understand that this setting is to be configured in the **app
 - [TUTORIAL 03 Using CMake.js based native modules with NW.js](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js)
 - [TUTORIAL 04 Creating CMake.js based native modules with Boost dependency](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-04-Creating-CMake.js-based-native-modules-with-Boost-dependency)
 
-## Use case in the works - Fire.js
+## Use case in the works - ArrayFire.js
 
-I'm working on the Node.js port of the awesome [ArrayFire](http://arrayfire.com/) CPU/GPU computing library, please follow its status in its repo: [Fire.js](https://github.com/unbornchikken/fire-js).
+I'm working on the Node.js port of the awesome [ArrayFire](http://arrayfire.com/) CPU/GPU computing library, please follow its status in its repo: [ArrayFire.js](https://github.com/arrayfire/arrayfire_js).
 
 ## Credits
 
