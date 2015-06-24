@@ -120,7 +120,7 @@ var options = {
     forceNoC11: argv.o,
     runtime: argv.r,
     runtimeVersion: argv.v,
-    arch: argv.A
+    arch: argv.a
 };
 
 log.verbose("CON", "options:");
