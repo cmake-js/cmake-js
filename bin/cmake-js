@@ -154,14 +154,14 @@ function printConfigure() {
             console.info(command);
         }));
 }
-function build() { buildSystem.build(); }
+function build() { exitOnError(buildSystem.build()); }
 function printBuild() {
     exitOnError(buildSystem.getBuildCommand()
         .then(function (command) {
             console.info(command);
         }));
 }
-function clean() { buildSystem.clean(); }
+function clean() { exitOnError(buildSystem.clean()); }
 function printClean() {
     exitOnError(buildSystem.getCleanCommand()
         .then(function (command) {
