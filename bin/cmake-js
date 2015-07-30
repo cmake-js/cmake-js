@@ -122,6 +122,7 @@ var options = {
     debug: argv.debug,
     cmakePath: argv.c || null,
     preferMake: argv.m,
+    preferXcode : argv.x,
     preferGnu: argv.g,
     forceNoC11: argv.o,
     runtime: argv.r,
