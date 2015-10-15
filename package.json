@@ -15,7 +15,7 @@
     "electron",
     "boost"
   ],
-  "version": "1.0.2",
+  "version": "1.1.0",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
@@ -37,6 +37,7 @@
     "npmconf": "^2.1.2",
     "npmlog": "^1.2.0",
     "request": "^2.54.0",
+    "semver": "^5.0.3",
     "splitargs": "0.0.3",
     "tar": "^1.0.3",
     "url-join": "0.0.1",
@@ -45,5 +46,8 @@
   },
   "devDependencies": {
     "mocha": "^2.2.4"
+  },
+  "scripts": {
+    "test": "mocha tests"
   }
 }

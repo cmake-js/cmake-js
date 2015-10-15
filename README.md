@@ -266,6 +266,10 @@ It is important to understand that this setting is to be configured in the **app
 
 I'm working on the Node.js port of the awesome [ArrayFire](http://arrayfire.com/) CPU/GPU computing library, please follow its status in its repo: [ArrayFire.js](https://github.com/arrayfire/arrayfire_js).
 
+## Changelog
+
+View [changelog.md](changelog.md)
+
 ## Credits
 
 - [Ivshti (Ivo Georgiev)](https://github.com/Ivshti) - Electron support
