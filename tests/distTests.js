@@ -9,11 +9,11 @@ var assert = require("assert");
 var testDownload = process.env.TEST_DOWNLOAD === "1";
 
 describe("dist", function () {
-    if (testDownload) {
-        it("should download dist files if needed", function (done) {
-            this.timeout(60000);
-            var dist = new Dist();
-            console.log("Internal path: " + dist.internalPath);
+    it("should download dist files if needed", function (done) {
+        this.timeout(60000);
+        var dist = new Dist();
+        console.log("Internal path: " + dist.internalPath);
+        if (testDownload) {
             fs.deleteAsync(dist.internalPath)
                 .then(function () {
                     assert(dist.downloaded === false);
@@ -23,6 +23,10 @@ describe("dist", function () {
                     assert(dist.downloaded);
                 })
                 .nodeify(done);
-        });
-    }
+        }
+        else {
+            dist.ensureDownloaded().nodeify(done);
+        }
+    });
+
 });
