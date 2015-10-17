@@ -59,6 +59,12 @@ var yargs = require("yargs")
             describe: "use Unix Makefiles even if Ninja is available (Posix)",
             type: "boolean"
         },
+        x : {
+            alias: "prefer-xcode",
+            demand: false,
+            describe: "use Xcode instead of Unix Makefiles",
+            type: "boolean"
+        },
         g: {
             alias: "prefer-gnu",
             demand: false,
@@ -116,6 +122,7 @@ var options = {
     debug: argv.debug,
     cmakePath: argv.c || null,
     preferMake: argv.m,
+    preferXcode : argv.x,
     preferGnu: argv.g,
     forceNoC11: argv.o,
     runtime: argv.r,
