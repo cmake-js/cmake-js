@@ -42,15 +42,14 @@
     "url-join": "0",
     "which": "^1.0.9",
     "yargs": "^3.6.0",
-    "traceur-runtime": "*"
+    "traceur": "0.0.x"
   },
   "devDependencies": {
     "gulp": "*",
     "gulp-sequence": "*",
     "gulp-sourcemaps": "*",
     "gulp-traceur": "*",
-    "mocha": "*",
-    "traceur": "*"
+    "mocha": "*"
   },
   "scripts": {
     "test": "mocha tests"
