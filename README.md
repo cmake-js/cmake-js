@@ -99,7 +99,7 @@ cmake-js --help
 ```
 
 ```
-Usage: bin/cmake-js [<command>] [options]
+Usage: cmake-js [<command>] [options]
 
 Commands:
   install          Install Node.js/io.js distribution files if needed
