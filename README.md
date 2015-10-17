@@ -98,7 +98,7 @@ npm install -g cmake-js
 cmake-js --help
 ```
 
-```bash
+```
 Usage: bin/cmake-js [<command>] [options]
 
 Commands:
