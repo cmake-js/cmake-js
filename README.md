@@ -88,14 +88,50 @@ won't involve developer efforts from CMake.js side, installing new versions of C
 
 ## Installation
 
-```
+```bash
 npm install -g cmake-js
 ```
 
 **Help:**
 
-```
+```bash
 cmake-js --help
+```
+
+```bash
+Usage: bin/cmake-js [<command>] [options]
+
+Commands:
+  install          Install Node.js/io.js distribution files if needed
+  configure        Configure CMake project
+  print-configure  Print the configuration command
+  build            Build the project (will configure first if required)
+  print-build      Print the build command
+  clean            Clean the project directory
+  print-clean      Print the clean command
+  reconfigure      Clean the project directory then configure the project
+  rebuild          Clean the project directory then build the project
+  compile          Build the project, and if build fails, try a full rebuild
+
+Options:
+  --version              Show version number                           [boolean]
+  -h, --help             show this screen                              [boolean]
+  -l, --log-level        set log level (silly, verbose, info, http, warn, error
+                         ), default is info                             [string]
+  -d, --directory        specify CMake project's directory (where CMakeLists.txt
+                         located)                                       [string]
+  -D, --debug            build debug configuration                     [boolean]
+  -c, --cmake-path       path of CMake executable                       [string]
+  -m, --prefer-make      use Unix Makefiles even if Ninja is available (Posix)
+                                                                       [boolean]
+  -x, --prefer-xcode     use Xcode instead of Unix Makefiles           [boolean]
+  -g, --prefer-gnu       use GNU compiler even if Clang is available (Posix)
+                                                                       [boolean]
+  -o, --prec11           do not force the c++11 flag, for compatibility with
+                         older systems                                 [boolean]
+  -r, --runtime          the runtime to use                             [string]
+  -v, --runtime-version  the runtime version to use                     [string]
+  -a, --arch             the architecture to build in                   [string]
 ```
 
 **Requirements:**
@@ -129,7 +165,7 @@ target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
 ```json
 "scripts": {
-    "install": "cmake-js rebuild"
+    "install": "cmake-js compile"
   }
 ```
 
@@ -274,3 +310,4 @@ View [changelog.md](changelog.md)
 
 - [Ivshti (Ivo Georgiev)](https://github.com/Ivshti) - Electron support
 - [Johan (JohanvdWest)](https://github.com/JohanvdWest) - option for supporting pre C++11 compilers
+- [javedulu](https://github.com/javedulu) option to generate Xcode project (-x, --prefer-xcode)

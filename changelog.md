@@ -1,3 +1,10 @@
+v2.0.0 - 17/10/15
+=================
+
+- Fix: distribution files only gets downloaded if needed (4.0.0+)
+- option to generate Xcode project (-x, --prefer-xcode) - by https://github.com/javedulu
+- compile command for fast module compilation during npm updates (instead of rebuild)
+
 v1.1.1 - 06/10/15
 =================
 
