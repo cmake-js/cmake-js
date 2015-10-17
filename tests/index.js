@@ -6,7 +6,7 @@ try {
 }
 
 if (!es6) {
-    require("traceur-runtime");
+    require("traceur/bin/traceur-runtime");
 }
 
 require(es6 ? "./es6" : "./es5");
