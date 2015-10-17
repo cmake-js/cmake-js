@@ -3,7 +3,7 @@
 
 var log = require("npmlog");
 var _ = require("lodash");
-var BuildSystem = require("../lib/buildSystem");
+var BuildSystem = require("../").BuildSystem;
 var util = require("util");
 
 var version = require("../package").version;
@@ -16,12 +16,13 @@ var yargs = require("yargs")
     .command("install", "Install Node.js/io.js distribution files if needed")
     .command("configure", "Configure CMake project")
     .command("print-configure", "Print the configuration command")
-    .command("build", "Build the project")
+    .command("build", "Build the project (will configure first if required)")
     .command("print-build", "Print the build command")
     .command("clean", "Clean the project directory")
     .command("print-clean", "Print the clean command")
     .command("reconfigure", "Clean the project directory then configure the project")
     .command("rebuild", "Clean the project directory then build the project")
+    .command("compile", "Build the project, and if build fails, try a full rebuild")
     .options({
         h: {
             alias: "help",
@@ -102,7 +103,7 @@ var argv = yargs.argv;
 
 if (argv.h) {
     console.info(yargs.help());
-    return;
+    process.exit(0);
 }
 
 // Setup log level:
@@ -177,6 +178,7 @@ function printClean() {
 }
 function reconfigure() { exitOnError(buildSystem.reconfigure()); }
 function rebuild() { exitOnError(buildSystem.rebuild()); }
+function compile() { exitOnError(buildSystem.compile()); }
 
 var done = ifCommand("install", install);
 done = done || ifCommand("configure", configure);
@@ -187,6 +189,7 @@ done = done || ifCommand("clean", clean);
 done = done || ifCommand("print-clean", printClean);
 done = done || ifCommand("reconfigure", reconfigure);
 done = done || ifCommand("rebuild", rebuild);
+done = done || ifCommand("compile", compile);
 if (!done) {
     if (command) {
         log.error("COM", "Unknown command: " + command);

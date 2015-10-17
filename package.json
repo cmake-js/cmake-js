@@ -15,14 +15,13 @@
     "electron",
     "boost"
   ],
-  "version": "1.1.1",
+  "version": "2.0.0",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
     "url": "git://github.com/unbornchikken/cmake-js.git"
   },
   "bin": "./bin/cmake-js",
-  "main": "./lib/index.js",
   "engines": {
     "node": ">= 0.10.0",
     "iojs": ">= 1.0.0"
@@ -33,19 +32,25 @@
     "fs-extra": "^0.16.5",
     "is-iojs": "^1.0.1",
     "lodash": "^3.6.0",
-    "memory-stream": "0.0.3",
+    "memory-stream": "0",
     "npmconf": "^2.1.2",
     "npmlog": "^1.2.0",
     "request": "^2.54.0",
     "semver": "^5.0.3",
-    "splitargs": "0.0.3",
+    "splitargs": "0",
     "tar": "^1.0.3",
-    "url-join": "0.0.1",
+    "url-join": "0",
     "which": "^1.0.9",
-    "yargs": "^3.6.0"
+    "yargs": "^3.6.0",
+    "traceur-runtime": "*"
   },
   "devDependencies": {
-    "mocha": "^2.2.4"
+    "gulp": "*",
+    "gulp-sequence": "*",
+    "gulp-sourcemaps": "*",
+    "gulp-traceur": "*",
+    "mocha": "*",
+    "traceur": "*"
   },
   "scripts": {
     "test": "mocha tests"
