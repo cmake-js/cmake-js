@@ -69,7 +69,13 @@ var yargs = require("yargs")
         g: {
             alias: "prefer-gnu",
             demand: false,
-            describe: "use GNU compiler even if Clang is available (Posix)",
+            describe: "use GNU compiler instead of default CMake compiler, if available (Posix)",
+            type: "boolean"
+        },
+        C: {
+            alias: "prefer-clang",
+            demand: false,
+            describe: "use Clang compiler instead of default CMake compiler, if available (Posix)",
             type: "boolean"
         },
         o: {
@@ -125,6 +131,7 @@ var options = {
     preferMake: argv.m,
     preferXcode : argv.x,
     preferGnu: argv.g,
+    preferClang: argv.C,
     forceNoC11: argv.o,
     runtime: argv.r,
     runtimeVersion: argv.v,

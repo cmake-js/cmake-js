@@ -1,3 +1,8 @@
+v2.1.0 - 29/10/15
+=================
+
+- explicit options for use GNU or Clang compiler instead of CMake's default (see --help for details)
+
 v2.0.2 - 22/10/15
 =================
 

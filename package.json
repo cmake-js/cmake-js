@@ -15,7 +15,7 @@
     "electron",
     "boost"
   ],
-  "version": "2.0.2",
+  "version": "2.1.0",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
@@ -52,6 +52,7 @@
     "mocha": "*"
   },
   "scripts": {
-    "test": "mocha tests"
+    "test": "mocha tests",
+    "compile": "gulp"
   }
 }
