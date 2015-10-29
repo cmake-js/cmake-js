@@ -125,8 +125,10 @@ Options:
   -m, --prefer-make      use Unix Makefiles even if Ninja is available (Posix)
                                                                        [boolean]
   -x, --prefer-xcode     use Xcode instead of Unix Makefiles           [boolean]
-  -g, --prefer-gnu       use GNU compiler even if Clang is available (Posix)
-                                                                       [boolean]
+  -g, --prefer-gnu       use GNU compiler instead of default CMake compiler, if
+                         available (Posix)                             [boolean]
+  -C, --prefer-clang     use Clang compiler instead of default CMake compiler,
+                         if available (Posix)                          [boolean]
   -o, --prec11           do not force the c++11 flag, for compatibility with
                          older systems                                 [boolean]
   -r, --runtime          the runtime to use                             [string]
