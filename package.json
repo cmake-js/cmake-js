@@ -39,10 +39,11 @@
     "semver": "^5.0.3",
     "splitargs": "0",
     "tar": "^1.0.3",
+    "traceur": "0.0.x",
+    "unzip": "^0.1.11",
     "url-join": "0",
     "which": "^1.0.9",
-    "yargs": "^3.6.0",
-    "traceur": "0.0.x"
+    "yargs": "^3.6.0"
   },
   "devDependencies": {
     "gulp": "*",
