@@ -1,14 +1,22 @@
 "use strict";
-/* global describe,it */
+/* global describe,it,before */
 
 let assert = require("assert");
-let CMake = require("../../").CMake;
+let lib = require("../../");
+let CMake = lib.CMake;
+let BuildSystem = lib.BuildSystem;
 let _ = require("lodash");
 let path = require("path");
 let Bluebird = require("bluebird");
 let async = Bluebird.coroutine;
+let log = require("npmlog");
 
 describe("CMake", function () {
+    before(function() {
+        log.level = "silly";
+        log.resume();
+    });
+
     it("should provide list of generators", function (done) {
         async(function*() {
             let gens = yield CMake.getGenerators();
@@ -21,7 +29,7 @@ describe("CMake", function () {
     it("should rebuild prototype with explicit directory option specified", function (done) {
         this.timeout(30000);
         async(function*() {
-            let cmake = new CMake({
+            let cmake = new BuildSystem({
                 directory: path.resolve(path.join(__dirname, "./prototype"))
             });
             yield cmake.rebuild();
@@ -35,7 +43,7 @@ describe("CMake", function () {
         async(function*() {
             let cwd = process.cwd();
             process.chdir(path.resolve(path.join(__dirname, "./prototype2")));
-            let cmake = new CMake();
+            let cmake = new BuildSystem();
             try {
                 yield cmake.rebuild();
                 process.chdir(cwd);
