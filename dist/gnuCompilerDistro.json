@@ -5,7 +5,7 @@
     "files": [
       {
         "fileName": "tdm-mingw-5.1.0.zip",
-        "path": "https://www.dropbox.com/s/vc8s495p6k1cbbb/tdm-mingw-5.1.0.zip?dl=1"
+        "url": "https://www.dropbox.com/s/vc8s495p6k1cbbb/tdm-mingw-5.1.0.zip?dl=1"
       }
     ]
   },
@@ -15,7 +15,7 @@
     "files": [
       {
         "fileName": "tdm64-mingw-5.1.0.zip",
-        "path": "https://www.dropbox.com/s/p3zajbra7mabvgx/tdm64-mingw-5.1.0.zip?dl=1"
+        "url": "https://www.dropbox.com/s/p3zajbra7mabvgx/tdm64-mingw-5.1.0.zip?dl=1"
       }
     ]
   }
