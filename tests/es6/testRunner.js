@@ -90,9 +90,6 @@ function* generateOptions() {
             yield runtimeOptions;
         }
         else {
-            // Default:
-            yield runtimeOptions;
-
             // Clang, Make
             yield _.extend({}, runtimeOptions, {preferClang: true, referMake: true});
 
@@ -104,6 +101,9 @@ function* generateOptions() {
 
             // g++, Ninja
             yield _.extend({}, runtimeOptions, {preferGnu: true});
+
+            // Default:
+            yield runtimeOptions;
         }
     }
 }
