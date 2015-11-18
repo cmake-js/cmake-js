@@ -32,7 +32,7 @@ let testCases = {
     shouldConfigurePreC11Properly: async(function*(options) {
         options = _.extend({
             directory: path.resolve(path.join(__dirname, "./prototype")),
-            forceNoC11:true
+            std: "c++98"
         }, options);
         let buildSystem = new BuildSystem(options);
         if (!/visual studio/i.test(buildSystem.toolset.generator)) {

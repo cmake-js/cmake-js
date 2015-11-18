@@ -80,13 +80,17 @@ function* generateRuntimeOptions() {
 }
 
 let testRunner = {
-    runCase: async(function*(testCase, options) {
+    runCase: function (testCase, options) {
         for (let runtimeOptions of generateRuntimeOptions()) {
             let currentOptions = _.extend({}, runtimeOptions, options || {});
-            log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));
-            yield testCase(currentOptions);
+            it("should build with: " + util.inspect(currentOptions), function (done) {
+                async(function*() {
+                    log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));
+                    yield testCase(currentOptions);
+                })().nodeify(done);
+            });
         }
-    })
+    }
 };
 
 module.exports = testRunner;

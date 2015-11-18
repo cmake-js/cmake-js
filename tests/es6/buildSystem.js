@@ -33,15 +33,15 @@ describe("BuildSystem", function () {
         })().nodeify(done);
     });
 
-    it("should rebuild prototype with explicit directory option specified", function (done) {
-        testRunner.runCase(testCases.buildPrototypeWithDirectoryOption).nodeify(done);
-    });
-
     it("should rebuild prototype if cwd is the source directory", function (done) {
-        testRunner.runCase(testCases.buildPrototype2WithCWD).nodeify(done);
+        testCases.buildPrototype2WithCWD().nodeify(done);
     });
 
     it("should run with old GNU compilers", function (done) {
-        testRunner.runCase(testCases.shouldConfigurePreC11Properly).nodeify(done);
+        testCases.shouldConfigurePreC11Properly().nodeify(done);
+    });
+
+    describe("Build with various options", function() {
+        testRunner.runCase(testCases.buildPrototypeWithDirectoryOption);
     });
 });
