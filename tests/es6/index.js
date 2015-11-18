@@ -1,3 +1,3 @@
 "use strict";
-require("./distTests");
-require("./cMakeTests");
+require("./dist");
+require("./buildSystem");
