@@ -1,4 +1,5 @@
 "use strict";
+/* global it */
 let lib = require("../../");
 let environment = lib.environment;
 let Bluebird = require("bluebird");
@@ -79,10 +80,38 @@ function* generateRuntimeOptions() {
     yield {};
 }
 
+function* generateOptions() {
+    for (let runtimeOptions of generateRuntimeOptions()) {
+        if (environment.isWin) {
+            // GNU:
+            yield _.extend({}, runtimeOptions, {noMSVC: true});
+
+            // VS (default):
+            yield runtimeOptions;
+        }
+        else {
+            // Default:
+            yield runtimeOptions;
+
+            // Clang, Make
+            yield _.extend({}, runtimeOptions, {preferClang: true, referMake: true});
+
+            // Clang, Ninja
+            yield _.extend({}, runtimeOptions, {preferClang: true});
+
+            // g++, Make
+            yield _.extend({}, runtimeOptions, {preferGnu: true, referMake: true});
+
+            // g++, Ninja
+            yield _.extend({}, runtimeOptions, {preferGnu: true});
+        }
+    }
+}
+
 let testRunner = {
     runCase: function (testCase, options) {
-        for (let runtimeOptions of generateRuntimeOptions()) {
-            let currentOptions = _.extend({}, runtimeOptions, options || {});
+        for (let testOptions of generateOptions()) {
+            let currentOptions = _.extend({}, testOptions, options || {});
             it("should build with: " + util.inspect(currentOptions), function (done) {
                 async(function*() {
                     log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));

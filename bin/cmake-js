@@ -60,7 +60,7 @@ var yargs = require("yargs")
             describe: "use Unix Makefiles even if Ninja is available (Posix)",
             type: "boolean"
         },
-        x : {
+        x: {
             alias: "prefer-xcode",
             demand: false,
             describe: "use Xcode instead of Unix Makefiles",
@@ -101,6 +101,18 @@ var yargs = require("yargs")
             demand: false,
             describe: "the architecture to build in",
             type: "string"
+        },
+        o: {
+            alias: "prec11",
+            demand: false,
+            describe: "use C++98 standard (obsolete: use -s=c++98 instead)",
+            type: "boolean"
+        },
+        n: {
+            alias: "no-MSVC",
+            demand: false,
+            describe: "use (download and install) GNU compiler on Windows even Visual C++ is installed",
+            type: "boolean"
         }
     });
 var argv = yargs.argv;
@@ -129,13 +141,14 @@ var options = {
     debug: argv.debug,
     cmakePath: argv.c || null,
     preferMake: argv.m,
-    preferXcode : argv.x,
+    preferXcode: argv.x,
     preferGnu: argv.g,
     preferClang: argv.C,
-    std: argv.s,
+    std: argv.s || (argv.o ? "c++98" : null),
     runtime: argv.r,
     runtimeVersion: argv.v,
-    arch: argv.a
+    arch: argv.a,
+    noMSVC: argv.n
 };
 
 log.verbose("CON", "options:");
@@ -161,31 +174,45 @@ function exitOnError(promise) {
     });
 }
 
-function install() { exitOnError(buildSystem.install()); }
-function configure() { exitOnError(buildSystem.configure()); }
+function install() {
+    exitOnError(buildSystem.install());
+}
+function configure() {
+    exitOnError(buildSystem.configure());
+}
 function printConfigure() {
     exitOnError(buildSystem.getConfigureCommand()
         .then(function (command) {
             console.info(command);
         }));
 }
-function build() { exitOnError(buildSystem.build()); }
+function build() {
+    exitOnError(buildSystem.build());
+}
 function printBuild() {
     exitOnError(buildSystem.getBuildCommand()
         .then(function (command) {
             console.info(command);
         }));
 }
-function clean() { exitOnError(buildSystem.clean()); }
+function clean() {
+    exitOnError(buildSystem.clean());
+}
 function printClean() {
     exitOnError(buildSystem.getCleanCommand()
         .then(function (command) {
             console.info(command);
         }));
 }
-function reconfigure() { exitOnError(buildSystem.reconfigure()); }
-function rebuild() { exitOnError(buildSystem.rebuild()); }
-function compile() { exitOnError(buildSystem.compile()); }
+function reconfigure() {
+    exitOnError(buildSystem.reconfigure());
+}
+function rebuild() {
+    exitOnError(buildSystem.rebuild());
+}
+function compile() {
+    exitOnError(buildSystem.compile());
+}
 
 var done = ifCommand("install", install);
 done = done || ifCommand("configure", configure);

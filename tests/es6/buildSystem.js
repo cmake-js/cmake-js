@@ -24,6 +24,10 @@ describe("BuildSystem", function () {
         lib.locateNAN.__projectRoot = path.resolve(path.join(__dirname, "../../"));
     });
 
+    describe("Build with various options", function() {
+        testRunner.runCase(testCases.buildPrototypeWithDirectoryOption);
+    });
+
     it("should provide list of generators", function (done) {
         async(function*() {
             let gens = yield CMake.getGenerators();
@@ -39,9 +43,5 @@ describe("BuildSystem", function () {
 
     it("should run with old GNU compilers", function (done) {
         testCases.shouldConfigurePreC11Properly().nodeify(done);
-    });
-
-    describe("Build with various options", function() {
-        testRunner.runCase(testCases.buildPrototypeWithDirectoryOption);
     });
 });
