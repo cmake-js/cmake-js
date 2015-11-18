@@ -50,7 +50,8 @@
     "gulp-sequence": "*",
     "gulp-sourcemaps": "*",
     "gulp-traceur": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "nan": "^2.1.0"
   },
   "scripts": {
     "test": "mocha tests",
