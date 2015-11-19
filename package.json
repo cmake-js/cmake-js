@@ -36,6 +36,7 @@
     "npmconf": "^2.1.2",
     "npmlog": "^1.2.0",
     "request": "^2.54.0",
+    "request-progress": "^0.3.1",
     "semver": "^5.0.3",
     "splitargs": "0",
     "tar": "^1.0.3",
