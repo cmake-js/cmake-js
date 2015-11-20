@@ -1,8 +1,24 @@
-var es6 = true;
-try {
-    eval("(function *(){})");
-} catch (err) {
+var yargs = require("yargs")
+    .options({
+        old: {
+            demand: false,
+            type: "boolean"
+        }
+    });
+var argv = yargs.argv;
+
+var es6;
+
+if (argv.old) {
     es6 = false;
+}
+else {
+    es6 = true;
+    try {
+        eval("(function *(){})");
+    } catch (err) {
+        es6 = false;
+    }
 }
 
 if (!es6) {

@@ -1,5 +1,10 @@
 # CMake.js (MIT)
 
+## Announcement - Works without Visual Studio!
+
+Just install [Visual C++ Build Tools TP](https://www.microsoft.com/en-us/download/details.aspx?id=48159) and CMake.js will use that if there
+is no Visual C++ available.
+
 ## About
 CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes: 
 
@@ -129,20 +134,24 @@ Options:
                          available (Posix)                             [boolean]
   -C, --prefer-clang     use Clang compiler instead of default CMake compiler,
                          if available (Posix)                          [boolean]
-  -o, --prec11           do not force the c++11 flag, for compatibility with
-                         older systems                                 [boolean]
+  -s, --std              C++ standard, eg.: c++98, c++11, c++14, etc., default
+                         is c++11 (Posix)                               [string]
   -r, --runtime          the runtime to use                             [string]
   -v, --runtime-version  the runtime version to use                     [string]
   -a, --arch             the architecture to build in                   [string]
+  -o, --prec11           use C++98 standard (obsolete: use -s=c++98 instead)
+                                                                       [boolean]
 ```
 
 **Requirements:**
 
 - [CMake](http://www.cmake.org/download/)
 - A proper C/C++ compiler toolchain of the given platform
-    - **Windows**: a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/en-us/news/vs2013-community-vs.aspx) version works well)             
+    - **Windows**:
+        - Visual C++ Build Tools ([Technical Preview works](https://www.microsoft.com/en-us/download/details.aspx?id=48159)) 
+        or a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/en-us/news/vs2013-community-vs.aspx) version works well)             
     - **Unix/Posix**: 
-        - Clang or GCC (Clang will be picked if both present)
+        - Clang or GCC
         - Ninja or Make (Ninja will be picked if both present)
 
 ## Usage

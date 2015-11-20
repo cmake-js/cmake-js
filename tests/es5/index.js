@@ -1,5 +1,5 @@
 "use strict";
-require("./distTests");
-require("./cMakeTests");
+require("./dist");
+require("./buildSystem");
 
 //# sourceMappingURL=index.js.map

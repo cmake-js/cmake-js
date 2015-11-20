@@ -14,7 +14,6 @@ describe("dist", function () {
         this.timeout(60000);
         async(function*() {
             let dist = new Dist();
-            console.log("Internal path: " + dist.internalPath);
             if (testDownload) {
                 yield fs.deleteAsync(dist.internalPath);
                 assert(dist.downloaded === false);
