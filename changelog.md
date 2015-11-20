@@ -1,3 +1,10 @@
+v3.0.0 - 20/11/15
+=================
+
+- Visual C++ Build Tools support
+- std option introduced
+- better unit test coverage
+
 v2.1.0 - 29/10/15
 =================
 

@@ -81,7 +81,7 @@ var yargs = require("yargs")
         s: {
             alias: "std",
             demand: false,
-            describe: "C++ standard, eg.: c++98, c++11, c++14, etc., defulat is c++11 (Posix)",
+            describe: "C++ standard, eg.: c++98, c++11, c++14, etc., default is c++11 (Posix)",
             type: "string"
         },
         r: {
