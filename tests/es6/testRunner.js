@@ -83,10 +83,7 @@ function* generateRuntimeOptions() {
 function* generateOptions() {
     for (let runtimeOptions of generateRuntimeOptions()) {
         if (environment.isWin) {
-            // GNU:
-            yield _.extend({}, runtimeOptions, {noMSVC: true});
-
-            // VS (default):
+            // V C++:
             yield runtimeOptions;
         }
         else {

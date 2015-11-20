@@ -107,12 +107,6 @@ var yargs = require("yargs")
             demand: false,
             describe: "use C++98 standard (obsolete: use -s=c++98 instead)",
             type: "boolean"
-        },
-        n: {
-            alias: "no-MSVC",
-            demand: false,
-            describe: "use (download and install) GNU compiler on Windows even Visual C++ is installed",
-            type: "boolean"
         }
     });
 var argv = yargs.argv;
@@ -147,8 +141,7 @@ var options = {
     std: argv.s || (argv.o ? "c++98" : null),
     runtime: argv.r,
     runtimeVersion: argv.v,
-    arch: argv.a,
-    noMSVC: argv.n
+    arch: argv.a
 };
 
 log.verbose("CON", "options:");
