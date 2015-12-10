@@ -2,7 +2,7 @@
 
 ## Announcement - Works without Visual Studio!
 
-Just install [Visual C++ Build Tools TP](https://www.microsoft.com/en-us/download/details.aspx?id=48159) and CMake.js will use that if there
+Just install [Visual C++ Build Tools TP](https://www.microsoft.com/en-us/download/details.aspx?id=49983) and CMake.js will use that if there
 is no Visual C++ available.
 
 ## About
