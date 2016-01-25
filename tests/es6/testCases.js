@@ -42,13 +42,14 @@ let testCases = {
     }),
     configureWithCustomOptions: async(function*(options) {
         options = _.extend({
-            directory: path.resolve(path.join(__dirname, "./prototype"))
+            directory: path.resolve(path.join(__dirname, "./prototype")),
+            cMakeOptions: {
+              foo: "bar"
+            }
         }, options);
         let buildSystem = new BuildSystem(options);
 
-        let command = yield buildSystem.getConfigureCommand({
-          "foo": "bar"
-        });
+        let command = yield buildSystem.getConfigureCommand();
         assert.notEqual(command.indexOf("-DFOO=\"bar\""), -1, "custom options added");
     })
 };
