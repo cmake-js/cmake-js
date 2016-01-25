@@ -55,6 +55,9 @@ describe("BuildSystem", function() {
   it("should run with old GNU compilers", function(done) {
     testCases.shouldConfigurePreC11Properly().nodeify(done);
   });
+  it("should configure with custom option", function(done) {
+    testCases.configureWithCustomOptions().nodeify(done);
+  });
 });
 
 //# sourceMappingURL=buildSystem.js.map

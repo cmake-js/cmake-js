@@ -162,6 +162,36 @@ var testCases = {
             return $ctx.end();
         }
     }, $__22, this);
+  })),
+  configureWithCustomOptions: async($traceurRuntime.initGeneratorFunction(function $__23(options) {
+    var buildSystem,
+        command;
+    return $traceurRuntime.createGeneratorInstance(function($ctx) {
+      while (true)
+        switch ($ctx.state) {
+          case 0:
+            options = _.extend({
+              directory: path.resolve(path.join(__dirname, "./prototype")),
+              cMakeOptions: {foo: "bar"}
+            }, options);
+            buildSystem = new BuildSystem(options);
+            $ctx.state = 6;
+            break;
+          case 6:
+            $ctx.state = 2;
+            return buildSystem.getConfigureCommand();
+          case 2:
+            command = $ctx.sent;
+            $ctx.state = 4;
+            break;
+          case 4:
+            assert.notEqual(command.indexOf("-DFOO=\"bar\""), -1, "custom options added");
+            $ctx.state = -2;
+            break;
+          default:
+            return $ctx.end();
+        }
+    }, $__23, this);
   }))
 };
 module.exports = testCases;
