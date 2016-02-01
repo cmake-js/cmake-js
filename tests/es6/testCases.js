@@ -39,6 +39,18 @@ let testCases = {
             let command = yield buildSystem.getConfigureCommand();
             assert.equal(command.indexOf("-std=c++11"), -1, "c++11 still forced");
         }
+    }),
+    configureWithCustomOptions: async(function*(options) {
+        options = _.extend({
+            directory: path.resolve(path.join(__dirname, "./prototype")),
+            cMakeOptions: {
+              foo: "bar"
+            }
+        }, options);
+        let buildSystem = new BuildSystem(options);
+
+        let command = yield buildSystem.getConfigureCommand();
+        assert.notEqual(command.indexOf("-DFOO=\"bar\""), -1, "custom options added");
     })
 };
 
