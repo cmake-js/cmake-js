@@ -130,6 +130,15 @@ log.silly("CON", util.inspect(argv));
 
 log.verbose("CON", "Parsing arguments");
 
+// Extract custom cMake options
+let customOptions = {};
+for (let key of _.keys(argv)) {
+  let ukey = key.toUpperCase();
+  if (_.startsWith(ukey, "CD")) {
+    customOptions[ukey.substr(2)] = argv[key];
+  }
+}
+
 var options = {
     directory: argv.directory || null,
     debug: argv.debug,
@@ -141,7 +150,8 @@ var options = {
     std: argv.s || (argv.o ? "c++98" : null),
     runtime: argv.r,
     runtimeVersion: argv.v,
-    arch: argv.a
+    arch: argv.a,
+    cMakeOptions: customOptions
 };
 
 log.verbose("CON", "options:");
