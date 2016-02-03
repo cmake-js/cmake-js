@@ -1,4 +1,4 @@
-v3.1.0 - 20/11/15
+v3.1.0 - 03/02/16
 =================
 
 - Custom CMake parameter support (https://github.com/gerhardberger)
