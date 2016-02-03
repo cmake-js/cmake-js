@@ -107,6 +107,11 @@ var yargs = require("yargs")
             demand: false,
             describe: "use C++98 standard (obsolete: use -s=c++98 instead)",
             type: "boolean"
+        },
+        "CD": {
+            demand: false,
+            describe: "Custom argument passed to CMake in format: -D<your-arg-here>",
+            type: "string"
         }
     });
 var argv = yargs.argv;
@@ -133,10 +138,9 @@ log.verbose("CON", "Parsing arguments");
 // Extract custom cMake options
 let customOptions = {};
 for (let key of _.keys(argv)) {
-  let ukey = key.toUpperCase();
-  if (_.startsWith(ukey, "CD")) {
-    customOptions[ukey.substr(2)] = argv[key];
-  }
+    if (argv[key] && _.startsWith(key, "CD")) {
+        customOptions[key.substr(2)] = argv[key];
+    }
 }
 
 var options = {
