@@ -121,8 +121,8 @@ Commands:
 Options:
   --version              Show version number                           [boolean]
   -h, --help             show this screen                              [boolean]
-  -l, --log-level        set log level (silly, verbose, info, http, warn, error
-                         ), default is info                             [string]
+  -l, --log-level        set log level (silly, verbose, info, http, warn,
+                         error), default is info                        [string]
   -d, --directory        specify CMake project's directory (where CMakeLists.txt
                          located)                                       [string]
   -D, --debug            build debug configuration                     [boolean]
@@ -141,6 +141,8 @@ Options:
   -a, --arch             the architecture to build in                   [string]
   -o, --prec11           use C++98 standard (obsolete: use -s=c++98 instead)
                                                                        [boolean]
+  --CD                   Custom argument passed to CMake in format:
+                         -D<your-arg-here>                              [string]
 ```
 
 **Requirements:**
@@ -238,13 +240,19 @@ You can add custom CMake options by beginning option name with `CD`.
 
 In command prompt:
 ```
-cmake-js compile --CDbubu="kittyfck"
+cmake-js compile --CDBUBU="kittyfck"
 ```
 
 Then in your CMakeLists.txt:
 
 ```cmake
 message (STATUS ${BUBU})
+```
+
+This will print during configure:
+
+```
+--- kittyfck
 ```
 
 ### Runtimes
@@ -339,3 +347,4 @@ View [changelog.md](changelog.md)
 - [Ivshti (Ivo Georgiev)](https://github.com/Ivshti) - Electron support
 - [Johan (JohanvdWest)](https://github.com/JohanvdWest) - option for supporting pre C++11 compilers
 - [javedulu](https://github.com/javedulu) option to generate Xcode project (-x, --prefer-xcode)
+- [Gerhard Berger](https://github.com/gerhardberger) - Custom CMake parameter support

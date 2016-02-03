@@ -1,3 +1,8 @@
+v3.1.0 - 20/11/15
+=================
+
+- Custom CMake parameter support (https://github.com/gerhardberger)
+
 v3.0.0 - 20/11/15
 =================
 
