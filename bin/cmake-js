@@ -136,8 +136,8 @@ log.silly("CON", util.inspect(argv));
 log.verbose("CON", "Parsing arguments");
 
 // Extract custom cMake options
-let customOptions = {};
-for (let key of _.keys(argv)) {
+var customOptions = {};
+for (var key of _.keys(argv)) {
     if (argv[key] && _.startsWith(key, "CD")) {
         customOptions[key.substr(2)] = argv[key];
     }
