@@ -20,15 +20,15 @@ function* generateRuntimeOptions() {
         // LTS:
         yield {
             runtime: "node",
-            runtimeVersion: "4.2.2",
+            runtimeVersion: "4.4.2",
             arch: arch
         };
 
         // Current:
-        if (environment.runtimeVersion !== "5.1.0") {
+        if (environment.runtimeVersion !== "5.10.0") {
             yield {
                 runtime: "node",
-                runtimeVersion: "5.1.0",
+                runtimeVersion: "5.10.0",
                 arch: arch
             };
         }
@@ -47,7 +47,7 @@ function* generateRuntimeOptions() {
         // Latest:
         yield {
             runtime: "nw",
-            runtimeVersion: "0.12.3",
+            runtimeVersion: "0.13.2",
             arch: arch
         };
     }
@@ -56,7 +56,7 @@ function* generateRuntimeOptions() {
         // Latest:
         yield {
             runtime: "electron",
-            runtimeVersion: "0.34.0",
+            runtimeVersion: "0.37.3",
             arch: arch
         };
     }
