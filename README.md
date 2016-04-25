@@ -204,7 +204,7 @@ if (CMAKE_JS_VERSION)
 else()
     add_subdirectory(other_subproject)
 endif()
-```_
+```
 
 ### NPM Config Integration
 
