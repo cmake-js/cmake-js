@@ -194,6 +194,18 @@ Please refer to the `--help` for the lists of available commands (they are like 
 
 You can override the project default runtimes via `--runtime` and `--runtime-version`, such as: `--runtime=electron --runtime-version=0.26.0`. See below for more info on runtimes.
 
+### CMake Specific
+
+`CMAKE_JS_VERSION` variable will reflect the actual CMake.js version. So CMake.js based builds could be detected, eg.:
+
+```cmake
+if (CMAKE_JS_VERSION)
+    add_subdirectory(node_addon)
+else()
+    add_subdirectory(other_subproject)
+endif()
+```_
+
 ### NPM Config Integration
 
 You can set npm configuration options for CMake.js.

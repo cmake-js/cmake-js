@@ -1,7 +1,14 @@
+v3.2.0 - 25/04/16
+=================
+
+- Added NW.js 0.13+ compatibility
+- 0.10 support fixed (https://github.com/cmake-js/cmake-js/issues/50)
+- CMAKE_JS_VERSION defined (https://github.com/cmake-js/cmake-js/issues/48)
+
 v3.1.2 - 03/02/16
 =================
 
-- Fixed cmake-js binary ES5 compatibility,
+- Fixed cmake-js binary ES5 compatibility.
 
 v3.1.1 - 03/02/16
 =================
