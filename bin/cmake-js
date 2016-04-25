@@ -137,11 +137,11 @@ log.verbose("CON", "Parsing arguments");
 
 // Extract custom cMake options
 var customOptions = {};
-for (var key of _.keys(argv)) {
+_.keys(argv).forEach(function (key) {
     if (argv[key] && _.startsWith(key, "CD")) {
         customOptions[key.substr(2)] = argv[key];
     }
-}
+});
 
 var options = {
     directory: argv.directory || null,
