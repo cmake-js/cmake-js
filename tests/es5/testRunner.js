@@ -28,7 +28,7 @@ function generateRuntimeOptions() {
             $ctx.state = 6;
             return {
               runtime: "node",
-              runtimeVersion: "4.2.2",
+              runtimeVersion: "4.4.2",
               arch: arch
             };
           case 6:
@@ -36,13 +36,13 @@ function generateRuntimeOptions() {
             $ctx.state = 8;
             break;
           case 8:
-            $ctx.state = (environment.runtimeVersion !== "5.1.0") ? 9 : -2;
+            $ctx.state = (environment.runtimeVersion !== "5.10.0") ? 9 : -2;
             break;
           case 9:
             $ctx.state = 10;
             return {
               runtime: "node",
-              runtimeVersion: "5.1.0",
+              runtimeVersion: "5.10.0",
               arch: arch
             };
           case 10:
@@ -87,6 +87,17 @@ function generateRuntimeOptions() {
             };
           case 2:
             $ctx.maybeThrow();
+            $ctx.state = 4;
+            break;
+          case 4:
+            $ctx.state = 6;
+            return {
+              runtime: "nw",
+              runtimeVersion: "0.13.2",
+              arch: arch
+            };
+          case 6:
+            $ctx.maybeThrow();
             $ctx.state = -2;
             break;
           default:
@@ -102,7 +113,7 @@ function generateRuntimeOptions() {
             $ctx.state = 2;
             return {
               runtime: "electron",
-              runtimeVersion: "0.34.0",
+              runtimeVersion: "0.37.3",
               arch: arch
             };
           case 2:
