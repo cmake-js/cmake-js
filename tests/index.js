@@ -16,6 +16,7 @@ else {
     es6 = true;
     try {
         eval("(function *(){})");
+        eval("var o = {['com'+'puted']: 'property'};");
     } catch (err) {
         es6 = false;
     }
