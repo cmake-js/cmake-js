@@ -1,3 +1,8 @@
+v3.2.2 - 12/08/16
+=================
+
+- Multi directory support for Windows/MSVC build
+
 v3.2.1 - 25/04/16
 =================
 
