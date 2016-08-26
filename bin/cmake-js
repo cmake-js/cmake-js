@@ -102,7 +102,7 @@ var yargs = require("yargs")
             describe: "the architecture to build in",
             type: "string"
         },
-        o: {
+        p: {
             alias: "prec11",
             demand: false,
             describe: "use C++98 standard (obsolete: use -s=c++98 instead)",
@@ -112,6 +112,11 @@ var yargs = require("yargs")
             demand: false,
             describe: "Custom argument passed to CMake in format: -D<your-arg-here>",
             type: "string"
+        },
+        o: {
+          alias: "out",
+          describe: "Specify the output directory to compile to, default is projectRoot/build",
+          type: "string"
         }
     });
 var argv = yargs.argv;
@@ -151,11 +156,12 @@ var options = {
     preferXcode: argv.x,
     preferGnu: argv.g,
     preferClang: argv.C,
-    std: argv.s || (argv.o ? "c++98" : null),
+    std: argv.s || (argv.p ? "c++98" : null),
     runtime: argv.r,
     runtimeVersion: argv.v,
     arch: argv.a,
-    cMakeOptions: customOptions
+    cMakeOptions: customOptions,
+    out: argv.o
 };
 
 log.verbose("CON", "options:");
