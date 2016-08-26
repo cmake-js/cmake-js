@@ -143,6 +143,7 @@ Options:
                                                                        [boolean]
   --CD                   Custom argument passed to CMake in format:
                          -D<your-arg-here>                              [string]
+  --si, --silent         Prevents cMake to print to the stdio          [boolean]
 ```
 
 **Requirements:**
