@@ -139,11 +139,11 @@ Options:
   -r, --runtime          the runtime to use                             [string]
   -v, --runtime-version  the runtime version to use                     [string]
   -a, --arch             the architecture to build in                   [string]
-  -p, --prec11           use C++98 standard (obsolete: use -s=c++98 instead)
+  -o, --prec11           use C++98 standard (obsolete: use -s=c++98 instead)
                                                                        [boolean]
   --CD                   Custom argument passed to CMake in format:
                          -D<your-arg-here>                              [string]
-  -o, --out              Specify the output directory to compile to, default is
+  -u, --out              Specify the output directory to compile to, default is
                          projectRoot/build                              [string]
 ```
 
