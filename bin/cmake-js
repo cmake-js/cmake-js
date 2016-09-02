@@ -113,10 +113,15 @@ var yargs = require("yargs")
             describe: "Custom argument passed to CMake in format: -D<your-arg-here>",
             type: "string"
         },
-        "i": {
+        i: {
             alias: "silent",
             describe: "Prevents CMake.js to print to the stdio",
             type: "boolean"
+        },
+        O: {
+          alias: "out",
+          describe: "Specify the output directory to compile to, default is projectRoot/build",
+          type: "string"
         }
     });
 var argv = yargs.argv;
@@ -161,7 +166,8 @@ var options = {
     runtimeVersion: argv.v,
     arch: argv.a,
     cMakeOptions: customOptions,
-    silent: argv.i
+    silent: argv.i,
+    out: argv.O
 };
 
 log.verbose("CON", "options:");

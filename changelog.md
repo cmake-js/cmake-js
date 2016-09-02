@@ -1,3 +1,9 @@
+v3.3.0 - 09/02/16
+=================
+
+- silent option (https://github.com/cmake-js/cmake-js/pull/54)
+- out option (https://github.com/cmake-js/cmake-js/pull/53)
+
 v3.2.3 - 08/17/16
 =================
 
