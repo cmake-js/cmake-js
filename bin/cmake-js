@@ -112,6 +112,11 @@ var yargs = require("yargs")
             demand: false,
             describe: "Custom argument passed to CMake in format: -D<your-arg-here>",
             type: "string"
+        },
+        "i": {
+            alias: "silent",
+            describe: "Prevents CMake.js to print to the stdio",
+            type: "boolean"
         }
     });
 var argv = yargs.argv;
@@ -155,7 +160,8 @@ var options = {
     runtime: argv.r,
     runtimeVersion: argv.v,
     arch: argv.a,
-    cMakeOptions: customOptions
+    cMakeOptions: customOptions,
+    silent: argv.i
 };
 
 log.verbose("CON", "options:");

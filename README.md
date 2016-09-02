@@ -143,6 +143,7 @@ Options:
                                                                        [boolean]
   --CD                   Custom argument passed to CMake in format:
                          -D<your-arg-here>                              [string]
+  --i, --silent          CMake.js to print to the stdio                [boolean]
 ```
 
 **Requirements:**
