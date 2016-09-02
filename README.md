@@ -143,8 +143,8 @@ Options:
                                                                        [boolean]
   --CD                   Custom argument passed to CMake in format:
                          -D<your-arg-here>                              [string]
-  --i, --silent          CMake.js to print to the stdio                [boolean]
-  -u, --out              Specify the output directory to compile to, default is
+  -i, --silent          CMake.js to print to the stdio                [boolean]
+  -O, --out              Specify the output directory to compile to, default is
                          projectRoot/build                              [string]
 ```
 
