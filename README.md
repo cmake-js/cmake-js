@@ -144,6 +144,8 @@ Options:
   --CD                   Custom argument passed to CMake in format:
                          -D<your-arg-here>                              [string]
   --i, --silent          CMake.js to print to the stdio                [boolean]
+  -u, --out              Specify the output directory to compile to, default is
+                         projectRoot/build                              [string]
 ```
 
 **Requirements:**
@@ -360,4 +362,4 @@ View [changelog.md](changelog.md)
 - [Ivshti (Ivo Georgiev)](https://github.com/Ivshti) - Electron support
 - [Johan (JohanvdWest)](https://github.com/JohanvdWest) - option for supporting pre C++11 compilers
 - [javedulu](https://github.com/javedulu) option to generate Xcode project (-x, --prefer-xcode)
-- [Gerhard Berger](https://github.com/gerhardberger) - Custom CMake parameter support
+- [Gerhard Berger](https://github.com/gerhardberger) - Custom CMake parameter support, silent and out parameters
