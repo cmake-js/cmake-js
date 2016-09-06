@@ -342,6 +342,30 @@ That's it. There is nothing else to do either on the application's or on the mod
 
 It is important to understand that this setting is to be configured in the **application's root package.json file**. If you're creating a native module targeting nw.js for example, then **do not specify anything** in your module's package.json. It's the actual application's decision to specify its runtime, your module's just compatible anything that was mentioned in the [About chapter](#about). Actually defining `cmake-js` key in your module's package.json file may lead to an error. Why? If you set it up to use nw.js 0.12.1 for example, then when it gets compiled during development time (to run its unit tests for example) it's gonna be compiled against io.js 1.2 runtime. But if you're having io.js 34.0.1 at the commandline then, which is binary incompatible with 1.2, then your unit tests will fail for sure. So it is advised to not use cmake-js target settings in your module's package.json, because that way CMake.js will use that you have, and your tests will pass.
 
+#### Heroku
+[Heroku](https://heroku.com) uses the concept of a [buildpack](https://devcenter.heroku.com/articles/buildpacks) to define
+how an application should be prepared to run in a [dyno](https://devcenter.heroku.com/articles/dynos).
+The typical buildpack for note-based applications,
+[heroku/nodejs](https://github.com/heroku/heroku-buildpack-nodejs),
+provides an environment capable of running [node-gyp](https://github.com/TooTallNate/node-gyp),
+but not [CMake](http://cmake.org).
+
+The least "painful" way of addressing this is to use heroku's multipack facility:
+
+- Set the applications' buildpack to
+[https://github.com/heroku/heroku-buildpack-multi.git](https://github.com/heroku/heroku-buildpack-multi.git)
+
+- In the root directory of the application,
+create a file called `.buildpacks` with these two lines:
+
+        https://github.com/brave/heroku-cmake-buildpack.git
+        https://github.com/heroku/heroku-buildpack-nodejs.git
+
+- Deploy the application to have the changes take effect
+
+The `heroku-buildpack-multi` will run each buildpack in order allowing the node application to reference CMake in the Heroku
+build environment.
+
 ## Tutorials
 
 - [TUTORIAL 01 Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN)
