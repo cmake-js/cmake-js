@@ -1,3 +1,8 @@
+v3.3.1 - 09/13/16
+=================
+
+- fix of default parameters: https://github.com/cmake-js/cmake-js/pull/57
+
 v3.3.0 - 09/02/16
 =================
 
