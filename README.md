@@ -2,7 +2,7 @@
 
 ## Announcement - Works without Visual Studio!
 
-Just install [Visual C++ Build Tools TP](https://www.microsoft.com/en-us/download/details.aspx?id=49983) and CMake.js will use that if there
+Just install [Visual C++ Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools) and CMake.js will use that if there
 is no Visual C++ available.
 
 ## About
@@ -153,8 +153,8 @@ Options:
 - [CMake](http://www.cmake.org/download/)
 - A proper C/C++ compiler toolchain of the given platform
     - **Windows**:
-        - Visual C++ Build Tools ([Technical Preview works](https://www.microsoft.com/en-us/download/details.aspx?id=48159))
-        or a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/en-us/news/vs2013-community-vs.aspx) version works well)             
+        - ([Visual C++ Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools))
+        or a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/products/visual-studio-community-vs) version works well)             
     - **Unix/Posix**:
         - Clang or GCC
         - Ninja or Make (Ninja will be picked if both present)
