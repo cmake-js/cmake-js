@@ -1,10 +1,5 @@
 # CMake.js (MIT)
 
-## Announcement - Works without Visual Studio!
-
-Just install [Visual C++ Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools) and CMake.js will use that if there
-is no Visual C++ available.
-
 ## About
 CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
 
