@@ -72,6 +72,12 @@ var yargs = require("yargs")
             describe: "use GNU compiler instead of default CMake compiler, if available (Posix)",
             type: "boolean"
         },
+        G: {
+            alias: "generator",
+            demand: false,
+            describe: "use specified generator",
+            type: "string"
+        },
         C: {
             alias: "prefer-clang",
             demand: false,
@@ -157,6 +163,7 @@ var options = {
     directory: argv.directory || null,
     debug: argv.debug,
     cmakePath: argv.c || null,
+    generator: argv.G,
     preferMake: argv.m,
     preferXcode: argv.x,
     preferGnu: argv.g,
