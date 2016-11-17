@@ -23,8 +23,7 @@
   },
   "bin": "./bin/cmake-js",
   "engines": {
-    "node": ">= 0.10.0",
-    "iojs": ">= 1.0.0"
+    "node": ">= 0.10.0"
   },
   "dependencies": {
     "bluebird": "^2.9.15",
