@@ -1,3 +1,8 @@
+v3.4.0 - 01/12/17
+=================
+
+- "G" option to set custom generators: https://github.com/cmake-js/cmake-js/pull/64
+
 v3.3.1 - 09/13/16
 =================
 

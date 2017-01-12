@@ -381,3 +381,4 @@ View [changelog.md](changelog.md)
 - [Johan (JohanvdWest)](https://github.com/JohanvdWest) - option for supporting pre C++11 compilers
 - [javedulu](https://github.com/javedulu) option to generate Xcode project (-x, --prefer-xcode)
 - [Gerhard Berger](https://github.com/gerhardberger) - Custom CMake parameter support, silent and out parameters
+- [d3x0r](https://github.com/d3x0r) - "G" option for supporting cutom generators

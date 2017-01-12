@@ -1,1 +1,1 @@
-{"version":3,"names":[],"mappings":"","sources":["index.js"],"sourcesContent":["\"use strict\";\nrequire(\"./dist\");\nrequire(\"./buildSystem\");"],"file":"index.js","sourceRoot":"/source/"}
+{"version":3,"names":[],"mappings":"","sources":["index.js"],"sourcesContent":["\"use strict\";\nrequire(\"./dist\");\nrequire(\"./buildSystem\");"],"file":"index.js"}
