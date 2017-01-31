@@ -334,6 +334,7 @@ That's it. There is nothing else to do either on the application's or on the mod
 
 ##### Note
 Currently Electron (V1.4.x) can only call modules built using CMake.js from the main process. To call such a module from a render process use the Electron remote module in your require statement:
+
 ```var yourModule = require('electron').remote.require('pathToYourModule/cmakeModuleName.node')```
 
 #### Important
