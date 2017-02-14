@@ -23,7 +23,7 @@ there is [Bazel](https://github.com/google/bazel) in the works, so sooner or lat
 see: [node-gyp Issue #193](https://github.com/TooTallNate/node-gyp/issues/193).
 
 3. While gyp is very good in dependency management and project generation,
-it still lacks features of essential build customization  
+it still lacks features of essential build customization
 (see: [gyp wiki - Custom_build_steps](https://code.google.com/p/gyp/wiki/GypUserDocumentation#Custom_build_steps)).
 
 4. [Its wiki](http://code.google.com/p/gyp/w/list) might be enough for an inhouse project,
@@ -148,7 +148,7 @@ Options:
 - A proper C/C++ compiler toolchain of the given platform
     - **Windows**:
         - [Visual C++ Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
-        or a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/products/visual-studio-community-vs) version works well)             
+        or a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/products/visual-studio-community-vs) version works well)
     - **Unix/Posix**:
         - Clang or GCC
         - Ninja or Make (Ninja will be picked if both present)
@@ -386,4 +386,4 @@ View [changelog.md](changelog.md)
 - [Johan (JohanvdWest)](https://github.com/JohanvdWest) - option for supporting pre C++11 compilers
 - [javedulu](https://github.com/javedulu) option to generate Xcode project (-x, --prefer-xcode)
 - [Gerhard Berger](https://github.com/gerhardberger) - Custom CMake parameter support, silent and out parameters
-- [d3x0r](https://github.com/d3x0r) - "G" option for supporting cutom generators
+- [d3x0r](https://github.com/d3x0r) - "G" option for supporting cutom generators, various fixes

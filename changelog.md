@@ -1,3 +1,8 @@
+v3.4.1 - 02/4/17
+=================
+
+- FIX: test output instead of guessing by platform: https://github.com/cmake-js/cmake-js/pull/77
+
 v3.4.0 - 01/12/17
 =================
 
