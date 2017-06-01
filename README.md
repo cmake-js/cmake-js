@@ -365,6 +365,40 @@ create a file called `.buildpacks` with these two lines:
 The `heroku-buildpack-multi` will run each buildpack in order allowing the node application to reference CMake in the Heroku
 build environment.
 
+
+#### N-API and `node-addon-api`
+
+[ABI-stable Node.js API
+(N-API)](https://nodejs.org/api/n-api.html) are a set of experimental C
+APIs that allow to compile a native module and have it loaded by
+different versions of Node.js that provide the N-API. At the moment,
+only Node.js v8.0.0 implements and exports N-API symbols under the flag
+`--napi-modules`:
+
+    node --napi-modules index.js
+
+To compile a native module that uses only the
+[plain `C` N-API calls](https://github.com/nodejs/node/blob/v8.x/src/node_api.h),
+follow the directions for plain `node` native modules.
+
+To compile a native module that uses the header-only C++ wrapper
+classes provided by
+[`node-addon-api`](https://github.com/nodejs/node-addon-api),
+you need at the moment to make your package depend on it with
+
+    npm install --save-dev node-addon-api
+
+and add it to the include directories of your *CMake* project file
+`CMakeLists.txt`:
+
+```cmake
+
+# Include N-API wrappers
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/node_modules/node-addon-api")
+
+```
+
+
 ## Tutorials
 
 - [TUTORIAL 01 Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN)
