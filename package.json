@@ -37,7 +37,7 @@
     "request": "^2.54.0",
     "semver": "^5.0.3",
     "splitargs": "0",
-    "tar": "^1.0.3",
+    "tar": "^3.1.5",
     "traceur": "0.0.x",
     "unzip": "^0.1.11",
     "url-join": "0",
