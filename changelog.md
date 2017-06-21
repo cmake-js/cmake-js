@@ -1,3 +1,8 @@
+v3.5.0 - 06/21/17
+=================
+
+- Added Visual Studio 2017 compatibility: https://github.com/cmake-js/cmake-js/pull/78
+
 v3.4.1 - 02/4/17
 =================
 
