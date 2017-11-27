@@ -78,6 +78,12 @@ var yargs = require("yargs")
             describe: "use specified generator",
             type: "string"
         },
+        T: {
+            alias: "target",
+            demand: false,
+            describe: "only build the specified target",
+            type: "string"
+        },
         C: {
             alias: "prefer-clang",
             demand: false,
@@ -164,6 +170,7 @@ var options = {
     debug: argv.debug,
     cmakePath: argv.c || null,
     generator: argv.G,
+    target: argv.T,
     preferMake: argv.m,
     preferXcode: argv.x,
     preferGnu: argv.g,
