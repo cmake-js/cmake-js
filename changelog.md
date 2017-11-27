@@ -1,3 +1,8 @@
+v3.6.0 - 11/27/17
+=================
+
+- "T" option for building specified target: https://github.com/cmake-js/cmake-js/pull/98
+
 v3.5.0 - 06/21/17
 =================
 

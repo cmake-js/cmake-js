@@ -54,26 +54,6 @@ function generateRuntimeOptions() {
         }
     }, $__10, this);
   }
-  function generateForIojs(arch) {
-    return $traceurRuntime.createGeneratorInstance(function($ctx) {
-      while (true)
-        switch ($ctx.state) {
-          case 0:
-            $ctx.state = 2;
-            return {
-              runtime: "iojs",
-              runtimeVersion: "3.3.1",
-              arch: arch
-            };
-          case 2:
-            $ctx.maybeThrow();
-            $ctx.state = -2;
-            break;
-          default:
-            return $ctx.end();
-        }
-    }, $__11, this);
-  }
   function generateForNWJS(arch) {
     return $traceurRuntime.createGeneratorInstance(function($ctx) {
       while (true)
@@ -103,7 +83,7 @@ function generateRuntimeOptions() {
           default:
             return $ctx.end();
         }
-    }, $__12, this);
+    }, $__11, this);
   }
   function generateForElectron(arch) {
     return $traceurRuntime.createGeneratorInstance(function($ctx) {
@@ -123,186 +103,163 @@ function generateRuntimeOptions() {
           default:
             return $ctx.end();
         }
-    }, $__13, this);
+    }, $__12, this);
   }
   function generateForArch(arch) {
-    var $__15,
+    var $__14,
+        $__15,
         $__16,
         $__17,
         $__18,
-        $__19,
-        $__20,
-        $__21,
-        $__22;
+        $__19;
     return $traceurRuntime.createGeneratorInstance(function($ctx) {
       while (true)
         switch ($ctx.state) {
           case 0:
-            $__15 = $ctx.wrapYieldStar(generateForNode(arch)[Symbol.iterator]());
+            $__14 = $ctx.wrapYieldStar(generateForNode(arch)[Symbol.iterator]());
             $ctx.sent = void 0;
             $ctx.action = 'next';
             $ctx.state = 12;
             break;
           case 12:
-            $__16 = $__15[$ctx.action]($ctx.sentIgnoreThrow);
+            $__15 = $__14[$ctx.action]($ctx.sentIgnoreThrow);
             $ctx.state = 9;
             break;
           case 9:
-            $ctx.state = ($__16.done) ? 3 : 2;
+            $ctx.state = ($__15.done) ? 3 : 2;
             break;
           case 3:
-            $ctx.sent = $__16.value;
+            $ctx.sent = $__15.value;
             $ctx.state = 10;
             break;
           case 2:
             $ctx.state = 12;
-            return $__16.value;
+            return $__15.value;
           case 10:
-            $__17 = $ctx.wrapYieldStar(generateForIojs(arch)[Symbol.iterator]());
+            $__16 = $ctx.wrapYieldStar(generateForNWJS(arch)[Symbol.iterator]());
             $ctx.sent = void 0;
             $ctx.action = 'next';
             $ctx.state = 24;
             break;
           case 24:
-            $__18 = $__17[$ctx.action]($ctx.sentIgnoreThrow);
+            $__17 = $__16[$ctx.action]($ctx.sentIgnoreThrow);
             $ctx.state = 21;
             break;
           case 21:
-            $ctx.state = ($__18.done) ? 15 : 14;
+            $ctx.state = ($__17.done) ? 15 : 14;
             break;
           case 15:
-            $ctx.sent = $__18.value;
+            $ctx.sent = $__17.value;
             $ctx.state = 22;
             break;
           case 14:
             $ctx.state = 24;
-            return $__18.value;
+            return $__17.value;
           case 22:
-            $__19 = $ctx.wrapYieldStar(generateForNWJS(arch)[Symbol.iterator]());
+            $__18 = $ctx.wrapYieldStar(generateForElectron(arch)[Symbol.iterator]());
             $ctx.sent = void 0;
             $ctx.action = 'next';
             $ctx.state = 36;
             break;
           case 36:
-            $__20 = $__19[$ctx.action]($ctx.sentIgnoreThrow);
+            $__19 = $__18[$ctx.action]($ctx.sentIgnoreThrow);
             $ctx.state = 33;
             break;
           case 33:
-            $ctx.state = ($__20.done) ? 27 : 26;
+            $ctx.state = ($__19.done) ? 27 : 26;
             break;
           case 27:
-            $ctx.sent = $__20.value;
-            $ctx.state = 34;
+            $ctx.sent = $__19.value;
+            $ctx.state = -2;
             break;
           case 26:
             $ctx.state = 36;
-            return $__20.value;
-          case 34:
-            $__21 = $ctx.wrapYieldStar(generateForElectron(arch)[Symbol.iterator]());
-            $ctx.sent = void 0;
-            $ctx.action = 'next';
-            $ctx.state = 48;
-            break;
-          case 48:
-            $__22 = $__21[$ctx.action]($ctx.sentIgnoreThrow);
-            $ctx.state = 45;
-            break;
-          case 45:
-            $ctx.state = ($__22.done) ? 39 : 38;
-            break;
-          case 39:
-            $ctx.sent = $__22.value;
-            $ctx.state = -2;
-            break;
-          case 38:
-            $ctx.state = 48;
-            return $__22.value;
+            return $__19.value;
           default:
             return $ctx.end();
         }
-    }, $__14, this);
+    }, $__13, this);
   }
   var $__10,
       $__11,
       $__12,
       $__13,
-      $__14,
+      $__20,
+      $__21,
+      $__22,
       $__23,
       $__24,
-      $__25,
-      $__26,
-      $__27,
-      $__28;
+      $__25;
   return $traceurRuntime.createGeneratorInstance(function($ctx) {
     while (true)
       switch ($ctx.state) {
         case 0:
-          $__10 = $traceurRuntime.initGeneratorFunction(generateForNode), $__11 = $traceurRuntime.initGeneratorFunction(generateForIojs), $__12 = $traceurRuntime.initGeneratorFunction(generateForNWJS), $__13 = $traceurRuntime.initGeneratorFunction(generateForElectron), $__14 = $traceurRuntime.initGeneratorFunction(generateForArch);
+          $__10 = $traceurRuntime.initGeneratorFunction(generateForNode), $__11 = $traceurRuntime.initGeneratorFunction(generateForNWJS), $__12 = $traceurRuntime.initGeneratorFunction(generateForElectron), $__13 = $traceurRuntime.initGeneratorFunction(generateForArch);
           $ctx.state = 43;
           break;
         case 43:
           $ctx.state = (environment.isWin) ? 11 : 35;
           break;
         case 11:
-          $__23 = $ctx.wrapYieldStar(generateForArch("x64")[Symbol.iterator]());
+          $__20 = $ctx.wrapYieldStar(generateForArch("x64")[Symbol.iterator]());
           $ctx.sent = void 0;
           $ctx.action = 'next';
           $ctx.state = 12;
           break;
         case 12:
-          $__24 = $__23[$ctx.action]($ctx.sentIgnoreThrow);
+          $__21 = $__20[$ctx.action]($ctx.sentIgnoreThrow);
           $ctx.state = 9;
           break;
         case 9:
-          $ctx.state = ($__24.done) ? 3 : 2;
+          $ctx.state = ($__21.done) ? 3 : 2;
           break;
         case 3:
-          $ctx.sent = $__24.value;
+          $ctx.sent = $__21.value;
           $ctx.state = 10;
           break;
         case 2:
           $ctx.state = 12;
-          return $__24.value;
+          return $__21.value;
         case 10:
-          $__25 = $ctx.wrapYieldStar(generateForArch("ia32")[Symbol.iterator]());
+          $__22 = $ctx.wrapYieldStar(generateForArch("ia32")[Symbol.iterator]());
           $ctx.sent = void 0;
           $ctx.action = 'next';
           $ctx.state = 24;
           break;
         case 24:
-          $__26 = $__25[$ctx.action]($ctx.sentIgnoreThrow);
+          $__23 = $__22[$ctx.action]($ctx.sentIgnoreThrow);
           $ctx.state = 21;
           break;
         case 21:
-          $ctx.state = ($__26.done) ? 15 : 14;
+          $ctx.state = ($__23.done) ? 15 : 14;
           break;
         case 15:
-          $ctx.sent = $__26.value;
+          $ctx.sent = $__23.value;
           $ctx.state = 22;
           break;
         case 14:
           $ctx.state = 24;
-          return $__26.value;
+          return $__23.value;
         case 35:
-          $__27 = $ctx.wrapYieldStar(generateForArch()[Symbol.iterator]());
+          $__24 = $ctx.wrapYieldStar(generateForArch()[Symbol.iterator]());
           $ctx.sent = void 0;
           $ctx.action = 'next';
           $ctx.state = 36;
           break;
         case 36:
-          $__28 = $__27[$ctx.action]($ctx.sentIgnoreThrow);
+          $__25 = $__24[$ctx.action]($ctx.sentIgnoreThrow);
           $ctx.state = 33;
           break;
         case 33:
-          $ctx.state = ($__28.done) ? 27 : 26;
+          $ctx.state = ($__25.done) ? 27 : 26;
           break;
         case 27:
-          $ctx.sent = $__28.value;
+          $ctx.sent = $__25.value;
           $ctx.state = 22;
           break;
         case 26:
           $ctx.state = 36;
-          return $__28.value;
+          return $__25.value;
         case 22:
           $ctx.state = 39;
           return {};

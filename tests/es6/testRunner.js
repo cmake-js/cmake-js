@@ -34,15 +34,6 @@ function* generateRuntimeOptions() {
         }
     }
 
-    function* generateForIojs(arch) {
-        // Latest:
-        yield {
-            runtime: "iojs",
-            runtimeVersion: "3.3.1",
-            arch: arch
-        };
-    }
-
     function* generateForNWJS(arch) {
         yield {
             runtime: "nw",
@@ -69,7 +60,6 @@ function* generateRuntimeOptions() {
 
     function* generateForArch(arch) {
         yield* generateForNode(arch);
-        yield* generateForIojs(arch);
         yield* generateForNWJS(arch);
         yield* generateForElectron(arch);
     }

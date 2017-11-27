@@ -289,7 +289,6 @@ Available settings:
 
 - **runtime**: application's target runtime, possible values are:
 	- `node`: Node.js
-	- `iojs`: io.js
 	- `nw`: nw.js
 	- `electron`: Electron
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
@@ -299,7 +298,7 @@ Available settings:
 
 The actual node runtime parameters are detectable in CMakeLists.txt files, the following variables are set:
 
-- **NODE_RUNTIME**: `"node"`, `"iojs"`, `"nw"`, `"electron"`
+- **NODE_RUNTIME**: `"node"`, `"nw"`, `"electron"`
 - **NODE_RUNTIMEVERSION**: for example: `"0.12.1"`
 - **NODE_ARCH**: `"x64"`, `"ia32"`, `"arm"`
 
@@ -424,3 +423,4 @@ View [changelog.md](changelog.md)
 - [javedulu](https://github.com/javedulu) option to generate Xcode project (-x, --prefer-xcode)
 - [Gerhard Berger](https://github.com/gerhardberger) - Custom CMake parameter support, silent and out parameters
 - [d3x0r](https://github.com/d3x0r) - "G" option for supporting cutom generators, various fixes
+- [AlessandroA](https://github.com/AlessandroA) - "T" option for building a specified target
