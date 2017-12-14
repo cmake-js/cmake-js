@@ -15,7 +15,7 @@ describe("dist", function () {
         async(function*() {
             let dist = new Dist();
             if (testDownload) {
-                yield fs.deleteAsync(dist.internalPath);
+                yield fs.removeAsync(dist.internalPath);
                 assert(dist.downloaded === false);
                 yield dist.ensureDownloaded();
                 assert(dist.downloaded);
@@ -23,7 +23,26 @@ describe("dist", function () {
             else {
                 yield dist.ensureDownloaded();
             }
-        })().nodeify(done);        
+        })().nodeify(done);
     });
 
+    it("should be able to download dist files from other mirrors", function (done) {
+        this.timeout(60000);
+        async(function*() {
+            let dist = new Dist({
+                mirrors: {
+                    node: "https://npm.taobao.org/mirrors/node"
+                }
+            });
+            if (testDownload) {
+                yield fs.removeAsync(dist.internalPath);
+                assert(dist.downloaded === false);
+                yield dist.ensureDownloaded();
+                assert(dist.downloaded);
+            }
+            else {
+                yield dist.ensureDownloaded();
+            }
+        })().nodeify(done);
+    });
 });

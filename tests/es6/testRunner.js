@@ -35,11 +35,12 @@ function* generateRuntimeOptions() {
     }
 
     function* generateForNWJS(arch) {
-        yield {
-            runtime: "nw",
-            runtimeVersion: "0.12.3",
-            arch: arch
-        };
+        // Clang breaks old NW.js, causing tests to fail: https://github.com/nodejs/node-gyp/issues/1160
+        // yield {
+        //     runtime: "nw",
+        //     runtimeVersion: "0.12.3",
+        //     arch: arch
+        // };
 
         // Latest:
         yield {
