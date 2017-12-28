@@ -62,21 +62,10 @@ function generateRuntimeOptions() {
             $ctx.state = 2;
             return {
               runtime: "nw",
-              runtimeVersion: "0.12.3",
-              arch: arch
-            };
-          case 2:
-            $ctx.maybeThrow();
-            $ctx.state = 4;
-            break;
-          case 4:
-            $ctx.state = 6;
-            return {
-              runtime: "nw",
               runtimeVersion: "0.13.2",
               arch: arch
             };
-          case 6:
+          case 2:
             $ctx.maybeThrow();
             $ctx.state = -2;
             break;

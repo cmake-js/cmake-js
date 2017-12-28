@@ -143,6 +143,10 @@ Options:
   -O, --out              Specify the output directory to compile to, default is
                          projectRoot/build                              [string]
                          projectRoot/build                              [string]
+  -M, --mirrors          Specify mirrors, default is
+                         node=http://nodejs.org/dist,iojs=https://iojs.org/dist,
+                         nw=http://node-webkit.s3.amazonaws.com,electron=http://
+                         atom.io/download/atom-shell                    [string]
 ```
 
 **Requirements:**
@@ -178,8 +182,16 @@ target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
 ```json
 "scripts": {
-    "install": "cmake-js compile"
-  }
+  "install": "cmake-js compile"
+}
+```
+
+- For Chinese users using Taobao NPM mirrors:
+
+```json
+"scripts": {
+  "install": "cmake-js -M node=https://npm.taobao.org/mirrors/node compile"
+}
 ```
 
 #### Commandline

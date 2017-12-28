@@ -4,6 +4,7 @@
 var log = require("npmlog");
 var _ = require("lodash");
 var BuildSystem = require("../").BuildSystem;
+var Environment = require("../").environment
 var util = require("util");
 
 var version = require("../package").version;
@@ -134,6 +135,11 @@ var yargs = require("yargs")
           alias: "out",
           describe: "Specify the output directory to compile to, default is projectRoot/build",
           type: "string"
+        },
+        M: {
+            alias: "mirrors",
+            describe: `Specify mirrors, default is node=${Environment.mirrors.node},iojs=${Environment.mirrors.iojs},nw=${Environment.mirrors.nw},electron=${Environment.mirrors.electron}`,
+            type: "string"
         }
     });
 var argv = yargs.argv;
@@ -165,6 +171,26 @@ _.keys(argv).forEach(function (key) {
     }
 });
 
+function parseMirrors(mirrors) {
+    var result = {};
+    var validMirrorKeys = ["node", "iojs", "nw", "electron"]
+
+    if (!mirrors) {
+        return result;
+    }
+
+    _.forEach(mirrors.split(","), function (entry) {
+        var keyvalue = entry.split("=");
+        if (keyvalue.length !== 2 || validMirrorKeys.indexOf(keyvalue[0]) < 0) {
+            log.error("OMG", "Invalid mirror entry: " + entry);
+            process.exit(1);
+        }
+        result[keyvalue[0]] = keyvalue[1];
+    });
+
+    return result;
+}
+
 var options = {
     directory: argv.directory || null,
     debug: argv.debug,
@@ -181,7 +207,8 @@ var options = {
     arch: argv.a,
     cMakeOptions: customOptions,
     silent: argv.i,
-    out: argv.O
+    out: argv.O,
+    mirrors: parseMirrors(argv.M)
 };
 
 log.verbose("CON", "options:");
