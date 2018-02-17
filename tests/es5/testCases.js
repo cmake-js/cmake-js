@@ -185,7 +185,7 @@ var testCases = {
             $ctx.state = 4;
             break;
           case 4:
-            assert.notEqual(command.indexOf("-DFOO=\"bar\""), -1, "custom options added");
+            assert.notEqual(command.indexOf("-Dfoo=\"bar\""), -1, "custom options added");
             $ctx.state = -2;
             break;
           default:

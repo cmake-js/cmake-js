@@ -1,3 +1,9 @@
+v3.6.2 - 17/02/18
+=================
+
+- use https distribution download urls
+- custom cmake options made case sensitive
+
 v3.6.1 - 11/01/18
 =================
 
