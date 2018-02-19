@@ -169,7 +169,7 @@ var options = {
     directory: argv.directory || null,
     debug: argv.debug,
     cmakePath: argv.c || null,
-    generator: argv.G,
+    generator: argv.G || process.env["CMAKE_GENERATOR"],
     target: argv.T,
     preferMake: argv.m,
     preferXcode: argv.x,
