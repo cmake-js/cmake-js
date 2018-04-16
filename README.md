@@ -127,6 +127,7 @@ Options:
   -g, --prefer-gnu       use GNU compiler instead of default CMake compiler, if
                          available (Posix)                             [boolean]
   -G, --generator        use specified generator                        [string]
+  -t, --toolset          use specified toolset                          [string]
   -T, --target           only build the specified target                [string]
   -C, --prefer-clang     use Clang compiler instead of default CMake compiler,
                          if available (Posix)                          [boolean]
