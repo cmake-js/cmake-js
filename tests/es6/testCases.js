@@ -6,7 +6,7 @@ let _ = require("lodash");
 let path = require("path");
 let Bluebird = require("bluebird");
 let async = Bluebird.coroutine;
-let fs = Bluebird.promisifyAll(require("fs-extra"));
+let fs = require("fs-extra");
 
 let testCases = {
     buildPrototypeWithDirectoryOption: async(function*(options) {
@@ -15,7 +15,7 @@ let testCases = {
         }, options);
         let buildSystem = new BuildSystem(options);
         yield buildSystem.rebuild();
-        assert.ok((yield fs.statAsync(path.join(__dirname, "prototype/build/Release/addon.node"))).isFile());
+        assert.ok((yield fs.stat(path.join(__dirname, "prototype/build/Release/addon.node"))).isFile());
     }),
     buildPrototype2WithCWD: async(function*(options) {
         let cwd = process.cwd();
@@ -23,7 +23,7 @@ let testCases = {
         let buildSystem = new BuildSystem(options);
         try {
             yield buildSystem.rebuild();
-            assert.ok((yield fs.statAsync(path.join(__dirname, "prototype2/build/Release/addon2.node"))).isFile());
+            assert.ok((yield fs.stat(path.join(__dirname, "prototype2/build/Release/addon2.node"))).isFile());
         }
         finally {
             process.chdir(cwd);

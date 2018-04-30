@@ -2,7 +2,7 @@
 /* global describe,it */
 
 let Bluebird = require("bluebird");
-let fs = Bluebird.promisifyAll(require("fs-extra"));
+let fs = require("fs-extra");
 let Dist = require("../../").Dist;
 let assert = require("assert");
 let async = Bluebird.coroutine;
@@ -15,7 +15,7 @@ describe("dist", function () {
         async(function*() {
             let dist = new Dist();
             if (testDownload) {
-                yield fs.deleteAsync(dist.internalPath);
+                yield fs.remove(dist.internalPath);
                 assert(dist.downloaded === false);
                 yield dist.ensureDownloaded();
                 assert(dist.downloaded);
@@ -23,7 +23,7 @@ describe("dist", function () {
             else {
                 yield dist.ensureDownloaded();
             }
-        })().nodeify(done);        
+        })().nodeify(done);
     });
 
 });
