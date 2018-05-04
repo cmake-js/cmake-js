@@ -39,7 +39,7 @@
     "splitargs": "0",
     "tar": "^3.1.5",
     "traceur": "0.0.x",
-    "unzip": "^0.1.11",
+    "unzipper": "^0.8.13",
     "url-join": "0",
     "which": "^1.0.9",
     "yargs": "^3.6.0"
