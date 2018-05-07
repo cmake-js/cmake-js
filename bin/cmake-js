@@ -78,6 +78,12 @@ var yargs = require("yargs")
             describe: "use specified generator",
             type: "string"
         },
+        t: {
+            alias: "toolset",
+            demand: false,
+            describe: "use specified toolset",
+            type: "string"
+        },
         T: {
             alias: "target",
             demand: false,
@@ -170,6 +176,7 @@ var options = {
     debug: argv.debug,
     cmakePath: argv.c || null,
     generator: argv.G,
+    toolset: argv.t,
     target: argv.T,
     preferMake: argv.m,
     preferXcode: argv.x,
