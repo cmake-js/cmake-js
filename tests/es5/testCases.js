@@ -6,7 +6,7 @@ var _ = require("lodash");
 var path = require("path");
 var Bluebird = require("bluebird");
 var async = Bluebird.coroutine;
-var fs = Bluebird.promisifyAll(require("fs-extra"));
+var fs = require("fs-extra");
 var testCases = {
   buildPrototypeWithDirectoryOption: async($traceurRuntime.initGeneratorFunction(function $__2(options) {
     var buildSystem,
@@ -36,7 +36,7 @@ var testCases = {
             break;
           case 4:
             $__3 = assert.ok;
-            $__4 = fs.statAsync;
+            $__4 = fs.stat;
             $__5 = path.join;
             $__6 = $__5.call(path, __dirname, "prototype/build/Release/addon.node");
             $__7 = $__4.call(fs, $__6);
@@ -94,7 +94,7 @@ var testCases = {
             break;
           case 4:
             $__13 = assert.ok;
-            $__14 = fs.statAsync;
+            $__14 = fs.stat;
             $__15 = path.join;
             $__16 = $__15.call(path, __dirname, "prototype2/build/Release/addon2.node");
             $__17 = $__14.call(fs, $__16);

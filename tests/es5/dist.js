@@ -1,6 +1,6 @@
 "use strict";
 var Bluebird = require("bluebird");
-var fs = Bluebird.promisifyAll(require("fs-extra"));
+var fs = require("fs-extra");
 var Dist = require("../../").Dist;
 var assert = require("assert");
 var async = Bluebird.coroutine;
@@ -22,7 +22,7 @@ describe("dist", function() {
               break;
             case 1:
               $ctx.state = 2;
-              return fs.deleteAsync(dist.internalPath);
+              return fs.remove(dist.internalPath);
             case 2:
               $ctx.maybeThrow();
               $ctx.state = 4;

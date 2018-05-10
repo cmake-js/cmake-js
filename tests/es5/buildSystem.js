@@ -19,6 +19,9 @@ describe("BuildSystem", function() {
     }
     lib.locateNAN.__projectRoot = path.resolve(path.join(__dirname, "../../"));
   });
+  after(function() {
+    lib.locateNAN.__projectRoot = undefined;
+  });
   describe("Build with various options", function() {
     testRunner.runCase(testCases.buildPrototypeWithDirectoryOption);
   });
