@@ -264,6 +264,7 @@ done = done || ifCommand("print-clean", printClean);
 done = done || ifCommand("reconfigure", reconfigure);
 done = done || ifCommand("rebuild", rebuild);
 done = done || ifCommand("compile", compile);
+
 if (!done) {
     if (command) {
         log.error("COM", "Unknown command: " + command);
