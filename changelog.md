@@ -1,4 +1,14 @@
-v3.7.1 - 10/05/17
+v3.7.3 - 16/05/18
+=================
+
+- npm config hotfix https://github.com/cmake-js/cmake-js/pull/123
+
+v3.7.2 - 16/05/18
+=================
+
+- do not use, breaks ES5 compatibility
+
+v3.7.1 - 07/05/18
 =================
 
 - Linux line ending hotfix (wat)
