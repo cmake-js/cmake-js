@@ -35,12 +35,6 @@ function* generateRuntimeOptions() {
     }
 
     function* generateForNWJS(arch) {
-        yield {
-            runtime: "nw",
-            runtimeVersion: "0.12.3",
-            arch: arch
-        };
-
         // Latest:
         yield {
             runtime: "nw",
