@@ -1,3 +1,11 @@
+v4.0.0 - 14/09/18
+=================
+
+BREAKING CHANGES:
+
+- -s/--std (along with -o/--prec11 option removed, you have to specify compiler standard in CMakeLists.txt files https://github.com/cmake-js/cmake-js/issues/72
+- Implicit -w compiler flag doesn't get added on OSX https://github.com/cmake-js/cmake-js/pull/133
+
 v3.7.3 - 16/05/18
 =================
 

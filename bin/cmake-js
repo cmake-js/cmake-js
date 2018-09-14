@@ -96,12 +96,6 @@ var yargs = require("yargs")
             describe: "use Clang compiler instead of default CMake compiler, if available (Posix)",
             type: "boolean"
         },
-        s: {
-            alias: "std",
-            demand: false,
-            describe: "C++ standard, eg.: c++98, c++11, c++14, etc., default is c++11 (Posix)",
-            type: "string"
-        },
         r: {
             alias: "runtime",
             demand: false,
@@ -119,12 +113,6 @@ var yargs = require("yargs")
             demand: false,
             describe: "the architecture to build in",
             type: "string"
-        },
-        o: {
-            alias: "prec11",
-            demand: false,
-            describe: "use C++98 standard (obsolete: use -s=c++98 instead)",
-            type: "boolean"
         },
         "CD": {
             demand: false,
@@ -182,7 +170,6 @@ var options = {
     preferXcode: argv.x,
     preferGnu: argv.g,
     preferClang: argv.C,
-    std: argv.s || (argv.o ? "c++98" : null),
     runtime: argv.r,
     runtimeVersion: argv.v,
     arch: argv.a,
