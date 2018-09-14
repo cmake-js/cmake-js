@@ -135,13 +135,9 @@ Options:
   -T, --target           only build the specified target                [string]
   -C, --prefer-clang     use Clang compiler instead of default CMake compiler,
                          if available (Posix)                          [boolean]
-  -s, --std              C++ standard, eg.: c++98, c++11, c++14, etc., default
-                         is c++11 (Posix)                               [string]
   -r, --runtime          the runtime to use                             [string]
   -v, --runtime-version  the runtime version to use                     [string]
   -a, --arch             the architecture to build in                   [string]
-  -o, --prec11           use C++98 standard (obsolete: use -s=c++98 instead)
-                                                                       [boolean]
   --CD                   Custom argument passed to CMake in format:
                          -D<your-arg-here>                              [string]
   -i, --silent           Prevents CMake.js to print to the stdio       [boolean]
