@@ -141,7 +141,7 @@ if (argv.h) {
 
 // Setup log level:
 
-if (argv.l && _.contains(logLevels, argv.l)) {
+if (argv.l && _.includes(logLevels, argv.l)) {
     log.level = argv.l;
     log.resume();
 }
