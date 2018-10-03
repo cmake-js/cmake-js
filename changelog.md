@@ -1,3 +1,8 @@
+v4.0.1 - 03/10/18
+=================
+
+- log argument hotfix https://github.com/cmake-js/cmake-js/pull/145
+
 v4.0.0 - 14/09/18
 =================
 
