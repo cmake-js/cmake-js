@@ -223,20 +223,20 @@ For current user:
 npm config set cmake_<key> <value>
 ```
 
-CMake.js will set a variable named uppercase `"<key>"` to `<value>` (by using `-D<key>="<value>"` option). User's settings will **overwrite** globals.
+CMake.js will set a variable named `"<key>"` to `<value>` (by using `-D<key>="<value>"` option). User's settings will **overwrite** globals.
 
 #### Example:
 
 Enter at command prompt:
 
 ```
-npm config set cmake_bubu="kittyfck"
+npm config set cmake_BuBu="kittyfck"
 ```
 
 Then write to your CMakeLists.txt the following:
 
 ```cmake
-message (STATUS ${BUBU})
+message (STATUS ${BuBu})
 ```
 
 This will print during configure:
