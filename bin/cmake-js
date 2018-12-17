@@ -12,8 +12,15 @@ var npmConfigData = require("rc")("npm");
 for (var key of _.keys(npmConfigData)) {
     if (_.startsWith(key, "cmake_js_")) {
         var option = key.substr(9);
-        process.argv.push("-" + option);
-        process.argv.push(npmConfigData[key]);
+        if (option.length === 1) {
+            process.argv.push("-" + option);
+        }
+        else {
+            process.argv.push("--" + option);
+        }
+        if (npmConfigData[key]) {
+            process.argv.push(npmConfigData[key]);
+        }
     }
 }
 
