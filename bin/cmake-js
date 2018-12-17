@@ -5,9 +5,20 @@ var log = require("npmlog");
 var _ = require("lodash");
 var BuildSystem = require("../").BuildSystem;
 var util = require("util");
-
 var version = require("../package").version;
 var logLevels = ["silly", "verbose", "info", "http", "warn", "error"];
+
+var npmConfigData = require("rc")("npm");
+for (var key of _.keys(npmConfigData)) {
+    if (_.startsWith(key, "cmake_js_")) {
+        var option = key.substr(9);
+        process.argv.push("-" + option);
+        process.argv.push(npmConfigData[key]);
+    }
+}
+
+console.log(process.argv);
+
 var yargs = require("yargs")
     .usage("CMake.js " + version + "\n\nUsage: $0 [<command>] [options]")
     .version(function () {
