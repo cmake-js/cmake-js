@@ -225,6 +225,20 @@ npm config set cmake_<key> <value>
 
 CMake.js will set a variable named `"<key>"` to `<value>` (by using `-D<key>="<value>"` option). User's settings will **overwrite** globals.
 
+UPDATE:
+
+You can set CMake.js commandline arguments with npm config with the following pattern:
+
+```
+npm config set cmake_js_G "Visual Studio 56 Win128"
+```
+
+Which sets the CMake generator, basically defaults to:
+
+```
+cmake-js -G "Visual Studio 56 Win128"
+```
+
 #### Example:
 
 Enter at command prompt:
@@ -427,3 +441,5 @@ View [changelog.md](changelog.md)
 - [AlessandroA](https://github.com/AlessandroA) - "T" option for building a specified target
 - [pirxpilot](https://github.com/pirxpilot) - various dependency upgrades
 - [VictorLeach96](https://github.com/VictorLeach96) - tolset commandlien option
+- [Arnaud Botella](https://github.com/BotellaA) - Case sensitive npm config
+- [Jeremy Apthorp](https://github.com/nornagon) - Support for Electron v4+

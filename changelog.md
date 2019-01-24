@@ -1,3 +1,10 @@
+v5.0.0 - 03/10/18
+=================
+
+- [semver major] Add case sensitive NPM config integration https://github.com/cmake-js/cmake-js/pull/151
+- better npm config integration, all CMake.js commandline argument could be set by using npm config: https://github.com/cmake-js/cmake-js#npm-config-integration
+- support for Electron v4+ https://github.com/cmake-js/cmake-js/pull/152
+
 v4.0.1 - 03/10/18
 =================
 
