@@ -1,4 +1,9 @@
-v5.0.0 - 03/10/18
+v5.0.1 - 24/01/19
+=================
+
+- Linux line ending hotfix (I hate Windows!)
+
+v5.0.0 - 24/01/19
 =================
 
 - [semver major] Add case sensitive NPM config integration https://github.com/cmake-js/cmake-js/pull/151
