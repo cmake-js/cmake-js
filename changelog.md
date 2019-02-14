@@ -1,3 +1,8 @@
+v5.1.0 - 14/02/19
+=================
+
+- CMake 3.14 support - https://github.com/cmake-js/cmake-js/pull/159
+
 v5.0.1 - 24/01/19
 =================
 

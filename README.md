@@ -443,3 +443,4 @@ View [changelog.md](changelog.md)
 - [VictorLeach96](https://github.com/VictorLeach96) - tolset commandlien option
 - [Arnaud Botella](https://github.com/BotellaA) - Case sensitive npm config
 - [Jeremy Apthorp](https://github.com/nornagon) - Support for Electron v4+
+- [Gregor Jasny](https://github.com/gjasny) - CMake 3.14 support
