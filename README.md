@@ -449,3 +449,4 @@ View [changelog.md](changelog.md)
 - [Arnaud Botella](https://github.com/BotellaA) - Case sensitive npm config
 - [Jeremy Apthorp](https://github.com/nornagon) - Support for Electron v4+
 - [Gregor Jasny](https://github.com/gjasny) - CMake 3.14 support
+- [Rogério Ribeiro da Cruz](https://github.com/rogeriorc) - Windows delay load hook, Electron 4+ compatibility

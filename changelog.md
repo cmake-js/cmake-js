@@ -1,3 +1,8 @@
+v5.2.1 - 10/04/19
+=================
+
+- Win delay load hook: https://github.com/cmake-js/cmake-js/pull/165/
+
 v5.1.1 - 02/04/19
 =================
 
