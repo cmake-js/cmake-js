@@ -61,7 +61,7 @@ and it isn't likely to be abandoned in the near future.
 2. It's native software, having no dependencies to any runtime.
 
 3. Right now CMake has all of the features that
-[were missing when development of gyp started](https://code.google.com/p/gyp/wiki/GypVsCMake), and on top of that
+[were missing when development of gyp started](https://gyp.gsrc.io/docs/GypVsCMake.md), and on top of that
 it still has those features that gyp didn't have since then.
 It has an own module ecosystem with [internal modules](http://www.cmake.org/cmake/help/v3.2/manual/cmake-modules.7.html),
 and with 3rd party gems like [Compile Time Reducer (Cotire)](https://github.com/sakra/cotire).
