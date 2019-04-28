@@ -15,7 +15,7 @@
     "electron",
     "boost"
   ],
-  "version": "5.1.0",
+  "version": "5.2.0",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
@@ -45,12 +45,13 @@
     "yargs": "^3.6.0"
   },
   "devDependencies": {
-    "gulp": "*",
+    "gulp": "3",
     "gulp-sequence": "*",
     "gulp-sourcemaps": "*",
     "gulp-traceur": "*",
     "mocha": "*",
-    "nan": "^2.1.0"
+    "nan": "^2.1.0",
+    "natives": "^1.1.6"
   },
   "scripts": {
     "test": "mocha tests",

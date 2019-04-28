@@ -61,7 +61,7 @@ and it isn't likely to be abandoned in the near future.
 2. It's native software, having no dependencies to any runtime.
 
 3. Right now CMake has all of the features that
-[were missing when development of gyp started](https://code.google.com/p/gyp/wiki/GypVsCMake), and on top of that
+[were missing when development of gyp started](https://gyp.gsrc.io/docs/GypVsCMake.md), and on top of that
 it still has those features that gyp didn't have since then.
 It has an own module ecosystem with [internal modules](http://www.cmake.org/cmake/help/v3.2/manual/cmake-modules.7.html),
 and with 3rd party gems like [Compile Time Reducer (Cotire)](https://github.com/sakra/cotire).
@@ -170,7 +170,7 @@ In a nutshell. *(For more complete documentation please see [the first tutorial]
 project (your-addon-name-here)
 include_directories(${CMAKE_JS_INC})
 file(GLOB SOURCE_FILES "your-source files-location-here")
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 ```
@@ -411,7 +411,12 @@ and add it to the include directories of your *CMake* project file
 ```cmake
 
 # Include N-API wrappers
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/node_modules/node-addon-api")
+execute_process(COMMAND node -p "require('node-addon-api').include"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE NODE_ADDON_API_DIR
+        )
+string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${NODE_ADDON_API_DIR})
 
 ```
 
@@ -444,3 +449,5 @@ View [changelog.md](changelog.md)
 - [Arnaud Botella](https://github.com/BotellaA) - Case sensitive npm config
 - [Jeremy Apthorp](https://github.com/nornagon) - Support for Electron v4+
 - [Gregor Jasny](https://github.com/gjasny) - CMake 3.14 support
+- [Rogério Ribeiro da Cruz](https://github.com/rogeriorc) - Windows delay load hook, Electron 4+ compatibility
+
