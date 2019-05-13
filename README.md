@@ -151,7 +151,7 @@ Options:
 - [CMake](http://www.cmake.org/download/)
 - A proper C/C++ compiler toolchain of the given platform
     - **Windows**:
-        - [Visual C++ Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
+        - [Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
         or a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/products/visual-studio-community-vs) version works well)
     - **Unix/Posix**:
         - Clang or GCC
@@ -450,3 +450,4 @@ View [changelog.md](changelog.md)
 - [Jeremy Apthorp](https://github.com/nornagon) - Support for Electron v4+
 - [Gregor Jasny](https://github.com/gjasny) - CMake 3.14 support
 - [Rogério Ribeiro da Cruz](https://github.com/rogeriorc) - Windows delay load hook, Electron 4+ compatibility
+
