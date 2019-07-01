@@ -2,7 +2,7 @@
 
 ## Quick note to contributors
 
-First of all, thanks for the PRs! Keep'em comming! I try to verify and release stuff as fast as I can. So, you should not bother to compile and include ES5 files along with ur PRs, generating them is the part of the release process.
+First of all, thanks for the PRs! Keep'em comm=ing! I try to verify and release stuff as fast as I can. So, you should not bother to compile and include ES5 files along with your PRs, generating them is the part of the release process.
 
 ## About
 CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
@@ -30,7 +30,7 @@ see: [node-gyp Issue #193](https://github.com/TooTallNate/node-gyp/issues/193).
 it still lacks features of essential build customization
 (see: [gyp wiki - Custom_build_steps](https://code.google.com/p/gyp/wiki/GypUserDocumentation#Custom_build_steps)).
 
-4. [Its wiki](http://code.google.com/p/gyp/w/list) might be enough for an inhouse project,
+4. [Its wiki](http://code.google.com/p/gyp/w/list) might be enough for an in-house project,
 but far from what can be called for a good product documentation.
 
 5. If you wanna port a native library to node as an addon,
@@ -164,7 +164,7 @@ Options:
 In a nutshell. *(For more complete documentation please see [the first tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)*
 
 - Install cmake-js for your module `npm install --save cmake-js`
-- Put a CMakeLists.txt file into you module root with this minimal required content:
+- Put a CMakeLists.txt file into your module root with this minimal required content:
 
 ```cmake
 project (your-addon-name-here)
@@ -223,11 +223,11 @@ For current user:
 npm config set cmake_<key> <value>
 ```
 
-CMake.js will set a variable named `"<key>"` to `<value>` (by using `-D<key>="<value>"` option). User's settings will **overwrite** globals.
+CMake.js will set a variable named `"<key>"` to `<value>` (by using `-D<key>="<value>"` option). User settings will **overwrite** globals.
 
 UPDATE:
 
-You can set CMake.js commandline arguments with npm config with the following pattern:
+You can set CMake.js command line arguments with npm config using the following pattern:
 
 ```
 npm config set cmake_js_G "Visual Studio 56 Win128"
@@ -307,7 +307,7 @@ Available settings:
 	- `nw`: nw.js
 	- `electron`: Electron
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
-- **arch**: architecutre of application's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite of this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
+- **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
 
 #### Runtime options in CMakeLists.txt
 
@@ -356,7 +356,7 @@ Currently Electron (V1.4.x+) can only call modules built using CMake.js from the
 
 #### Important
 
-It is important to understand that this setting is to be configured in the **application's root package.json file**. If you're creating a native module targeting nw.js for example, then **do not specify anything** in your module's package.json. It's the actual application's decision to specify its runtime, your module's just compatible anything that was mentioned in the [About chapter](#about). Actually defining `cmake-js` key in your module's package.json file may lead to an error. Why? If you set it up to use nw.js 0.12.1 for example, then when it gets compiled during development time (to run its unit tests for example) it's gonna be compiled against io.js 1.2 runtime. But if you're having io.js 34.0.1 at the commandline then, which is binary incompatible with 1.2, then your unit tests will fail for sure. So it is advised to not use cmake-js target settings in your module's package.json, because that way CMake.js will use that you have, and your tests will pass.
+It is important to understand that this setting is to be configured in the **application's root package.json file**. If you're creating a native module targeting nw.js for example, then **do not specify anything** in your module's package.json. It's the actual application's decision to specify its runtime, your module's just compatible anything that was mentioned in the [About chapter](#about). Actually defining `cmake-js` key in your module's package.json file may lead to an error. Why? If you set it up to use nw.js 0.12.1 for example, then when it gets compiled during development time (to run its unit tests for example) it's gonna be compiled against io.js 1.2 runtime. But if you're having io.js 34.0.1 at the command line then, which is binary incompatible with 1.2, then your unit tests will fail for sure. So it is advised to not use cmake-js target settings in your module's package.json, because that way CMake.js will use that you have, and your tests will pass.
 
 #### Heroku
 [Heroku](https://heroku.com) uses the concept of a [buildpack](https://devcenter.heroku.com/articles/buildpacks) to define
