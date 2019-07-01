@@ -19,7 +19,7 @@ CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [
 Nearly every native addon is using node-gyp today, so what's wrong with it?
 
 1. First of all, Google, the creator of the gyp platform is moving
-towards its new build system called [gn](https://code.google.com/p/chromium/wiki/gn),
+towards its new build system called [gn](https://gn.googlesource.com/gn/),
 which means gyp's days of support are counted. (Just for the record, despite the announced gn switch,
 there is [Bazel](https://github.com/google/bazel) in the works, so sooner or later gn will be dropped in favor of it - IMHO.)
 
