@@ -1,3 +1,8 @@
+v5.3.0 - 09/07/19
+=================
+
+- VS 2019 Support: https://github.com/cmake-js/cmake-js/pull/178/, https://github.com/cmake-js/cmake-js/pull/184/
+
 v5.2.1 - 10/04/19
 =================
 

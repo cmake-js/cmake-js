@@ -451,4 +451,4 @@ View [changelog.md](changelog.md)
 - [Jeremy Apthorp](https://github.com/nornagon) - Support for Electron v4+
 - [Gregor Jasny](https://github.com/gjasny) - CMake 3.14 support
 - [Rogério Ribeiro da Cruz](https://github.com/rogeriorc) - Windows delay load hook, Electron 4+ compatibility
-
+- [Jack McKernan](https://github.com/jmcker), [Nik M](https://github.com/nik-m2) - VS 2019 support
