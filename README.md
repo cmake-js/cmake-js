@@ -2,7 +2,7 @@
 
 ## Quick note to contributors
 
-First of all, thanks for the PRs! Keep'em comm=ing! I try to verify and release stuff as fast as I can. So, you should not bother to compile and include ES5 files along with your PRs, generating them is the part of the release process.
+First of all, thanks for the PRs! Keep'em comming! I try to verify and release stuff as fast as I can. So, you should not bother to compile and include ES5 files along with your PRs, generating them is the part of the release process.
 
 ## About
 CMake.js is a Node.js/io.js native addon build tool which works *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
