@@ -446,7 +446,7 @@ View [changelog.md](changelog.md)
 - [d3x0r](https://github.com/d3x0r) - "G" option for supporting cutom generators, various fixes
 - [AlessandroA](https://github.com/AlessandroA) - "T" option for building a specified target
 - [pirxpilot](https://github.com/pirxpilot) - various dependency upgrades
-- [VictorLeach96](https://github.com/VictorLeach96) - tolset commandlien option
+- [VictorLeach96](https://github.com/VictorLeach96) - tolset commandline option
 - [Arnaud Botella](https://github.com/BotellaA) - Case sensitive npm config
 - [Jeremy Apthorp](https://github.com/nornagon) - Support for Electron v4+
 - [Gregor Jasny](https://github.com/gjasny) - CMake 3.14 support
