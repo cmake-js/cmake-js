@@ -135,6 +135,8 @@ Options:
   -T, --target           only build the specified target                [string]
   -C, --prefer-clang     use Clang compiler instead of default CMake compiler,
                          if available (Posix)                          [boolean]
+  --cc                   use the specified C compiler                   [string]
+  --cxx                  use the specified C++ compiler                 [string]
   -r, --runtime          the runtime to use                             [string]
   -v, --runtime-version  the runtime version to use                     [string]
   -a, --arch             the architecture to build in                   [string]
@@ -142,7 +144,6 @@ Options:
                          -D<your-arg-here>                              [string]
   -i, --silent           Prevents CMake.js to print to the stdio       [boolean]
   -O, --out              Specify the output directory to compile to, default is
-                         projectRoot/build                              [string]
                          projectRoot/build                              [string]
 ```
 
