@@ -114,6 +114,16 @@ var yargs = require("yargs")
             describe: "use Clang compiler instead of default CMake compiler, if available (Posix)",
             type: "boolean"
         },
+        cc: {
+            demand: false,
+            describe: "use the specified C compiler",
+            type: "string"
+        },
+        cxx: {
+            demand: false,
+            describe: "use the specified C++ compiler",
+            type: "string"
+        },
         r: {
             alias: "runtime",
             demand: false,
@@ -188,6 +198,8 @@ var options = {
     preferXcode: argv.x,
     preferGnu: argv.g,
     preferClang: argv.C,
+    cCompilerPath: argv.cc,
+    cppCompilerPath: argv.cxx,
     runtime: argv.r,
     runtimeVersion: argv.v,
     arch: argv.a,
