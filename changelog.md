@@ -1,3 +1,9 @@
+v6.0.0 - 30/09/19
+=================
+
+- Dropped compatibility of old Node.js runtimes (<10.0.0)
+- --cc and --cxx flags for overriding compiler detection: https://github.com/cmake-js/cmake-js/pull/191
+
 v5.3.2 - 21/08/19
 =================
 
