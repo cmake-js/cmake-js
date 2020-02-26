@@ -102,6 +102,12 @@ var yargs = require("yargs")
             describe: "use specified toolset",
             type: "string"
         },
+        A: {
+            alias: "platform",
+            demand: false,
+            describe: "use specified platform name",
+            type: "string"
+        },
         T: {
             alias: "target",
             demand: false,
@@ -193,6 +199,7 @@ var options = {
     cmakePath: argv.c || null,
     generator: argv.G,
     toolset: argv.t,
+    platform: argv.A,
     target: argv.T,
     preferMake: argv.m,
     preferXcode: argv.x,

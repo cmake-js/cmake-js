@@ -128,6 +128,7 @@ Options:
                          available (Posix)                             [boolean]
   -G, --generator        use specified generator                        [string]
   -t, --toolset          use specified toolset                          [string]
+  -A, --platform         use specified platform name                    [string]
   -T, --target           only build the specified target                [string]
   -C, --prefer-clang     use Clang compiler instead of default CMake compiler,
                          if available (Posix)                          [boolean]
@@ -281,6 +282,8 @@ This will print during configure:
 
 ### Runtimes
 
+If any of the `runtime`, `runtimeVersion`, or `arch` configuration parameters is not explicitly configured, sensible defaults will be auto-detected based on the JavaScript environment where CMake.js runs within.
+
 You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` key in the application's root `package.json` file, eg.:
 
 ```json
@@ -304,7 +307,7 @@ Available settings:
 	- `nw`: nw.js
 	- `electron`: Electron
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
-- **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
+- **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm64`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
 
 #### Runtime options in CMakeLists.txt
 
@@ -312,7 +315,7 @@ The actual node runtime parameters are detectable in CMakeLists.txt files, the f
 
 - **NODE_RUNTIME**: `"node"`, `"nw"`, `"electron"`
 - **NODE_RUNTIMEVERSION**: for example: `"0.12.1"`
-- **NODE_ARCH**: `"x64"`, `"ia32"`, `"arm"`
+- **NODE_ARCH**: `"x64"`, `"ia32"`, `"arm64"`, `"arm"`
 
 #### NW.js
 
@@ -406,7 +409,6 @@ and add it to the include directories of your *CMake* project file
 `CMakeLists.txt`:
 
 ```cmake
-
 # Include N-API wrappers
 execute_process(COMMAND node -p "require('node-addon-api').include"
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
