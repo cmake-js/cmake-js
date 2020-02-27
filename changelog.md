@@ -1,4 +1,4 @@
-unreleased
+v6.1.0 - 27/02/20
 ==========
 
 - Add support for "-A/--platform" option to make target platform selectable for Visual Studio 2019 generator: https://github.com/cmake-js/cmake-js/pull/201
