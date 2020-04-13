@@ -41,7 +41,7 @@ Options:
                          error), default is info                        [string]
   -d, --directory        specify CMake project's directory (where CMakeLists.txt
                          located)                                       [string]
-  -D, --debug            build debug configuration                     [boolean]
+  -D, --debug            build debug configuration if no config is used [boolean]
   -c, --cmake-path       path of CMake executable                       [string]
   -m, --prefer-make      use Unix Makefiles even if Ninja is available (Posix)
                                                                        [boolean]
@@ -52,6 +52,7 @@ Options:
   -t, --toolset          use specified toolset                          [string]
   -A, --platform         use specified platform name                    [string]
   -T, --target           only build the specified target                [string]
+  -F, --config           use specified build configuration              [string]
   -C, --prefer-clang     use Clang compiler instead of default CMake compiler,
                          if available (Posix)                          [boolean]
   --cc                   use the specified C compiler                   [string]
