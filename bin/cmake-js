@@ -114,6 +114,12 @@ var yargs = require("yargs")
             describe: "only build the specified target",
             type: "string"
         },
+        F: {
+            alias: "config",
+            demand: false,
+            describe: "use specified build configuration",
+            type: "string"
+        },
         C: {
             alias: "prefer-clang",
             demand: false,
@@ -201,6 +207,7 @@ var options = {
     toolset: argv.t,
     platform: argv.A,
     target: argv.T,
+    configuration: argv.F,
     preferMake: argv.m,
     preferXcode: argv.x,
     preferGnu: argv.g,
