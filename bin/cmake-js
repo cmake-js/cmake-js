@@ -66,6 +66,12 @@ var yargs = require("yargs")
             describe: "build debug configuration",
             type: "boolean"
         },
+        C: {
+            alias: "config",
+            demand: false,
+            describe: "specify build configuration (Debug, RelWithDebInfo, Release), will ignore '--debug' if specified",
+            type: "string"
+        },
         c: {
             alias: "cmake-path",
             demand: false,
