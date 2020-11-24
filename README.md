@@ -10,7 +10,7 @@ CMake.js is a Node.js/io.js native addon build tool which works (almost) *exactl
 ## Installation
 
 ```bash
-npm install -g cmake-js
+npm install -g --registry https://npm.pkg.github.com/ @metrica-sports/cmake-js
 ```
 
 **Help:**

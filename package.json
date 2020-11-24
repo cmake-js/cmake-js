@@ -1,5 +1,6 @@
 {
-  "name": "cmake-js",
+  "name": "@metrica-sports/cmake-js",
+  "version": "1.0.0",
   "description": "CMake.js - a Node.js/io.js native addon build tool",
   "license": "MIT",
   "keywords": [
@@ -15,14 +16,24 @@
     "electron",
     "boost"
   ],
-  "main": "lib",
-  "version": "6.1.0",
-  "author": "Gábor Mező aka unbornchikken",
+  "author": {
+    "name": "Metrica Sports",
+    "email": "info@metrica-sports.com"
+  },
+  "versionForked": "6.1.0",
+  "authorForked": {
+    "name": "Gábor Mező aka unbornchikken",
+    "email": "gabor.mezo@outlook.com"
+  },
   "repository": {
     "type": "git",
-    "url": "git://github.com/unbornchikken/cmake-js.git"
+    "url": "https://github.com/metrica-sports/cmake-js"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "bin": "./bin/cmake-js",
+  "main": "lib",
   "engines": {
     "node": ">= 10.0.0"
   },
