@@ -50,7 +50,7 @@ let testCases = {
         let buildSystem = new BuildSystem(options);
 
         let command = yield buildSystem.getConfigureCommand();
-        assert.notEqual(command.indexOf("-Dfoo=\"bar\""), -1, "custom options added");
+        assert.notEqual(command.indexOf("-Dfoo=bar"), -1, "custom options added");
     })
 };
 
