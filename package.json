@@ -27,6 +27,7 @@
     "node": ">= 10.0.0"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "debug": "^4",
     "fs-extra": "^5.0.0",
     "is-iojs": "^1.0.1",
@@ -34,7 +35,6 @@
     "memory-stream": "0",
     "npmlog": "^1.2.0",
     "rc": "^1.2.7",
-    "request": "^2.54.0",
     "semver": "^5.0.3",
     "splitargs": "0",
     "tar": "^4",
