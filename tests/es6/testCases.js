@@ -51,6 +51,16 @@ let testCases = {
 
         let command = yield buildSystem.getConfigureCommand();
         assert.notEqual(command.indexOf("-Dfoo=bar"), -1, "custom options added");
+    }),
+    configureWithCustomBuildOptions: async(function*(options) {
+        options = _.extend({
+            directory: path.resolve(path.join(__dirname, "./prototype")),
+            buildArgs: ["-j7"]
+        }, options);
+        let buildSystem = new BuildSystem(options);
+
+        let command = yield buildSystem.getBuildCommand();
+        assert.notEqual(command.indexOf("-- -j7"), -1, "custom build options added");
     })
 };
 
