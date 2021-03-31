@@ -1,12 +1,12 @@
 "use strict";
 /* global it */
-let lib = require("../../");
-let environment = lib.environment;
-let Bluebird = require("bluebird");
-let async = Bluebird.coroutine;
-let _ = require("lodash");
-let log = require("npmlog");
-let util = require("util");
+const lib = require("../../");
+const environment = lib.environment;
+const Bluebird = require("bluebird");
+const async = Bluebird.coroutine;
+const _ = require("lodash");
+const log = require("npmlog");
+const util = require("util");
 
 function* generateRuntimeOptions() {
     function* generateForNode(arch) {
@@ -71,7 +71,7 @@ function* generateRuntimeOptions() {
 }
 
 function* generateOptions() {
-    for (let runtimeOptions of generateRuntimeOptions()) {
+    for (const runtimeOptions of generateRuntimeOptions()) {
         if (environment.isWin) {
             // V C++:
             yield runtimeOptions;
@@ -95,10 +95,10 @@ function* generateOptions() {
     }
 }
 
-let testRunner = {
+const testRunner = {
     runCase: function (testCase, options) {
-        for (let testOptions of generateOptions()) {
-            let currentOptions = _.extend({}, testOptions, options || {});
+        for (const testOptions of generateOptions()) {
+            const currentOptions = _.extend({}, testOptions, options || {});
             it("should build with: " + util.inspect(currentOptions), function (done) {
                 async(function*() {
                     log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));

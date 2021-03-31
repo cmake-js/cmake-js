@@ -1,19 +1,19 @@
 "use strict";
 /* global describe,it */
 
-let Bluebird = require("bluebird");
-let fs = require("fs-extra");
-let Dist = require("../../").Dist;
-let assert = require("assert");
-let async = Bluebird.coroutine;
+const Bluebird = require("bluebird");
+const fs = require("fs-extra");
+const Dist = require("../../").Dist;
+const assert = require("assert");
+const async = Bluebird.coroutine;
 
-let testDownload = process.env.TEST_DOWNLOAD === "1";
+const testDownload = process.env.TEST_DOWNLOAD === "1";
 
 describe("dist", function () {
     it("should download dist files if needed", function (done) {
         this.timeout(60000);
         async(function*() {
-            let dist = new Dist();
+            const dist = new Dist();
             if (testDownload) {
                 yield fs.remove(dist.internalPath);
                 assert(dist.downloaded === false);

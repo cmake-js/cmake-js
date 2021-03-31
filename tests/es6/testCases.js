@@ -1,26 +1,26 @@
 "use strict";
-let assert = require("assert");
-let lib = require("../../");
-let BuildSystem = lib.BuildSystem;
-let _ = require("lodash");
-let path = require("path");
-let Bluebird = require("bluebird");
-let async = Bluebird.coroutine;
-let fs = require("fs-extra");
+const assert = require("assert");
+const lib = require("../../");
+const BuildSystem = lib.BuildSystem;
+const _ = require("lodash");
+const path = require("path");
+const Bluebird = require("bluebird");
+const async = Bluebird.coroutine;
+const fs = require("fs-extra");
 
-let testCases = {
+const testCases = {
     buildPrototypeWithDirectoryOption: async(function*(options) {
         options = _.extend({
             directory: path.resolve(path.join(__dirname, "./prototype"))
         }, options);
-        let buildSystem = new BuildSystem(options);
+        const buildSystem = new BuildSystem(options);
         yield buildSystem.rebuild();
         assert.ok((yield fs.stat(path.join(__dirname, "prototype/build/Release/addon.node"))).isFile());
     }),
     buildPrototype2WithCWD: async(function*(options) {
-        let cwd = process.cwd();
+        const cwd = process.cwd();
         process.chdir(path.resolve(path.join(__dirname, "./prototype2")));
-        let buildSystem = new BuildSystem(options);
+        const buildSystem = new BuildSystem(options);
         try {
             yield buildSystem.rebuild();
             assert.ok((yield fs.stat(path.join(__dirname, "prototype2/build/Release/addon2.node"))).isFile());
@@ -34,9 +34,9 @@ let testCases = {
             directory: path.resolve(path.join(__dirname, "./prototype")),
             std: "c++98"
         }, options);
-        let buildSystem = new BuildSystem(options);
+        const buildSystem = new BuildSystem(options);
         if (!/visual studio/i.test(buildSystem.toolset.generator)) {
-            let command = yield buildSystem.getConfigureCommand();
+            const command = yield buildSystem.getConfigureCommand();
             assert.equal(command.indexOf("-std=c++11"), -1, "c++11 still forced");
         }
     }),
@@ -47,9 +47,9 @@ let testCases = {
               foo: "bar"
             }
         }, options);
-        let buildSystem = new BuildSystem(options);
+        const buildSystem = new BuildSystem(options);
 
-        let command = yield buildSystem.getConfigureCommand();
+        const command = yield buildSystem.getConfigureCommand();
         assert.notEqual(command.indexOf("-Dfoo=bar"), -1, "custom options added");
     })
 };
