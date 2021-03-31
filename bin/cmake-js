@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 "use strict";
 
-var log = require("npmlog");
-var _ = require("lodash");
-var BuildSystem = require("../").BuildSystem;
-var util = require("util");
-var version = require("../package").version;
-var logLevels = ["silly", "verbose", "info", "http", "warn", "error"];
+const log = require("npmlog");
+const _ = require("lodash");
+const BuildSystem = require("../").BuildSystem;
+const util = require("util");
+const version = require("../package").version;
+const logLevels = ["silly", "verbose", "info", "http", "warn", "error"];
 
-var npmConfigData = require("rc")("npm");
-for (var key of _.keys(npmConfigData)) {
+const npmConfigData = require("rc")("npm");
+for (const key of _.keys(npmConfigData)) {
     if (_.startsWith(key, "cmake_js_")) {
-        var option = key.substr(9);
+        const option = key.substr(9);
         if (option.length === 1) {
             process.argv.push("-" + option);
         }
@@ -26,7 +26,7 @@ for (var key of _.keys(npmConfigData)) {
 
 console.log(process.argv);
 
-var yargs = require("yargs")
+const yargs = require("yargs")
     .usage("CMake.js " + version + "\n\nUsage: $0 [<command>] [options]")
     .version(function () {
         return version;
@@ -164,7 +164,7 @@ var yargs = require("yargs")
           type: "string"
         }
     });
-var argv = yargs.argv;
+const argv = yargs.argv;
 
 // If help, then print and exit:
 
@@ -186,14 +186,14 @@ log.silly("CON", util.inspect(argv));
 log.verbose("CON", "Parsing arguments");
 
 // Extract custom cMake options
-var customOptions = {};
+const customOptions = {};
 _.keys(argv).forEach(function (key) {
     if (argv[key] && _.startsWith(key, "CD")) {
         customOptions[key.substr(2)] = argv[key];
     }
 });
 
-var options = {
+const options = {
     directory: argv.directory || null,
     debug: argv.debug,
     cmakePath: argv.c || null,
@@ -218,11 +218,11 @@ var options = {
 log.verbose("CON", "options:");
 log.verbose("CON", util.inspect(options));
 
-var command = _.first(argv._) || "build";
+const command = _.first(argv._) || "build";
 
 log.verbose("CON", "Running command: " + command);
 
-var buildSystem = new BuildSystem(options);
+const buildSystem = new BuildSystem(options);
 
 function ifCommand(c, f) {
     if (c === command) {
@@ -278,7 +278,7 @@ function compile() {
     exitOnError(buildSystem.compile());
 }
 
-var done = ifCommand("install", install);
+let done = ifCommand("install", install);
 done = done || ifCommand("configure", configure);
 done = done || ifCommand("print-configure", printConfigure);
 done = done || ifCommand("build", build);
