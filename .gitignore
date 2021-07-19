@@ -26,6 +26,7 @@ node_modules
 
 # Build
 build
+package-lock.json
 
 # Users Environment Variables
 .lock-wscript
@@ -33,3 +34,4 @@ build
 # IDE
 .idea
 .vscode
+package-lock.json
