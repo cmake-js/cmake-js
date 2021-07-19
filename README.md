@@ -305,25 +305,23 @@ The `heroku-buildpack-multi` will run each buildpack in order allowing the node 
 build environment.
 
 
-#### N-API and `node-addon-api`
+#### Node-API and `node-addon-api`
 
 [ABI-stable Node.js API
-(N-API)](https://nodejs.org/api/n-api.html) are a set of experimental C
-APIs that allow to compile a native module and have it loaded by
-different versions of Node.js that provide the N-API. At the moment,
-only Node.js v8.0.0 implements and exports N-API symbols under the flag
-`--napi-modules`:
-
-    node --napi-modules index.js
+(Node-API)](https://nodejs.org/api/n-api.html#n_api_node_api),
+which was previously known as N-API, supplies a set of C
+APIs that allow to compilation and loading of native modules by
+different versions of Node.js that support Node-API which includes
+all versions of Node.js v10.x and later. 
 
 To compile a native module that uses only the
-[plain `C` N-API calls](https://github.com/nodejs/node/blob/v8.x/src/node_api.h),
+[plain `C` Node-API calls](https://nodejs.org/api/n-api.html#n_api_node_api),
 follow the directions for plain `node` native modules.
 
 To compile a native module that uses the header-only C++ wrapper
 classes provided by
 [`node-addon-api`](https://github.com/nodejs/node-addon-api),
-you need at the moment to make your package depend on it with
+you need to make your package depend on it with:
 
     npm install --save-dev node-addon-api
 
@@ -331,7 +329,7 @@ and add it to the include directories of your *CMake* project file
 `CMakeLists.txt`:
 
 ```cmake
-# Include N-API wrappers
+# Include node-addon-api wrappers
 execute_process(COMMAND node -p "require('node-addon-api').include"
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         OUTPUT_VARIABLE NODE_ADDON_API_DIR
@@ -339,7 +337,6 @@ execute_process(COMMAND node -p "require('node-addon-api').include"
 string(REPLACE "\n" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
 string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${NODE_ADDON_API_DIR})
-
 ```
 
 
