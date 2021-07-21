@@ -272,9 +272,10 @@ To make compatible your Electron application with any CMake.js based modules, wr
 That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with Electron out-of-the-box.
 
 ##### Note
-Currently Electron (V1.4.x+) can only call modules built using CMake.js from the main process. To call such a module from a render process use the Electron [remote](https://github.com/electron/electron/blob/master/docs/api/remote.md) module in your require statement:
+On Windows, the [`win_delay_load_hook`](https://www.electronjs.org/docs/tutorial/using-native-node-modules#a-note-about-win_delay_load_hook) is required to be embedded in the module or it will fail to load in the render process.
+cmake-js will add the hook if the CMakeLists.txt contains the library `${CMAKE_JS_SRC}`.
 
-```var yourModule = require('electron').remote.require('pathToYourModule/cmakeModuleName.node')```
+Without the hook, the module can only be called from the render process using the Electron [remote](https://github.com/electron/electron/blob/master/docs/api/remote.md) module.
 
 #### Important
 
