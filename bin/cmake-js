@@ -26,8 +26,20 @@ for (var key of _.keys(npmConfigData)) {
 
 console.log(process.argv);
 
+// forwards everything after '--' in argv as arguments to the build command
+var buildArgs = [];
+var hasSeenDoubleDash = false;
+process.argv.forEach(function (arg) {
+    if (!hasSeenDoubleDash) {
+        hasSeenDoubleDash = arg === '--';
+        return;
+    }
+
+  buildArgs.push(arg);
+});
+
 var yargs = require("yargs")
-    .usage("CMake.js " + version + "\n\nUsage: $0 [<command>] [options]")
+    .usage("CMake.js " + version + "\n\nUsage: $0 [<command>] [options] [-- <build args>]")
     .version(function () {
         return version;
     })
@@ -211,6 +223,7 @@ var options = {
     runtimeVersion: argv.v,
     arch: argv.a,
     cMakeOptions: customOptions,
+    buildArgs: buildArgs,
     silent: argv.i,
     out: argv.O
 };
