@@ -42,7 +42,7 @@ Options:
   -d, --directory        specify CMake project's directory (where CMakeLists.txt
                          located)                                       [string]
   -D, --debug            build debug configuration                     [boolean]
-  -C, --config           specify build configuration (Debug, RelWithDebInfo,
+  -B, --config           specify build configuration (Debug, RelWithDebInfo,
                          Release), will ignore '--debug' if specified   [string]
   -c, --cmake-path       path of CMake executable                       [string]
   -m, --prefer-make      use Unix Makefiles even if Ninja is available (Posix)
