@@ -66,6 +66,12 @@ var yargs = require("yargs")
             describe: "build debug configuration",
             type: "boolean"
         },
+        B: {
+            alias: "config",
+            demand: false,
+            describe: "specify build configuration (Debug, RelWithDebInfo, Release), will ignore '--debug' if specified",
+            type: "string"
+        },
         c: {
             alias: "cmake-path",
             demand: false,
@@ -212,7 +218,8 @@ var options = {
     arch: argv.a,
     cMakeOptions: customOptions,
     silent: argv.i,
-    out: argv.O
+    out: argv.O,
+    config: argv.B
 };
 
 log.verbose("CON", "options:");
