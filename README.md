@@ -61,6 +61,7 @@ Options:
   -r, --runtime          the runtime to use                             [string]
   -v, --runtime-version  the runtime version to use                     [string]
   -a, --arch             the architecture to build in                   [string]
+  -p, --parallel         the number of threads cmake-js can use         [number]
   --CD                   Custom argument passed to CMake in format:
                          -D<your-arg-here>                              [string]
   -i, --silent           Prevents CMake.js to print to the stdio       [boolean]
