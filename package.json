@@ -41,7 +41,7 @@
     "unzipper": "^0.8.13",
     "url-join": "0",
     "which": "^1.0.9",
-    "yargs": "^3.6.0"
+    "yargs": "^17.2.1"
   },
   "devDependencies": {
     "mocha": "*",
