@@ -359,17 +359,6 @@ View [changelog.md](changelog.md)
 
 ## Credits
 
-- [Ivshti (Ivo Georgiev)](https://github.com/Ivshti) - Electron support
-- [Johan (JohanvdWest)](https://github.com/JohanvdWest) - option for supporting pre C++11 compilers
-- [javedulu](https://github.com/javedulu) option to generate Xcode project (-x, --prefer-xcode)
-- [Gerhard Berger](https://github.com/gerhardberger) - Custom CMake parameter support, silent and out parameters
-- [d3x0r](https://github.com/d3x0r) - "G" option for supporting cutom generators, various fixes
-- [AlessandroA](https://github.com/AlessandroA) - "T" option for building a specified target
-- [pirxpilot](https://github.com/pirxpilot) - various dependency upgrades
-- [VictorLeach96](https://github.com/VictorLeach96) - tolset commandline option
-- [Arnaud Botella](https://github.com/BotellaA) - Case sensitive npm config
-- [Jeremy Apthorp](https://github.com/nornagon) - Support for Electron v4+
-- [Gregor Jasny](https://github.com/gjasny) - CMake 3.14 support, auto-detect Visual Studio 2019 platform
-- [Rogério Ribeiro da Cruz](https://github.com/rogeriorc) - Windows delay load hook, Electron 4+ compatibility
-- [Jack McKernan](https://github.com/jmcker), [Nik M](https://github.com/nik-m2) - VS 2019 support
-- [Colden Cullen](https://github.com/ColdenCullen) - --cc and --cxx flags
+https://github.com/cmake-js/cmake-js/graphs/contributors
+
+Ty all!
