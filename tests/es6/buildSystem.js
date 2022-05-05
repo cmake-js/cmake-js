@@ -7,8 +7,6 @@ let CMake = lib.CMake;
 let BuildSystem = lib.BuildSystem;
 let _ = require("lodash");
 let path = require("path");
-let Bluebird = require("bluebird");
-let async = Bluebird.coroutine;
 let log = require("npmlog");
 let testRunner = require("./testRunner");
 let testCases = require("./testCases");
@@ -32,13 +30,11 @@ describe("BuildSystem", function () {
         testRunner.runCase(testCases.buildPrototypeWithDirectoryOption);
     });
 
-    it("should provide list of generators", function (done) {
-        async(function*() {
-            let gens = yield CMake.getGenerators();
-            assert(_.isArray(gens));
-            assert(gens.length > 0);
-            assert.equal(gens.filter(function (g) { return g.length; }).length, gens.length);
-        })().nodeify(done);
+    it("should provide list of generators", async function () {
+        let gens = await CMake.getGenerators();
+        assert(_.isArray(gens));
+        assert(gens.length > 0);
+        assert.equal(gens.filter(function (g) { return g.length; }).length, gens.length);
     });
 
     it("should rebuild prototype if cwd is the source directory", function (done) {

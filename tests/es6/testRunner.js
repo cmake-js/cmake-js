@@ -2,8 +2,6 @@
 /* global it */
 let lib = require("../../");
 let environment = lib.environment;
-let Bluebird = require("bluebird");
-let async = Bluebird.coroutine;
 let _ = require("lodash");
 let log = require("npmlog");
 let util = require("util");
@@ -99,11 +97,9 @@ let testRunner = {
     runCase: function (testCase, options) {
         for (let testOptions of generateOptions()) {
             let currentOptions = _.extend({}, testOptions, options || {});
-            it("should build with: " + util.inspect(currentOptions), function (done) {
-                async(function*() {
-                    log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));
-                    yield testCase(currentOptions);
-                })().nodeify(done);
+            it("should build with: " + util.inspect(currentOptions), async function () {
+                log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));
+                await testCase(currentOptions);
             });
         }
     }

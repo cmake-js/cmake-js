@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "bluebird": "^3",
     "debug": "^4",
     "fs-extra": "^5.0.0",
     "lodash": "^4",
