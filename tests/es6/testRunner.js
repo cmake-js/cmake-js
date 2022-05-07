@@ -11,32 +11,30 @@ function* generateRuntimeOptions() {
         // Old:
         yield {
             runtime: "node",
-            runtimeVersion: "0.10.36",
+            runtimeVersion: "14.0.0",
             arch: arch
         };
 
         // LTS:
         yield {
             runtime: "node",
-            runtimeVersion: "4.4.2",
+            runtimeVersion: "16.0.0",
             arch: arch
         };
 
         // Current:
-        if (environment.runtimeVersion !== "5.10.0") {
-            yield {
-                runtime: "node",
-                runtimeVersion: "5.10.0",
-                arch: arch
-            };
-        }
+        yield {
+            runtime: "node",
+            runtimeVersion: "18.0.0",
+            arch: arch
+        };
     }
 
     function* generateForNWJS(arch) {
         // Latest:
         yield {
             runtime: "nw",
-            runtimeVersion: "0.13.2",
+            runtimeVersion: "0.64.0",
             arch: arch
         };
     }
@@ -45,7 +43,7 @@ function* generateRuntimeOptions() {
         // Latest:
         yield {
             runtime: "electron",
-            runtimeVersion: "0.37.3",
+            runtimeVersion: "18.2.1",
             arch: arch
         };
     }

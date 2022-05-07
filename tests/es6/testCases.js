@@ -35,7 +35,7 @@ let testCases = {
         let buildSystem = new BuildSystem(options);
         if (!/visual studio/i.test(buildSystem.toolset.generator)) {
             let command = await buildSystem.getConfigureCommand();
-            assert.equal(command.indexOf("-std=c++11"), -1, "c++11 still forced");
+            assert.equal(command.indexOf("-std=c++"), -1, "c++ version still forced");
         }
     },
     configureWithCustomOptions: async function(options) {

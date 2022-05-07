@@ -37,15 +37,15 @@ describe("BuildSystem", function () {
         assert.equal(gens.filter(function (g) { return g.length; }).length, gens.length);
     });
 
-    it("should rebuild prototype if cwd is the source directory", function (done) {
-        testCases.buildPrototype2WithCWD().nodeify(done);
+    it("should rebuild prototype if cwd is the source directory", async function () {
+        await testCases.buildPrototype2WithCWD();
     });
 
-    it("should run with old GNU compilers", function (done) {
-        testCases.shouldConfigurePreC11Properly().nodeify(done);
+    it("should run with old GNU compilers", async function () {
+        await testCases.shouldConfigurePreC11Properly();
     });
 
-    it("should configure with custom option", function (done) {
-        testCases.configureWithCustomOptions().nodeify(done);
+    it("should configure with custom option", async function () {
+        await testCases.configureWithCustomOptions();
     });
 });

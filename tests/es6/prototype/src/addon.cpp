@@ -3,7 +3,7 @@
 #include <nan.h>
 
 NAN_METHOD(Add) {
-  double value = info[0]->NumberValue() + info[1]->NumberValue();
+  double value = info[0]->NumberValue(Nan::GetCurrentContext()).FromJust() + info[1]->NumberValue(Nan::GetCurrentContext()).FromJust();
   info.GetReturnValue().Set(Nan::New(value));
 }
 
