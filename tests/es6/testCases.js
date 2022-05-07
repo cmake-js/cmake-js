@@ -8,9 +8,10 @@ let fs = require("fs-extra");
 
 let testCases = {
     buildPrototypeWithDirectoryOption: async function(options) {
-        options = _.extend({
-            directory: path.resolve(path.join(__dirname, "./prototype"))
-        }, options);
+        options = {
+            directory: path.resolve(path.join(__dirname, "./prototype")),
+            ...options
+        };
         let buildSystem = new BuildSystem(options);
         await  buildSystem.rebuild();
         assert.ok((await fs.stat(path.join(__dirname, "prototype/build/Release/addon.node"))).isFile());
@@ -28,10 +29,11 @@ let testCases = {
         }
     },
     shouldConfigurePreC11Properly: async function(options) {
-        options = _.extend({
+        options = {
             directory: path.resolve(path.join(__dirname, "./prototype")),
-            std: "c++98"
-        }, options);
+            std: "c++98",
+            ...options
+        };
         let buildSystem = new BuildSystem(options);
         if (!/visual studio/i.test(buildSystem.toolset.generator)) {
             let command = await buildSystem.getConfigureCommand();
@@ -39,12 +41,13 @@ let testCases = {
         }
     },
     configureWithCustomOptions: async function(options) {
-        options = _.extend({
+        options = {
             directory: path.resolve(path.join(__dirname, "./prototype")),
             cMakeOptions: {
               foo: "bar"
-            }
-        }, options);
+            },
+            ...options
+        };
         let buildSystem = new BuildSystem(options);
 
         let command = await buildSystem.getConfigureCommand();

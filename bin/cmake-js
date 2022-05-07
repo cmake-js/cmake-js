@@ -10,7 +10,7 @@ var logLevels = ["silly", "verbose", "info", "http", "warn", "error"];
 
 var npmConfigData = require("rc")("npm");
 for (var key of _.keys(npmConfigData)) {
-    if (_.startsWith(key, "cmake_js_")) {
+    if (key.startsWith("cmake_js_")) {
         var option = key.substr(9);
         if (option.length === 1) {
             process.argv.push("-" + option);
@@ -192,7 +192,7 @@ log.verbose("CON", "Parsing arguments");
 // Extract custom cMake options
 var customOptions = {};
 _.keys(argv).forEach(function (key) {
-    if (argv[key] && _.startsWith(key, "CD")) {
+    if (argv[key] && key.startsWith("CD")) {
         customOptions[key.substr(2)] = argv[key];
     }
 });

@@ -74,16 +74,16 @@ function* generateOptions() {
         }
         else {
             // Clang, Make
-            yield _.extend({}, runtimeOptions, {preferClang: true, referMake: true});
+            yield { ...runtimeOptions, preferClang: true, referMake: true };
 
             // Clang, Ninja
-            yield _.extend({}, runtimeOptions, {preferClang: true});
+            yield { ...runtimeOptions, preferClang: true };
 
             // g++, Make
-            yield _.extend({}, runtimeOptions, {preferGnu: true, referMake: true});
+            yield { ...runtimeOptions, preferGnu: true, referMake: true };
 
             // g++, Ninja
-            yield _.extend({}, runtimeOptions, {preferGnu: true});
+            yield { ...runtimeOptions, preferGnu: true };
 
             // Default:
             yield runtimeOptions;
@@ -94,7 +94,7 @@ function* generateOptions() {
 let testRunner = {
     runCase: function (testCase, options) {
         for (let testOptions of generateOptions()) {
-            let currentOptions = _.extend({}, testOptions, options || {});
+            let currentOptions = { ...testOptions, ...(options || {}) };
             it("should build with: " + util.inspect(currentOptions), async function () {
                 log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));
                 await testCase(currentOptions);
