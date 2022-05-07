@@ -47,5 +47,10 @@
   },
   "scripts": {
     "test": "mocha tests"
-  }
+  },
+  "files": [
+    "lib",
+    "bin",
+    "*.md"
+  ]
 }
