@@ -4,7 +4,6 @@
 let assert = require("assert");
 let lib = require("../../");
 let CMake = lib.CMake;
-let BuildSystem = lib.BuildSystem;
 let _ = require("lodash");
 let path = require("path");
 let log = require("npmlog");
