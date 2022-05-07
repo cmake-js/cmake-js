@@ -28,9 +28,7 @@ console.log(process.argv);
 
 var yargs = require("yargs")
     .usage("CMake.js " + version + "\n\nUsage: $0 [<command>] [options]")
-    .version(function () {
-        return version;
-    })
+    .version(version)
     .command("install", "Install Node.js/io.js distribution files if needed")
     .command("configure", "Configure CMake project")
     .command("print-configure", "Print the configuration command")
