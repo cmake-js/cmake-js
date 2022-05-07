@@ -2,7 +2,6 @@
 /* global it */
 let lib = require("../../");
 let environment = lib.environment;
-let _ = require("lodash");
 let log = require("npmlog");
 let util = require("util");
 

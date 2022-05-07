@@ -4,7 +4,6 @@
 let assert = require("assert");
 let lib = require("../../");
 let CMake = lib.CMake;
-let _ = require("lodash");
 let path = require("path");
 let log = require("npmlog");
 let testRunner = require("./testRunner");
@@ -31,7 +30,7 @@ describe("BuildSystem", function () {
 
     it("should provide list of generators", async function () {
         let gens = await CMake.getGenerators();
-        assert(_.isArray(gens));
+        assert(Array.isArray(gens));
         assert(gens.length > 0);
         assert.equal(gens.filter(function (g) { return g.length; }).length, gens.length);
     });
