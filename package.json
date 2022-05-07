@@ -1,6 +1,6 @@
 {
   "name": "cmake-js",
-  "description": "CMake.js - a Node.js/io.js native addon build tool",
+  "description": "CMake.js - a Node.js native addon build tool",
   "license": "MIT",
   "keywords": [
     "native",

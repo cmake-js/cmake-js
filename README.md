@@ -1,16 +1,16 @@
 # CMake.js (MIT)
 
 ## About
-CMake.js is a Node.js/io.js native addon build tool which works (almost) *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
+CMake.js is a Node.js native addon build tool which works (almost) *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
 
-- Node.js 10+ since CMake.js v6.0.0 (for older runtimes please use CMake.js 5)
+- Node.js 10+ since CMake.js v6.0.0 (for older runtimes please use CMake.js 5). Newer version can produce builds targetting older runtimes
 - [NW.js](https://github.com/nwjs/nw.js): all CMake.js based native modules are compatible with NW.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required
-- [Electron](https://github.com/atom/electron) (formerly known as atom-shell): out-of-the-box build support, [no post build steps required](https://github.com/atom/electron/blob/master/docs/tutorial/using-native-node-modules.md)
+- [Electron](https://github.com/electron/electron) (formerly known as atom-shell): out-of-the-box build support, [no post build steps required](https://github.com/electron/electron/blob/main/docs/tutorial/using-native-node-modules.md)
 
 ## Installation
 
 ```bash
-npm install -g cmake-js
+npm install cmake-js
 ```
 
 **Help:**
@@ -23,7 +23,7 @@ cmake-js --help
 Usage: cmake-js [<command>] [options]
 
 Commands:
-  install          Install Node.js/io.js distribution files if needed
+  install          Install Node.js distribution files if needed
   configure        Configure CMake project
   print-configure  Print the configuration command
   build            Build the project (will configure first if required)
@@ -90,10 +90,15 @@ In a nutshell. *(For more complete documentation please see [the first tutorial]
 
 ```cmake
 project (your-addon-name-here)
+
 include_directories(${CMAKE_JS_INC})
+
 file(GLOB SOURCE_FILES "your-source files-location-here")
+
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
+
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
+
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 ```
 
@@ -206,6 +211,12 @@ This will print during configure:
 
 ### Runtimes
 
+#### Important
+
+It is important to understand that this setting is to be configured in the **application's root package.json file**. If you're creating a native module targeting nw.js for example, then **do not specify anything** in your module's package.json. It's the actual application's decision to specify its runtime, your module's just compatible anything that was mentioned in the [About chapter](#about). Actually defining `cmake-js` key in your module's package.json file may lead to an error. Why? If you set it up to use nw.js 0.12.1 for example, then when it gets compiled during development time (to run its unit tests for example) it's gonna be compiled against io.js 1.2 runtime. But if you're having io.js 34.0.1 at the command line then, which is binary incompatible with 1.2, then your unit tests will fail for sure. So it is advised to not use cmake-js target settings in your module's package.json, because that way CMake.js will use that you have, and your tests will pass.
+
+#### Configuration
+
 If any of the `runtime`, `runtimeVersion`, or `arch` configuration parameters is not explicitly configured, sensible defaults will be auto-detected based on the JavaScript environment where CMake.js runs within.
 
 You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` key in the application's root `package.json` file, eg.:
@@ -231,7 +242,7 @@ Available settings:
 	- `nw`: nw.js
 	- `electron`: Electron
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
-- **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm64`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node/io.js runtime is gonna be used, so you have to choose a matching nw.js runtime.*
+- **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm64`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node runtime is gonna be used, so you have to choose a matching nw.js runtime.*
 
 #### Runtime options in CMakeLists.txt
 
@@ -257,30 +268,10 @@ To make compatible your NW.js application with any CMake.js based modules, write
 
 That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with NW.js out-of-the-box. For more complete documentation please see [the third tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js).
 
-#### Electron
-
-To make compatible your Electron application with any CMake.js based modules, write the following to your application's package.json file:
-
-```json
-{
-  "cmake-js": {
-    "runtime": "electron",
-    "runtimeVersion": "electron-runtime-version-here",
-    "arch": "whatever-setting-is-appropriate-for-your-application's-windows-build"
-  }
-}
-```
-
-That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with Electron out-of-the-box.
-
 ##### Note
 Currently Electron (V1.4.x+) can only call modules built using CMake.js from the main process. To call such a module from a render process use the Electron [remote](https://github.com/electron/electron/blob/master/docs/api/remote.md) module in your require statement:
 
 ```var yourModule = require('electron').remote.require('pathToYourModule/cmakeModuleName.node')```
-
-#### Important
-
-It is important to understand that this setting is to be configured in the **application's root package.json file**. If you're creating a native module targeting nw.js for example, then **do not specify anything** in your module's package.json. It's the actual application's decision to specify its runtime, your module's just compatible anything that was mentioned in the [About chapter](#about). Actually defining `cmake-js` key in your module's package.json file may lead to an error. Why? If you set it up to use nw.js 0.12.1 for example, then when it gets compiled during development time (to run its unit tests for example) it's gonna be compiled against io.js 1.2 runtime. But if you're having io.js 34.0.1 at the command line then, which is binary incompatible with 1.2, then your unit tests will fail for sure. So it is advised to not use cmake-js target settings in your module's package.json, because that way CMake.js will use that you have, and your tests will pass.
 
 #### Heroku
 [Heroku](https://heroku.com) uses the concept of a [buildpack](https://devcenter.heroku.com/articles/buildpacks) to define
@@ -325,7 +316,7 @@ classes provided by
 [`node-addon-api`](https://github.com/nodejs/node-addon-api),
 you need to make your package depend on it with:
 
-    npm install --save-dev node-addon-api
+    npm install --save node-addon-api
 
 and add it to the include directories of your *CMake* project file
 `CMakeLists.txt`:
@@ -349,9 +340,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${NODE_ADDON_API_DIR})
 - [TUTORIAL 03 Using CMake.js based native modules with NW.js](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js)
 - [TUTORIAL 04 Creating CMake.js based native modules with Boost dependency](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-04-Creating-CMake.js-based-native-modules-with-Boost-dependency)
 
-## Use case in the works - ArrayFire.js
+## Real examples
 
-I'm working on the Node.js port of the awesome [ArrayFire](http://arrayfire.com/) CPU/GPU computing library, please follow its status in its repo: [ArrayFire.js](https://github.com/arrayfire/arrayfire_js).
+* [@julusian/jpeg-turbo](https://github.com/julusian/node-jpeg-turbo) - A Node-API wrapping around libjpeg-turbo. cmake-js was a good fit here, as libjpeg-turbo provides cmake files that can be used, and would be hard to replicate correctly in node-gyp
+
+Open a PR to add your own project here.
 
 ## Changelog
 
