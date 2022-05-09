@@ -1,1 +1,0 @@
-{"version":3,"names":[],"mappings":"","sources":["index.js"],"sourcesContent":["\"use strict\";\nrequire(\"./dist\");\nrequire(\"./buildSystem\");\nrequire(\"./locateNAN\");\n"],"file":"index.js"}

@@ -1,3 +1,21 @@
+v6.3.0 - 26/11/21
+==========
+
+- add offline mode: https://github.com/cmake-js/cmake-js/pull/260
+- handle missing buildSystem.log: https://github.com/cmake-js/cmake-js/pull/259
+- Add config flag: https://github.com/cmake-js/cmake-js/pull/251
+- Remove escaped quotes from windows registry queries: https://github.com/cmake-js/cmake-js/pull/250
+
+v6.2.1 - 20/07/21
+==========
+
+- EOL hotfix (Thx Windows!)
+
+v6.2.0 - 19/07/21
+==========
+
+- various fixes
+
 v6.1.0 - 27/02/20
 ==========
 
