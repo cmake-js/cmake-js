@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project (addon2)
 
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 endif()
 
 include_directories(${CMAKE_JS_INC})
