@@ -1,13 +1,13 @@
 "use strict";
 /* global describe,it,before */
 
-let assert = require("assert");
-let lib = require("../../");
-let CMake = lib.CMake;
-let path = require("path");
-let log = require("npmlog");
-let testRunner = require("./testRunner");
-let testCases = require("./testCases");
+const assert = require("assert");
+const lib = require("../../");
+const CMake = lib.CMake;
+const path = require("path");
+const log = require("npmlog");
+const testRunner = require("./testRunner");
+const testCases = require("./testCases");
 
 describe("BuildSystem", function () {
     this.timeout(300000);
@@ -29,7 +29,7 @@ describe("BuildSystem", function () {
     });
 
     it("should provide list of generators", async function () {
-        let gens = await CMake.getGenerators();
+        const gens = await CMake.getGenerators();
         assert(Array.isArray(gens));
         assert(gens.length > 0);
         assert.equal(gens.filter(function (g) { return g.length; }).length, gens.length);

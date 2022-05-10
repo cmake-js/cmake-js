@@ -1,9 +1,9 @@
 "use strict";
 /* global it */
-let lib = require("../../");
-let environment = lib.environment;
-let log = require("npmlog");
-let util = require("util");
+const lib = require("../../");
+const environment = lib.environment;
+const log = require("npmlog");
+const util = require("util");
 
 function* generateRuntimeOptions() {
     function* generateForNode(arch) {
@@ -66,7 +66,7 @@ function* generateRuntimeOptions() {
 }
 
 function* generateOptions() {
-    for (let runtimeOptions of generateRuntimeOptions()) {
+    for (const runtimeOptions of generateRuntimeOptions()) {
         if (environment.isWin) {
             // V C++:
             yield runtimeOptions;
@@ -90,10 +90,10 @@ function* generateOptions() {
     }
 }
 
-let testRunner = {
+const testRunner = {
     runCase: function (testCase, options) {
-        for (let testOptions of generateOptions()) {
-            let currentOptions = { ...testOptions, ...(options || {}) };
+        for (const testOptions of generateOptions()) {
+            const currentOptions = { ...testOptions, ...(options || {}) };
             it("should build with: " + util.inspect(currentOptions), async function () {
                 log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));
                 await testCase(currentOptions);

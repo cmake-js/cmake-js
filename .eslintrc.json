@@ -4,6 +4,8 @@
         "sourceType": "module"
     },
     "rules": {
-        "semi": 2
+        "semi": 2,
+        "no-var": 2,
+        "prefer-const": 2
     }
 }

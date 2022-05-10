@@ -1,24 +1,24 @@
 "use strict";
-let assert = require("assert");
-let lib = require("../../");
-let BuildSystem = lib.BuildSystem;
-let path = require("path");
-let fs = require("fs-extra");
+const assert = require("assert");
+const lib = require("../../");
+const BuildSystem = lib.BuildSystem;
+const path = require("path");
+const fs = require("fs-extra");
 
-let testCases = {
+const testCases = {
     buildPrototypeWithDirectoryOption: async function(options) {
         options = {
             directory: path.resolve(path.join(__dirname, "./prototype")),
             ...options
         };
-        let buildSystem = new BuildSystem(options);
+        const buildSystem = new BuildSystem(options);
         await  buildSystem.rebuild();
         assert.ok((await fs.stat(path.join(__dirname, "prototype/build/Release/addon.node"))).isFile());
     },
     buildPrototype2WithCWD: async function(options) {
-        let cwd = process.cwd();
+        const cwd = process.cwd();
         process.chdir(path.resolve(path.join(__dirname, "./prototype2")));
-        let buildSystem = new BuildSystem(options);
+        const buildSystem = new BuildSystem(options);
         try {
             await buildSystem.rebuild();
             assert.ok((await fs.stat(path.join(__dirname, "prototype2/build/Release/addon2.node"))).isFile());
@@ -33,9 +33,9 @@ let testCases = {
             std: "c++98",
             ...options
         };
-        let buildSystem = new BuildSystem(options);
+        const buildSystem = new BuildSystem(options);
         if (!/visual studio/i.test(buildSystem.toolset.generator)) {
-            let command = await buildSystem.getConfigureCommand();
+            const command = await buildSystem.getConfigureCommand();
             assert.equal(command.indexOf("-std=c++"), -1, "c++ version still forced");
         }
     },
@@ -47,9 +47,9 @@ let testCases = {
             },
             ...options
         };
-        let buildSystem = new BuildSystem(options);
+        const buildSystem = new BuildSystem(options);
 
-        let command = await buildSystem.getConfigureCommand();
+        const command = await buildSystem.getConfigureCommand();
         assert.notEqual(command.indexOf("-Dfoo=bar"), -1, "custom options added");
     }
 };
