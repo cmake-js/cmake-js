@@ -27,6 +27,7 @@ node_modules
 # Build
 build
 package-lock.json
+yarn.lock
 
 # Users Environment Variables
 .lock-wscript

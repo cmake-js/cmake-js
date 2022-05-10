@@ -2,15 +2,14 @@
 "use strict";
 
 var log = require("npmlog");
-var _ = require("lodash");
 var BuildSystem = require("../").BuildSystem;
 var util = require("util");
 var version = require("../package").version;
 var logLevels = ["silly", "verbose", "info", "http", "warn", "error"];
 
 var npmConfigData = require("rc")("npm");
-for (var key of _.keys(npmConfigData)) {
-    if (_.startsWith(key, "cmake_js_")) {
+for (const [key, value] of Object.entries(npmConfigData)) {
+    if (key.startsWith("cmake_js_")) {
         var option = key.substr(9);
         if (option.length === 1) {
             process.argv.push("-" + option);
@@ -18,8 +17,8 @@ for (var key of _.keys(npmConfigData)) {
         else {
             process.argv.push("--" + option);
         }
-        if (npmConfigData[key]) {
-            process.argv.push(npmConfigData[key]);
+        if (value) {
+            process.argv.push(value);
         }
     }
 }
@@ -28,10 +27,8 @@ console.log(process.argv);
 
 var yargs = require("yargs")
     .usage("CMake.js " + version + "\n\nUsage: $0 [<command>] [options]")
-    .version(function () {
-        return version;
-    })
-    .command("install", "Install Node.js/io.js distribution files if needed")
+    .version(version)
+    .command("install", "Install Node.js distribution files if needed")
     .command("configure", "Configure CMake project")
     .command("print-configure", "Print the configuration command")
     .command("build", "Build the project (will configure first if required)")
@@ -187,7 +184,7 @@ if (argv.h) {
 
 // Setup log level:
 
-if (argv.l && _.includes(logLevels, argv.l)) {
+if (argv.l && logLevels.includes(argv.l)) {
     log.level = argv.l;
     log.resume();
 }
@@ -199,11 +196,11 @@ log.verbose("CON", "Parsing arguments");
 
 // Extract custom cMake options
 var customOptions = {};
-_.keys(argv).forEach(function (key) {
-    if (argv[key] && _.startsWith(key, "CD")) {
-        customOptions[key.substr(2)] = argv[key];
+for (const [key, value] of Object.entries(argv)) {
+     if (value && key.startsWith("CD")) {
+        customOptions[key.substr(2)] = value;
     }
-});
+}
 
 var options = {
     directory: argv.directory || null,
@@ -232,7 +229,7 @@ var options = {
 log.verbose("CON", "options:");
 log.verbose("CON", util.inspect(options));
 
-var command = _.first(argv._) || "build";
+var command = argv._[0] || "build";
 
 log.verbose("CON", "Running command: " + command);
 

@@ -2,9 +2,6 @@
 /* global it */
 let lib = require("../../");
 let environment = lib.environment;
-let Bluebird = require("bluebird");
-let async = Bluebird.coroutine;
-let _ = require("lodash");
 let log = require("npmlog");
 let util = require("util");
 
@@ -13,32 +10,30 @@ function* generateRuntimeOptions() {
         // Old:
         yield {
             runtime: "node",
-            runtimeVersion: "0.10.36",
+            runtimeVersion: "14.0.0",
             arch: arch
         };
 
         // LTS:
         yield {
             runtime: "node",
-            runtimeVersion: "4.4.2",
+            runtimeVersion: "16.0.0",
             arch: arch
         };
 
         // Current:
-        if (environment.runtimeVersion !== "5.10.0") {
-            yield {
-                runtime: "node",
-                runtimeVersion: "5.10.0",
-                arch: arch
-            };
-        }
+        yield {
+            runtime: "node",
+            runtimeVersion: "18.0.0",
+            arch: arch
+        };
     }
 
     function* generateForNWJS(arch) {
         // Latest:
         yield {
             runtime: "nw",
-            runtimeVersion: "0.13.2",
+            runtimeVersion: "0.64.0",
             arch: arch
         };
     }
@@ -47,7 +42,7 @@ function* generateRuntimeOptions() {
         // Latest:
         yield {
             runtime: "electron",
-            runtimeVersion: "0.37.3",
+            runtimeVersion: "18.2.1",
             arch: arch
         };
     }
@@ -78,16 +73,16 @@ function* generateOptions() {
         }
         else {
             // Clang, Make
-            yield _.extend({}, runtimeOptions, {preferClang: true, referMake: true});
+            yield { ...runtimeOptions, preferClang: true, referMake: true };
 
             // Clang, Ninja
-            yield _.extend({}, runtimeOptions, {preferClang: true});
+            yield { ...runtimeOptions, preferClang: true };
 
             // g++, Make
-            yield _.extend({}, runtimeOptions, {preferGnu: true, referMake: true});
+            yield { ...runtimeOptions, preferGnu: true, referMake: true };
 
             // g++, Ninja
-            yield _.extend({}, runtimeOptions, {preferGnu: true});
+            yield { ...runtimeOptions, preferGnu: true };
 
             // Default:
             yield runtimeOptions;
@@ -98,12 +93,10 @@ function* generateOptions() {
 let testRunner = {
     runCase: function (testCase, options) {
         for (let testOptions of generateOptions()) {
-            let currentOptions = _.extend({}, testOptions, options || {});
-            it("should build with: " + util.inspect(currentOptions), function (done) {
-                async(function*() {
-                    log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));
-                    yield testCase(currentOptions);
-                })().nodeify(done);
+            let currentOptions = { ...testOptions, ...(options || {}) };
+            it("should build with: " + util.inspect(currentOptions), async function () {
+                log.info("TEST", "Running case for options of: " + util.inspect(currentOptions));
+                await testCase(currentOptions);
             });
         }
     }
