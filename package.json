@@ -16,7 +16,7 @@
     "boost"
   ],
   "main": "lib",
-  "version": "6.3.0",
+  "version": "7.0.0-0",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
@@ -24,15 +24,15 @@
   },
   "bin": "./bin/cmake-js",
   "engines": {
-    "node": ">= 10.0.0"
+    "node": ">= 14.15.0"
   },
   "dependencies": {
     "axios": "^0.27.2",
     "debug": "^4",
-    "fs-extra": "^9.1.0",
+    "fs-extra": "^10.1.0",
     "lodash.isplainobject": "^4.0.6",
     "memory-stream": "^1.0.0",
-    "npmlog": "^5.0.1",
+    "npmlog": "^6.0.2",
     "rc": "^1.2.7",
     "semver": "^7.3.7",
     "tar": "^6.1.11",
