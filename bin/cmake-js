@@ -151,6 +151,12 @@ var yargs = require("yargs")
             describe: "the architecture to build in",
             type: "string"
         },
+        p: {
+            alias: "parallel",
+            demand: false,
+            describe: "the number of threads cmake can use",
+            type: "number"
+        },
         "CD": {
             demand: false,
             describe: "Custom argument passed to CMake in format: -D<your-arg-here>",
@@ -216,7 +222,8 @@ var options = {
     cMakeOptions: customOptions,
     silent: argv.i,
     out: argv.O,
-    config: argv.B
+    config: argv.B,
+    parallel: argv.p
 };
 
 log.verbose("CON", "options:");
