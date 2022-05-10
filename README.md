@@ -244,6 +244,13 @@ Available settings:
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
 - **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm64`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node runtime is gonna be used, so you have to choose a matching nw.js runtime.*
 
+#### Electron
+
+On Windows, the [`win_delay_load_hook`](https://www.electronjs.org/docs/tutorial/using-native-node-modules#a-note-about-win_delay_load_hook) is required to be embedded in the module or it will fail to load in the render process.
+cmake-js will add the hook if the CMakeLists.txt contains the library `${CMAKE_JS_SRC}`.
+
+Without the hook, the module can only be called from the render process using the Electron [remote](https://github.com/electron/electron/blob/master/docs/api/remote.md) module.
+
 #### Runtime options in CMakeLists.txt
 
 The actual node runtime parameters are detectable in CMakeLists.txt files, the following variables are set:
@@ -268,10 +275,6 @@ To make compatible your NW.js application with any CMake.js based modules, write
 
 That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with NW.js out-of-the-box. For more complete documentation please see [the third tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js).
 
-##### Note
-Currently Electron (V1.4.x+) can only call modules built using CMake.js from the main process. To call such a module from a render process use the Electron [remote](https://github.com/electron/electron/blob/master/docs/api/remote.md) module in your require statement:
-
-```var yourModule = require('electron').remote.require('pathToYourModule/cmakeModuleName.node')```
 
 #### Heroku
 [Heroku](https://heroku.com) uses the concept of a [buildpack](https://devcenter.heroku.com/articles/buildpacks) to define
