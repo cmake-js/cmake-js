@@ -172,19 +172,19 @@ cmake-js -G "Visual Studio 56 Win128"
 Enter at command prompt:
 
 ```
-npm config set cmake_BuBu="kittyfck"
+npm config set cmake_Foo="bar"
 ```
 
 Then write to your CMakeLists.txt the following:
 
 ```cmake
-message (STATUS ${BuBu})
+message (STATUS ${Foo})
 ```
 
 This will print during configure:
 
 ```
---- kittyfck
+--- bar
 ```
 
 ### Custom CMake options
@@ -195,19 +195,19 @@ You can add custom CMake options by beginning option name with `CD`.
 
 In command prompt:
 ```
-cmake-js compile --CDBUBU="kittyfck"
+cmake-js compile --CDFOO="bar"
 ```
 
 Then in your CMakeLists.txt:
 
 ```cmake
-message (STATUS ${BUBU})
+message (STATUS ${FOO})
 ```
 
 This will print during configure:
 
 ```
---- kittyfck
+--- bar
 ```
 
 ### Runtimes
