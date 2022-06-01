@@ -1,7 +1,7 @@
 "use strict";
 /* global describe,it */
 
-const locateNAN = require("../../").locateNAN;
+const locateNAN = require("../../lib/locateNAN");
 const path = require("path");
 const assert = require("assert");
 

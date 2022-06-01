@@ -3,6 +3,7 @@
 
 const assert = require("assert");
 const lib = require("../../");
+const locateNAN = require("../../lib/locateNAN")
 const CMake = lib.CMake;
 const path = require("path");
 const log = require("npmlog");
@@ -17,11 +18,11 @@ describe("BuildSystem", function () {
             log.level = process.env.UT_LOG_LEVEL;
             log.resume();
         }
-        lib.locateNAN.__projectRoot = path.resolve(path.join(__dirname, "../../"));
+        locateNAN.__projectRoot = path.resolve(path.join(__dirname, "../../"));
     });
 
     after(function() {
-        lib.locateNAN.__projectRoot = undefined;
+        locateNAN.__projectRoot = undefined;
     });
 
     describe("Build with various options", function() {
