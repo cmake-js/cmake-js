@@ -18,6 +18,13 @@
   "main": "lib",
   "version": "7.0.0-0",
   "author": "Gábor Mező aka unbornchikken",
+  "maintainers": [
+    {
+      "name" : "Julian Waller",
+      "email" : "git@julusian.co.uk",
+      "url" : "https://github.com/julusian/"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/cmake-js/cmake-js.git"
