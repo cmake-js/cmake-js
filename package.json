@@ -29,7 +29,11 @@
     "type": "git",
     "url": "git://github.com/cmake-js/cmake-js.git"
   },
-  "bin": "./bin/cmake-js",
+  "bin": {
+    "cmake-js": "./bin/cmake-js",
+    "cmake-js-prebuildify": "./bin/cmake-js-prebuildify.mjs",
+    "cmake-js-verify": "./bin/cmake-js-verify.mjs"
+  },
   "engines": {
     "node": ">= 14.15.0"
   },
@@ -49,7 +53,8 @@
   },
   "devDependencies": {
     "mocha": "*",
-    "nan": "^2.1.0"
+    "nan": "^2.1.0",
+    "node-addon-api": "^5.0.0"
   },
   "scripts": {
     "test": "mocha tests",
