@@ -20,7 +20,7 @@
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
-    "url": "git://github.com/unbornchikken/cmake-js.git"
+    "url": "git://github.com/cmake-js/cmake-js.git"
   },
   "bin": "./bin/cmake-js",
   "engines": {
