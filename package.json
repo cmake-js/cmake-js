@@ -16,7 +16,7 @@
     "boost"
   ],
   "main": "lib",
-  "version": "7.0.0-0",
+  "version": "7.0.0-1",
   "author": "Gábor Mező aka unbornchikken",
   "maintainers": [
     {
@@ -63,6 +63,8 @@
   "files": [
     "lib",
     "bin",
-    "*.md"
+    "*.md",
+    "bindings.js",
+    "bindings.d.ts"
   ]
 }
