@@ -24,7 +24,7 @@ function* generateRuntimeOptions() {
         // Current:
         yield {
             runtime: "node",
-            runtimeVersion: "18.0.0",
+            runtimeVersion: "18.3.0",
             arch: arch
         };
     }

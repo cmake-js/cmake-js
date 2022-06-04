@@ -1,5 +1,8 @@
 # CMake.js (MIT)
 
+[![Node CI](https://github.com/cmake-js/cmake-js/actions/workflows/node.yaml/badge.svg)](https://github.com/cmake-js/cmake-js/actions/workflows/node.yaml)
+[![npm](https://img.shields.io/npm/v/cmake-js)](https://www.npmjs.com/package/cmake-js)
+
 ## About
 CMake.js is a Node.js native addon build tool which works (almost) *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
 
@@ -83,6 +86,8 @@ Options:
 ## Usage
 
 ### General
+
+It is advised to use Node-API for new projects instead of NAN. It provides ABI stability making usage simpler and reducing maintainance.
 
 In a nutshell. *(For more complete documentation please see [the first tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)*
 
