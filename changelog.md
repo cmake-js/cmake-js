@@ -3,7 +3,6 @@ v7.0.0 - unreleased
 
 - update dependencies
 - replace some dependencies with modern language features
-- prototype bindings loader and prebuildify-like system
 - fix support for cross-compiling on macos
 
 v6.3.0 - 26/11/21

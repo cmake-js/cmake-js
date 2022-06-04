@@ -30,9 +30,7 @@
     "url": "git://github.com/cmake-js/cmake-js.git"
   },
   "bin": {
-    "cmake-js": "./bin/cmake-js",
-    "cmake-js-prebuildify": "./bin/cmake-js-prebuildify.mjs",
-    "cmake-js-verify": "./bin/cmake-js-verify.mjs"
+    "cmake-js": "./bin/cmake-js"
   },
   "engines": {
     "node": ">= 14.15.0"
