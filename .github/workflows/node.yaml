@@ -5,7 +5,7 @@ on:
 
 jobs:
   test:
-    name: Build ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.libc }}
+    name: Run tests for ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.libc }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -52,7 +52,7 @@ jobs:
 
       - name: Use Node.js 14.x
         if: ${{ !matrix.docker-arch }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           architecture: ${{ matrix.arch }}
           node-version: 14.x
