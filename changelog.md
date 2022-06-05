@@ -5,6 +5,7 @@ v7.0.0 - unreleased
 - replace some dependencies with modern language features
 - follow node-gyp behaviour for visual-studio version detection and selection
 - automatically locate node-addon-api and add to include paths
+- avoid downloads when building for node-api
 
 v6.3.1 - 05/06/22
 ==========
