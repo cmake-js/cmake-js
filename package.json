@@ -20,9 +20,9 @@
   "author": "Gábor Mező aka unbornchikken",
   "maintainers": [
     {
-      "name" : "Julian Waller",
-      "email" : "git@julusian.co.uk",
-      "url" : "https://github.com/julusian/"
+      "name": "Julian Waller",
+      "email": "git@julusian.co.uk",
+      "url": "https://github.com/julusian/"
     }
   ],
   "repository": {
@@ -41,6 +41,7 @@
     "fs-extra": "^10.1.0",
     "lodash.isplainobject": "^4.0.6",
     "memory-stream": "^1.0.0",
+    "node-api-headers": "^0.0.1",
     "npmlog": "^6.0.2",
     "rc": "^1.2.7",
     "semver": "^7.3.7",
