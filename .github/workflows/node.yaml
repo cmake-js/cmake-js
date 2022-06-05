@@ -18,7 +18,7 @@ jobs:
           - os: windows-2022
             arch: x64
           - os: windows-2019
-            arch: ia32
+            arch: x86
           # macos
           - os: macos-12
             arch: x64
