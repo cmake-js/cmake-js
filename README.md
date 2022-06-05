@@ -321,6 +321,14 @@ To compile a native module that uses only the
 [plain `C` Node-API calls](https://nodejs.org/api/n-api.html#n_api_node_api),
 follow the directions for plain `node` native modules.
 
+You must also add the following lines to your CMakeLists.txt, to allow for building on windows
+```
+if(MSVC)
+  # Generate node.lib
+  execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
+endif()
+```
+
 To compile a native module that uses the header-only C++ wrapper
 classes provided by
 [`node-addon-api`](https://github.com/nodejs/node-addon-api),
