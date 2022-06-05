@@ -3,7 +3,13 @@ v7.0.0 - unreleased
 
 - update dependencies
 - replace some dependencies with modern language features
-- fix support for cross-compiling on macos
+
+v6.3.1 - 05/06/22
+==========
+
+- add missing bluebird dependency
+- fix platform detection for visual studio 2019 and newer
+- fix platform detection for macos
 
 v6.3.0 - 26/11/21
 ==========
