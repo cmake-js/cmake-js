@@ -73,13 +73,13 @@ function* generateOptions() {
         }
         else {
             // Clang, Make
-            yield { ...runtimeOptions, preferClang: true, referMake: true };
+            yield { ...runtimeOptions, preferClang: true, preferMake: true };
 
             // Clang, Ninja
             yield { ...runtimeOptions, preferClang: true };
 
             // g++, Make
-            yield { ...runtimeOptions, preferGnu: true, referMake: true };
+            yield { ...runtimeOptions, preferGnu: true, preferMake: true };
 
             // g++, Ninja
             yield { ...runtimeOptions, preferGnu: true };
