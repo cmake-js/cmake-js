@@ -10,10 +10,15 @@
     "c++",
     "bindings",
     "build",
+    "buildtools",
     "cmake",
     "nw.js",
     "electron",
-    "boost"
+    "boost",
+    "nan",
+    "napi",
+    "node-api",
+    "node-addon-api"
   ],
   "main": "lib",
   "version": "7.0.0-2",
