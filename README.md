@@ -327,20 +327,7 @@ you need to make your package depend on it with:
 
     npm install --save node-addon-api
 
-and add it to the include directories of your *CMake* project file
-`CMakeLists.txt`:
-
-```cmake
-# Include node-addon-api wrappers
-execute_process(COMMAND node -p "require('node-addon-api').include"
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE NODE_ADDON_API_DIR
-        )
-string(REPLACE "\n" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
-string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${NODE_ADDON_API_DIR})
-```
-
+cmake-js will then add it to the include search path automatically
 
 ## Tutorials
 
