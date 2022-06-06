@@ -1,3 +1,9 @@
+v6.3.2 - 06/06/22
+==========
+
+- fix: if --runtimeVerison must be explicitly specified if building for a different runtime
+- Update baseurl for electron mirror
+
 v6.3.1 - 05/06/22
 ==========
 

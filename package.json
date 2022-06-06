@@ -16,7 +16,7 @@
     "boost"
   ],
   "main": "lib",
-  "version": "6.3.1",
+  "version": "6.3.2",
   "author": "Gábor Mező aka unbornchikken",
   "repository": {
     "type": "git",
