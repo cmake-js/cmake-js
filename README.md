@@ -77,8 +77,8 @@ Options:
 - [CMake](http://www.cmake.org/download/)
 - A proper C/C++ compiler toolchain of the given platform
     - **Windows**:
-        - [Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
-        or a recent version of Visual C++ will do ([the free Community](https://www.visualstudio.com/products/visual-studio-community-vs) version works well)
+        - [Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/). If you installed nodejs with the installer, you can install these when prompted.
+        - If you have multiple versions installed, you can select a specific version with `npm config set msvs_version 2017` (Note: this will also affect `node-gyp`)
     - **Unix/Posix**:
         - Clang or GCC
         - Ninja or Make (Ninja will be picked if both present)

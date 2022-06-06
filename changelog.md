@@ -3,6 +3,7 @@ v7.0.0 - unreleased
 
 - update dependencies
 - replace some dependencies with modern language features
+- follow node-gyp behaviour for visual-studio version detection and selection
 
 v6.3.1 - 05/06/22
 ==========
