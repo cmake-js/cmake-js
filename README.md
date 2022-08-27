@@ -113,16 +113,18 @@ target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
 ```json
 "scripts": {
-    "install": "cmake-js compile"
+    "install": "npx cmake-js compile"
   }
 ```
 
 #### Commandline
 
-In your module folder you can access cmake-js commands if you install cmake-js globally:
+In your module folder you can access cmake-js commands via npm exec or npx :
 
 ```
-npm install -g cmake-js
+npm exec cmake-js
+# or
+npx cmake-js
 ```
 
 Please refer to the `--help` for the lists of available commands (they are like commands in `node-gyp`).
@@ -201,7 +203,7 @@ You can add custom CMake options by beginning option name with `CD`.
 
 In command prompt:
 ```
-cmake-js compile --CDFOO="bar"
+npx cmake-js compile --CDFOO="bar"
 ```
 
 Then in your CMakeLists.txt:
@@ -218,7 +220,7 @@ This will print during configure:
 
 ### Runtimes
 
-#### Important
+#### Important note Always use npx do not add it as direct dependencie of your module distribution.
 
 It is important to understand that this setting is to be configured in the **application's root package.json file**. If you're creating a native module targeting nw.js for example, then **do not specify anything** in your module's package.json. It's the actual application's decision to specify its runtime, your module's just compatible anything that was mentioned in the [About chapter](#about). Actually defining `cmake-js` key in your module's package.json file may lead to an error. Why? If you set it up to use nw.js 0.12.1 for example, then when it gets compiled during development time (to run its unit tests for example) it's gonna be compiled against io.js 1.2 runtime. But if you're having io.js 34.0.1 at the command line then, which is binary incompatible with 1.2, then your unit tests will fail for sure. So it is advised to not use cmake-js target settings in your module's package.json, because that way CMake.js will use that you have, and your tests will pass.
 
@@ -234,6 +236,9 @@ You can configure runtimes for compiling target for all depending CMake.js modul
   "description": "pa-param-pam-pam",
   "version": "1.0.0",
   "main": "app.js",
+  "scripts": {
+  	"preinstall": "npx cmake-js compile"
+  },
   "cmake-js": {
     "runtime": "node",
     "runtimeVersion": "0.12.0",
@@ -250,6 +255,14 @@ Available settings:
 	- `electron`: Electron
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
 - **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm64`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node runtime is gonna be used, so you have to choose a matching nw.js runtime.*
+
+compiling the above example for x64 and not ia32
+
+```shell
+npm pkg set cmake-js.arch="x64" # set arch to x64 for the next build
+npx cmake-js compile # run the build
+npm pkg set cmake-js.arch="ia32" # set it back to prev value
+```
 
 #### Electron
 
