@@ -8,7 +8,9 @@ CMake.js is a Node.js native addon build tool which works (almost) *exactly* lik
 
 - Node.js 14.15+ since CMake.js v7.0.0 (for older runtimes please use an earlier version of CMake.js). Newer versions can produce builds targetting older runtimes
 - [NW.js](https://github.com/nwjs/nw.js): all CMake.js based native modules are compatible with NW.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required
-- [Electron](https://github.com/electron/electron) (formerly known as atom-shell): out-of-the-box build support, [no post build steps required](https://github.com/electron/electron/blob/main/docs/tutorial/using-native-node-modules.md)
+- [Electron](https://github.com/electron/electron): out-of-the-box build support, [no post build steps required](https://github.com/electron/electron/blob/main/docs/tutorial/using-native-node-modules.md)
+
+If you use `node-api` for your module instead of `nan` it should be able to run on all the runtimes above without needing to be built separately for each.
 
 ## Installation
 

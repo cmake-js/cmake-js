@@ -1,4 +1,4 @@
-v7.0.0 - unreleased
+v7.0.0 - 08/10/22
 ==========
 
 - update dependencies
