@@ -49,15 +49,15 @@
     "node-api-headers": "^0.0.1",
     "npmlog": "^6.0.2",
     "rc": "^1.2.7",
-    "semver": "^7.3.7",
+    "semver": "^7.3.8",
     "tar": "^6.1.11",
     "url-join": "^4.0.1",
     "which": "^2.0.2",
-    "yargs": "^17.4.1"
+    "yargs": "^17.6.0"
   },
   "devDependencies": {
     "mocha": "*",
-    "nan": "^2.1.0",
+    "nan": "^2.16.0",
     "node-addon-api": "^5.0.0"
   },
   "scripts": {

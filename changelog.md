@@ -6,6 +6,7 @@ v7.0.0 - unreleased
 - follow node-gyp behaviour for visual-studio version detection and selection
 - automatically locate node-addon-api and add to include paths
 - avoid downloads when building for node-api
+- encourage use of MT builds with MSVC, rather than MD
 
 v6.3.1 - 05/06/22
 ==========
