@@ -96,17 +96,26 @@ In a nutshell. *(For more complete documentation please see [the first tutorial]
 - Put a CMakeLists.txt file into your module root with this minimal required content:
 
 ```cmake
+cmake_minimum_required(VERSION 3.15)
+cmake_policy(SET CMP0091 NEW)
+cmake_policy(SET CMP0042 NEW)
+
 project (your-addon-name-here)
+
+add_definitions(-DNAPI_VERSION=4)
 
 include_directories(${CMAKE_JS_INC})
 
 file(GLOB SOURCE_FILES "your-source files-location-here")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
-
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
-
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
+
+if(MSVC AND CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
+  # Generate node.lib
+  execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
+endif()
 ```
 
 - Add the following into your package.json scripts section:
@@ -119,10 +128,12 @@ target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
 #### Commandline
 
-In your module folder you can access cmake-js commands if you install cmake-js globally:
+With cmake-js installed as a depdendency or devDependency of your module, you can access run commands directly with:
 
 ```
-npm install -g cmake-js
+npx cmake-js --help
+# OR
+yarn cmake-js --help
 ```
 
 Please refer to the `--help` for the lists of available commands (they are like commands in `node-gyp`).
@@ -251,6 +262,38 @@ Available settings:
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
 - **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm64`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node runtime is gonna be used, so you have to choose a matching nw.js runtime.*
 
+
+#### Node-API and `node-addon-api`
+
+[ABI-stable Node.js API
+(Node-API)](https://nodejs.org/api/n-api.html#n_api_node_api),
+which was previously known as N-API, supplies a set of C
+APIs that allow to compilation and loading of native modules by
+different versions of Node.js that support Node-API which includes
+all versions of Node.js v10.x and later. 
+
+To compile a native module that uses only the
+[plain `C` Node-API calls](https://nodejs.org/api/n-api.html#n_api_node_api),
+follow the directions for plain `node` native modules.
+
+You must also add the following lines to your CMakeLists.txt, to allow for building on windows
+```
+if(MSVC AND CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
+  # Generate node.lib
+  execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
+endif()
+```
+
+To compile a native module that uses the header-only C++ wrapper
+classes provided by
+[`node-addon-api`](https://github.com/nodejs/node-addon-api),
+you need to make your package depend on it with:
+
+    npm install --save node-addon-api
+
+cmake-js will then add it to the include search path automatically
+
+
 #### Electron
 
 On Windows, the [`win_delay_load_hook`](https://www.electronjs.org/docs/tutorial/using-native-node-modules#a-note-about-win_delay_load_hook) is required to be embedded in the module or it will fail to load in the render process.
@@ -268,7 +311,7 @@ The actual node runtime parameters are detectable in CMakeLists.txt files, the f
 
 #### NW.js
 
-To make compatible your NW.js application with any CMake.js based modules, write the following to your application's package.json file:
+To make compatible your NW.js application with any NAN CMake.js based modules, write the following to your application's package.json file (this is not neccessary for node-api modules):
 
 ```json
 {
@@ -307,36 +350,6 @@ create a file called `.buildpacks` with these two lines:
 The `heroku-buildpack-multi` will run each buildpack in order allowing the node application to reference CMake in the Heroku
 build environment.
 
-
-#### Node-API and `node-addon-api`
-
-[ABI-stable Node.js API
-(Node-API)](https://nodejs.org/api/n-api.html#n_api_node_api),
-which was previously known as N-API, supplies a set of C
-APIs that allow to compilation and loading of native modules by
-different versions of Node.js that support Node-API which includes
-all versions of Node.js v10.x and later. 
-
-To compile a native module that uses only the
-[plain `C` Node-API calls](https://nodejs.org/api/n-api.html#n_api_node_api),
-follow the directions for plain `node` native modules.
-
-You must also add the following lines to your CMakeLists.txt, to allow for building on windows
-```
-if(MSVC AND CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
-  # Generate node.lib
-  execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
-endif()
-```
-
-To compile a native module that uses the header-only C++ wrapper
-classes provided by
-[`node-addon-api`](https://github.com/nodejs/node-addon-api),
-you need to make your package depend on it with:
-
-    npm install --save node-addon-api
-
-cmake-js will then add it to the include search path automatically
 
 ## Tutorials
 
