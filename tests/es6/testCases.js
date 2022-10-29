@@ -27,6 +27,18 @@ const testCases = {
             process.chdir(cwd);
         }
     },
+    buildPrototypeNapi: async function(options) {
+        const cwd = process.cwd();
+        process.chdir(path.resolve(path.join(__dirname, "./prototype-napi")));
+        const buildSystem = new BuildSystem(options);
+        try {
+            await buildSystem.rebuild();
+            assert.ok((await fs.stat(path.join(__dirname, "prototype-napi/build/Release/addon_napi.node"))).isFile());
+        }
+        finally {
+            process.chdir(cwd);
+        }
+    },
     shouldConfigurePreC11Properly: async function(options) {
         options = {
             directory: path.resolve(path.join(__dirname, "./prototype")),

@@ -39,6 +39,11 @@ describe("BuildSystem", function () {
     it("should rebuild prototype if cwd is the source directory", async function () {
         await testCases.buildPrototype2WithCWD();
     });
+    
+    it("should build prototpye with nodeapi", async function () {
+        await testCases.buildPrototypeNapi();
+    });
+
 
     it("should run with old GNU compilers", async function () {
         await testCases.shouldConfigurePreC11Properly();
