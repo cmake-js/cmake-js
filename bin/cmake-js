@@ -23,8 +23,6 @@ for (const [key, value] of Object.entries(npmConfigData)) {
     }
 }
 
-console.log(process.argv);
-
 const yargs = require("yargs")
     .usage("CMake.js " + version + "\n\nUsage: $0 [<command>] [options]")
     .version(version)
