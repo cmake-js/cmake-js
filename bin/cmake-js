@@ -288,6 +288,12 @@ function rebuild() {
 function compile() {
     exitOnError(buildSystem.compile());
 }
+function cmakeOptions() {
+    exitOnError(buildSystem.cmakeOptions()
+        .then(function (result) {
+            console.info(result);
+        }));
+}
 
 let done = ifCommand("install", install);
 done = done || ifCommand("configure", configure);
@@ -299,6 +305,7 @@ done = done || ifCommand("print-clean", printClean);
 done = done || ifCommand("reconfigure", reconfigure);
 done = done || ifCommand("rebuild", rebuild);
 done = done || ifCommand("compile", compile);
+done = done || ifCommand("options", cmakeOptions);
 
 if (!done) {
     if (command) {
