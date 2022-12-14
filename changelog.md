@@ -1,3 +1,10 @@
+v7.1.0 - 14/12/22
+==========
+
+- add commands for retrieving cmake-js include and lib directories
+- fix win delay hook issues with electron
+- fix missing js_native_api_symbols in windows node.lib
+
 v7.0.0 - 08/10/22
 ==========
 
