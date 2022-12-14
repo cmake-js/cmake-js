@@ -23,14 +23,15 @@ for (const [key, value] of Object.entries(npmConfigData)) {
     }
 }
 
-console.log(process.argv);
-
 const yargs = require("yargs")
     .usage("CMake.js " + version + "\n\nUsage: $0 [<command>] [options]")
     .version(version)
     .command("install", "Install Node.js distribution files if needed")
     .command("configure", "Configure CMake project")
     .command("print-configure", "Print the configuration command")
+    .command("print-cmakejs-src", "Print the value of the CMAKE_JS_SRC variable")
+    .command("print-cmakejs-include", "Print the value of the CMAKE_JS_INC variable")
+    .command("print-cmakejs-lib", "Print the value of the CMAKE_JS_LIB variable")
     .command("build", "Build the project (will configure first if required)")
     .command("print-build", "Print the build command")
     .command("clean", "Clean the project directory")
@@ -261,6 +262,24 @@ function printConfigure() {
             console.info(command);
         }));
 }
+function printCmakeJsLib() {
+    exitOnError(buildSystem.getCmakeJsLibString()
+        .then(function (command) {
+            console.info(command);
+        }));
+}
+function printCmakeJsInclude() {
+    exitOnError(buildSystem.getCmakeJsIncludeString()
+        .then(function (command) {
+            console.info(command);
+        }));
+}
+function printCmakeJsSrc() {
+    exitOnError(buildSystem.getCmakeJsSrcString()
+        .then(function (command) {
+            console.info(command);
+        }));
+}
 function build() {
     exitOnError(buildSystem.build());
 }
@@ -292,6 +311,9 @@ function compile() {
 let done = ifCommand("install", install);
 done = done || ifCommand("configure", configure);
 done = done || ifCommand("print-configure", printConfigure);
+done = done || ifCommand("print-cmakejs-src", printCmakeJsSrc);
+done = done || ifCommand("print-cmakejs-include", printCmakeJsInclude);
+done = done || ifCommand("print-cmakejs-lib", printCmakeJsLib);
 done = done || ifCommand("build", build);
 done = done || ifCommand("print-build", printBuild);
 done = done || ifCommand("clean", clean);

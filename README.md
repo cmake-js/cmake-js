@@ -28,20 +28,27 @@ cmake-js --help
 Usage: cmake-js [<command>] [options]
 
 Commands:
-  install          Install Node.js distribution files if needed
-  configure        Configure CMake project
-  print-configure  Print the configuration command
-  build            Build the project (will configure first if required)
-  print-build      Print the build command
-  clean            Clean the project directory
-  print-clean      Print the clean command
-  reconfigure      Clean the project directory then configure the project
-  rebuild          Clean the project directory then build the project
-  compile          Build the project, and if build fails, try a full rebuild
+  cmake-js install                Install Node.js distribution files if needed
+  cmake-js configure              Configure CMake project
+  cmake-js print-configure        Print the configuration command
+  cmake-js print-cmakejs-src      Print the value of the CMAKE_JS_SRC variable
+  cmake-js print-cmakejs-include  Print the value of the CMAKE_JS_INC variable
+  cmake-js print-cmakejs-lib      Print the value of the CMAKE_JS_LIB variable
+  cmake-js build                  Build the project (will configure first if
+                                  required)
+  cmake-js print-build            Print the build command
+  cmake-js clean                  Clean the project directory
+  cmake-js print-clean            Print the clean command
+  cmake-js reconfigure            Clean the project directory then configure the
+                                  project
+  cmake-js rebuild                Clean the project directory then build the
+                                  project
+  cmake-js compile                Build the project, and if build fails, try a
+                                  full rebuild
 
 Options:
-  --version              Show version number                           [boolean]
-  -h, --help             show this screen                              [boolean]
+      --version          Show version number                           [boolean]
+  -h, --help             Show help                                     [boolean]
   -l, --log-level        set log level (silly, verbose, info, http, warn,
                          error), default is info                        [string]
   -d, --directory        specify CMake project's directory (where CMakeLists.txt
@@ -61,13 +68,13 @@ Options:
   -T, --target           only build the specified target                [string]
   -C, --prefer-clang     use Clang compiler instead of default CMake compiler,
                          if available (Posix)                          [boolean]
-  --cc                   use the specified C compiler                   [string]
-  --cxx                  use the specified C++ compiler                 [string]
+      --cc               use the specified C compiler                   [string]
+      --cxx              use the specified C++ compiler                 [string]
   -r, --runtime          the runtime to use                             [string]
   -v, --runtime-version  the runtime version to use                     [string]
   -a, --arch             the architecture to build in                   [string]
   -p, --parallel         the number of threads cmake can use            [number]
-  --CD                   Custom argument passed to CMake in format:
+      --CD               Custom argument passed to CMake in format:
                          -D<your-arg-here>                              [string]
   -i, --silent           Prevents CMake.js to print to the stdio       [boolean]
   -O, --out              Specify the output directory to compile to, default is
