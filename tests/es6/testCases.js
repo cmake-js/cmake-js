@@ -63,7 +63,25 @@ const testCases = {
 
         const command = await buildSystem.getConfigureCommand();
         assert.notEqual(command.indexOf("-Dfoo=bar"), -1, "custom options added");
-    }
+    },
+    shouldForwardExtraCMakeArgs: async function(options) {
+        options = {
+            directory: path.resolve(path.join(__dirname, "./prototype")),
+            ...options
+        };
+
+        options.extraCMakeArgs = ["--debug-find-pkg=Boost", "--trace-source=FindBoost.cmake"];
+        const configure = await (new BuildSystem(options)).getConfigureCommand();
+        assert.deepEqual(configure.slice(-2), options.extraCMakeArgs, "extra CMake args appended");
+
+        options.extraCMakeArgs = ["--", "CMakeFiles/x.dir/y.cpp.o"];
+        const build = await (new BuildSystem(options)).getBuildCommand();
+        assert.deepEqual(build.slice(-2), options.extraCMakeArgs, "extra CMake args appended");
+
+        options.extraCMakeArgs = [".cache", "/tmp/jest_rs"];
+        const clean = await (new BuildSystem(options)).getCleanCommand();
+        assert.deepEqual(clean.slice(-2), options.extraCMakeArgs, "extra CMake args appended");
+      }
 };
 
 module.exports = testCases;
