@@ -1,3 +1,10 @@
+v7.2.0 - 12/02/23
+==========
+
+- fix: `-DCMAKE_JS_VERSION=undefined` (#298)
+- fix: Only add build type to `CMAKE_LIBRARY_OUTPUT_DIRECTORY` if needed (#299)
+- feat: Forward extra arguments to CMake commands (#297)
+
 v7.1.1 - 15/12/22
 ==========
 
