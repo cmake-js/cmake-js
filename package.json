@@ -58,7 +58,7 @@
   "devDependencies": {
     "mocha": "*",
     "nan": "^2.16.0",
-    "node-addon-api": "^5.0.0"
+    "node-addon-api": "^6.0.0"
   },
   "scripts": {
     "test": "mocha tests",
