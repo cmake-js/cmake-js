@@ -3,7 +3,7 @@
 
 const assert = require("assert");
 const lib = require("../../");
-const locateNAN = require("../../lib/locateNAN")
+const locateNAN = require("../../lib/locateNAN");
 const CMake = lib.CMake;
 const path = require("path");
 const log = require("npmlog");
@@ -39,7 +39,7 @@ describe("BuildSystem", function () {
     it("should rebuild prototype if cwd is the source directory", async function () {
         await testCases.buildPrototype2WithCWD();
     });
-    
+
     it("should build prototpye with nodeapi", async function () {
         await testCases.buildPrototypeNapi();
     });
@@ -51,5 +51,9 @@ describe("BuildSystem", function () {
 
     it("should configure with custom option", async function () {
         await testCases.configureWithCustomOptions();
+    });
+
+    it("should forward extra arguments to CMake", async function () {
+      await testCases.shouldForwardExtraCMakeArgs();
     });
 });

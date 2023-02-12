@@ -224,7 +224,8 @@ const options = {
     silent: argv.i,
     out: argv.O,
     config: argv.B,
-    parallel: argv.p
+    parallel: argv.p,
+    extraCMakeArgs: argv._.slice(1),
 };
 
 log.verbose("CON", "options:");
