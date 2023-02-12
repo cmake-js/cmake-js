@@ -35,11 +35,11 @@ jobs:
           - os: ubuntu-latest
             arch: arm64
             docker-arch: linux/arm64
-            docker-image: node:14-buster
+            docker-image: node:14-bullseye
           - os: ubuntu-latest
             arch: arm
             docker-arch: linux/arm/v7
-            docker-image: node:14-buster
+            docker-image: node:14-bullseye
           # linux-musl
           - os: ubuntu-latest
             arch: x64
