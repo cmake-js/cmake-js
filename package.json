@@ -12,7 +12,7 @@
     "build",
     "buildtools",
     "cmake",
-    "nw.js",
+    "nw.js",  
     "electron",
     "boost",
     "nan",
@@ -21,7 +21,7 @@
     "node-addon-api"
   ],
   "main": "lib",
-  "version": "7.2.0",
+  "version": "7.2.1",
   "author": "Gábor Mező aka unbornchikken",
   "maintainers": [
     {
