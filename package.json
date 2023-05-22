@@ -12,7 +12,7 @@
     "build",
     "buildtools",
     "cmake",
-    "nw.js",  
+    "nw.js",
     "electron",
     "boost",
     "nan",
@@ -38,10 +38,10 @@
     "cmake-js": "./bin/cmake-js"
   },
   "engines": {
-    "node": ">= 14.15.0"
+    "node": ">= 10.0.0"
   },
   "dependencies": {
-    "axios": "^1.3.2",
+    "axios": "^0.27.2",
     "debug": "^4",
     "fs-extra": "^10.1.0",
     "lodash.isplainobject": "^4.0.6",
@@ -56,7 +56,7 @@
     "yargs": "^17.6.0"
   },
   "devDependencies": {
-    "mocha": "*",
+    "mocha": "^9.2.2",
     "nan": "^2.16.0",
     "node-addon-api": "^6.0.0"
   },
