@@ -53,12 +53,12 @@
     "tar": "^6.1.11",
     "url-join": "^4.0.1",
     "which": "^2.0.2",
-    "yargs": "^17.6.0"
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
     "mocha": "^9.2.2",
     "nan": "^2.16.0",
-    "node-addon-api": "^6.0.0"
+    "node-addon-api": "^3.2.1"
   },
   "scripts": {
     "test": "mocha tests",
