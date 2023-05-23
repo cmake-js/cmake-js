@@ -6,7 +6,7 @@
 ## About
 CMake.js is a Node.js native addon build tool which works (almost) *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
 
-- Node.js 14.15+ since CMake.js v7.0.0 (for older runtimes please use an earlier version of CMake.js). Newer versions can produce builds targetting older runtimes
+- Node.js 10+ since CMake.js v7.0.0 (for older runtimes please use an earlier version of CMake.js). Newer versions can produce builds targetting older runtimes
 - [NW.js](https://github.com/nwjs/nw.js): all CMake.js based native modules are compatible with NW.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required
 - [Electron](https://github.com/electron/electron): out-of-the-box build support, [no post build steps required](https://github.com/electron/electron/blob/main/docs/tutorial/using-native-node-modules.md)
 
@@ -279,7 +279,7 @@ Available settings:
 which was previously known as N-API, supplies a set of C
 APIs that allow to compilation and loading of native modules by
 different versions of Node.js that support Node-API which includes
-all versions of Node.js v10.x and later. 
+all versions of Node.js v10.x and later.
 
 To compile a native module that uses only the
 [plain `C` Node-API calls](https://nodejs.org/api/n-api.html#n_api_node_api),
