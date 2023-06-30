@@ -7,12 +7,12 @@ interface Config {
   [key: string]: any;
 }
 
-const getConfig = (lookPath: string, log: any) => {
+const getConfig = (lookPath: string, log: CMLog) => {
   const pjsonPath = path.join(lookPath, "package.json");
-  const json = JSON.parse(fs.readFileSync(pjsonPath, "utf8"));
 
   log.silly("CFG", `Looking for package.json in: '${pjsonPath}'.`);
   try {
+    const json = JSON.parse(fs.readFileSync(pjsonPath, "utf8"));
     log.silly("CFG", `Loaded:\n${JSON.stringify(json)}`);
     if (isPlainObject(json) && isPlainObject(json["cmake-js"])) {
       log.silly("CFG", "Config found.");

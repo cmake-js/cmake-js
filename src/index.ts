@@ -6,6 +6,3 @@ export * from "./dist";
 export * from "./cMake";
 export * from "./downloader";
 export * from "./toolset";
-
-/* TestOnly */
-export { locateNAN } from "./locateNAN";

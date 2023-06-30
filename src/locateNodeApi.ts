@@ -1,6 +1,9 @@
 import path from "path";
+import { createRequire } from "module";
 
-type LocateNodeApi = ((projectRoot: string) => Promise<string | null>) & {
+export type LocateNodeApi = ((
+  projectRoot: string
+) => Promise<string | null>) & {
   __projectRoot?: string;
 };
 
@@ -13,9 +16,7 @@ export const locateNodeApi: LocateNodeApi = (module.exports = async (
   }
 
   try {
-    const tmpRequire = require("module").createRequire(
-      path.join(projectRoot, "package.json")
-    );
+    const tmpRequire = createRequire(path.join(projectRoot, "package.json"));
     const inc = tmpRequire("node-addon-api");
     return inc.include.replace(/"/g, "");
   } catch (e) {

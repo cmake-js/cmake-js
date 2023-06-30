@@ -28,6 +28,7 @@ export interface CMakeOptions
   silent?: boolean;
   target?: string;
   parallel?: number;
+  std?: string;
 }
 
 function isNodeApi(log: CMLog, projectRoot: string) {
@@ -56,9 +57,10 @@ export class CMake {
   protected readonly log: CMLog;
   protected readonly dist: Dist;
   protected readonly targetOptions: TargetOptions;
-  protected readonly toolset: Toolset;
 
   protected readonly isNodeApi: boolean;
+
+  readonly toolset: Toolset;
 
   constructor(protected readonly options: CMakeOptions) {
     this.log = new CMLog(this.options);
@@ -322,7 +324,7 @@ export class CMake {
       }
     } else {
       // Base headers
-      const apiHeaders = require("node-api-headers");
+      const apiHeaders = Object.create(headers);
       incPaths.push(apiHeaders.include_dir);
 
       // Node-api

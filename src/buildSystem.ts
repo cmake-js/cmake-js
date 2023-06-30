@@ -4,7 +4,7 @@ import { CMake, CMakeOptions } from "./cMake";
 import { appCMakeJSConfig } from "./appCMakeJSConfig";
 import { npmConfig } from "./npmConfig";
 
-interface BuildSystemOptions extends CMakeOptions {}
+export interface BuildSystemOptions extends CMakeOptions {}
 
 export class BuildSystem extends CMake {
   private readonly runtimeDirectory?: string;
@@ -13,7 +13,7 @@ export class BuildSystem extends CMake {
   private readonly runtimeVersion?: string;
   private readonly arch?: string;
 
-  constructor(options: BuildSystemOptions) {
+  constructor(options: BuildSystemOptions = {}) {
     super(options);
 
     const appConfig = appCMakeJSConfig(this.projectRoot, this.log);

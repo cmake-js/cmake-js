@@ -1,6 +1,8 @@
 import os from "os";
 import which from "which";
 
+import { version } from "../package.json";
+
 declare global {
   interface PropertyDescriptorT<This, T> {
     value?: T;
@@ -22,7 +24,7 @@ declare global {
 
 export const environment = Object.create(
   {
-    cmakeJsVersion: require("../package.json").version,
+    cmakeJsVersion: version,
     platform: os.platform(),
     isWin: os.platform() === "win32",
     isLinux: os.platform() === "linux",

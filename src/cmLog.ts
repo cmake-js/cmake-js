@@ -1,4 +1,5 @@
-import * as log from "npmlog";
+import log from "npmlog";
+import debug from "debug";
 
 export interface CMLogOptions {
   logName?: string;
@@ -11,7 +12,7 @@ export class CMLog {
 
   constructor(options: CMLogOptions) {
     this.options = options || {};
-    this.debug = require("debug")(this.options.logName || "cmake-js");
+    this.debug = debug(this.options.logName || "cmake-js");
   }
 
   get level(): string {
