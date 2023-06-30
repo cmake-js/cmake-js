@@ -7,9 +7,7 @@ export type LocateNodeApi = ((
   __projectRoot?: string;
 };
 
-export const locateNodeApi: LocateNodeApi = (module.exports = async (
-  projectRoot: string
-) => {
+export const locateNodeApi: LocateNodeApi = async (projectRoot: string) => {
   if (locateNodeApi.__projectRoot) {
     // Override for unit tests
     projectRoot = locateNodeApi.__projectRoot;
@@ -23,4 +21,4 @@ export const locateNodeApi: LocateNodeApi = (module.exports = async (
     // It most likely wasn't found
     return null;
   }
-});
+};
