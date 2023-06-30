@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-"use strict";
 
 const log = require("npmlog");
-const BuildSystem = require("../").BuildSystem;
+const BuildSystem = require("../build/cmake-js").BuildSystem;
 const util = require("util");
 const version = require("../package").version;
 const logLevels = ["silly", "verbose", "info", "http", "warn", "error"];
