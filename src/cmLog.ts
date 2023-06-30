@@ -1,25 +1,47 @@
-import log from "npmlog";
+import npmlog from "npmlog";
 import debug from "debug";
 
+interface Logger {
+  silly: (...messages: string[]) => void;
+  verbose: (...messages: string[]) => void;
+  info: (...messages: string[]) => void;
+  http: (...messages: string[]) => void;
+  warn: (...messages: string[]) => void;
+  error: (...messages: string[]) => void;
+}
+
 export interface CMLogOptions {
+  logger?: Logger;
   logName?: string;
   noLog?: boolean;
 }
 
 export class CMLog {
-  options: CMLogOptions;
   debug: (message: string) => void;
 
-  constructor(options: CMLogOptions) {
-    this.options = options || {};
-    this.debug = debug(this.options.logName || "cmake-js");
+  constructor(protected options: CMLogOptions = {}) {
+    this.options.logger = this.options.logger || {
+      silly: (...messages) =>
+        npmlog.silly(messages[0], messages.slice(1).join(" ")),
+      verbose: (...messages) =>
+        npmlog.verbose(messages[0], messages.slice(1).join(" ")),
+      info: (...messages) =>
+        npmlog.info(messages[0], messages.slice(1).join(" ")),
+      http: (...messages) =>
+        npmlog.http(messages[0], messages.slice(1).join(" ")),
+      warn: (...messages) =>
+        npmlog.warn(messages[0], messages.slice(1).join(" ")),
+      error: (...messages) =>
+        npmlog.error(messages[0], messages.slice(1).join(" ")),
+    };
+    this.debug = debug(options.logName || "cmake-js");
   }
 
   get level(): string {
     if (this.options.noLog) {
       return "silly";
     } else {
-      return log.level;
+      return npmlog.level;
     }
   }
 
@@ -27,7 +49,7 @@ export class CMLog {
     if (this.options.noLog) {
       this.debug(cat + ": " + msg);
     } else {
-      log.silly(cat, msg);
+      this.options.logger!.silly(cat, msg);
     }
   }
 
@@ -35,7 +57,7 @@ export class CMLog {
     if (this.options.noLog) {
       this.debug(cat + ": " + msg);
     } else {
-      log.verbose(cat, msg);
+      this.options.logger!.verbose(cat, msg);
     }
   }
 
@@ -43,7 +65,7 @@ export class CMLog {
     if (this.options.noLog) {
       this.debug(cat + ": " + msg);
     } else {
-      log.info(cat, msg);
+      this.options.logger!.info(cat, msg);
     }
   }
 
@@ -51,7 +73,7 @@ export class CMLog {
     if (this.options.noLog) {
       this.debug(cat + ": " + msg);
     } else {
-      log.warn(cat, msg);
+      this.options.logger!.warn(cat, msg);
     }
   }
 
@@ -59,7 +81,7 @@ export class CMLog {
     if (this.options.noLog) {
       this.debug(cat + ": " + msg);
     } else {
-      log.http(cat, msg);
+      this.options.logger!.http(cat, msg);
     }
   }
 
@@ -67,7 +89,7 @@ export class CMLog {
     if (this.options.noLog) {
       this.debug(cat + ": " + msg);
     } else {
-      log.error(cat, msg);
+      this.options.logger!.error(cat, msg);
     }
   }
 }
