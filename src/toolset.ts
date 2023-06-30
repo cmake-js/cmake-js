@@ -293,5 +293,3 @@ export class Toolset {
     return null;
   }
 }
-
-export default Toolset;

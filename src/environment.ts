@@ -3,20 +3,20 @@ import which from "which";
 
 import { version } from "../package.json";
 
+interface PropertyDescriptorT<This, T> {
+  value?: T;
+  configurable?: boolean;
+  enumerable?: boolean;
+  writable?: boolean;
+  get?(this: This): T;
+  set?(this: This, v: T): void;
+}
+
+type PropertyDescriptorMapT<This, T> = {
+  [s in keyof T]: PropertyDescriptorT<This, T[s]>;
+};
+
 declare global {
-  interface PropertyDescriptorT<This, T> {
-    value?: T;
-    configurable?: boolean;
-    enumerable?: boolean;
-    writable?: boolean;
-    get?(this: This): T;
-    set?(this: This, v: T): void;
-  }
-
-  type PropertyDescriptorMapT<This, T> = {
-    [s in keyof T]: PropertyDescriptorT<This, T[s]>;
-  };
-
   interface ObjectConstructor {
     create<T, S>(o: T, properties?: PropertyDescriptorMapT<T & S, S>): T & S;
   }

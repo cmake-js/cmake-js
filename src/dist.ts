@@ -18,7 +18,7 @@ function testSum(sums: Sum[], sum: string, fPath: string) {
   throw new Error("SHA sum of file '" + fPath + "' mismatch!");
 }
 
-interface DistOptions extends CMLogOptions, TargetOptionsOptions {
+export interface DistOptions extends CMLogOptions, TargetOptionsOptions {
   runtimeDirectory?: string;
 }
 
