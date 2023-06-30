@@ -13,6 +13,7 @@ const external = [
   "util",
   "os",
   "module",
+  "zlib",
 ];
 
 export default defineConfig({
