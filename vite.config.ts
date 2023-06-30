@@ -14,6 +14,7 @@ const external = [
   "os",
   "module",
   "zlib",
+  "crypto",
 ];
 
 export default defineConfig({
