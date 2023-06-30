@@ -9,6 +9,8 @@ const external = [
   "fs",
   "path",
   "child_process",
+  "assert",
+  "util",
   "os",
   "module",
 ];
