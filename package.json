@@ -78,10 +78,12 @@
   "scripts": {
     "build": "vite build",
     "test": "mocha --require ts-node/register --extensions ts tests/index.ts",
-    "lint": "eslint src bin/cmake-js tests"
+    "lint": "eslint src bin/cmake-js tests",
+    "postinstall": "yarn build"
   },
   "files": [
     "build",
+    "src",
     "bin",
     "*.md",
     "bindings.js",
