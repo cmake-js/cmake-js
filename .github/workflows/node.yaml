@@ -57,12 +57,17 @@ jobs:
           architecture: ${{ matrix.arch }}
           node-version: 14.x
 
+      - name: build
+        run: |
+          yarn
+          yarn build
+
       - name: run tests
         if: ${{ !matrix.docker-arch }}
         shell: bash
         run: |
-          npm install
-          npm test
+          yarn
+          yarn test
         env:
           CI: true
           npm_config_build_from_source: true
@@ -90,5 +95,5 @@ jobs:
 
             cd /work
 
-            npm install
-            npm test
+            yarn install
+            yarn test
