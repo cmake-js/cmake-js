@@ -12,7 +12,7 @@
     "build",
     "buildtools",
     "cmake",
-    "nw.js",  
+    "nw.js",
     "electron",
     "boost",
     "nan",
@@ -20,7 +20,8 @@
     "node-api",
     "node-addon-api"
   ],
-  "main": "lib",
+  "main": "build/cmake-js.js",
+  "module": "build/cmake-js.mjs",
   "version": "7.2.1",
   "author": "Gábor Mező aka unbornchikken",
   "maintainers": [
@@ -34,9 +35,7 @@
     "type": "git",
     "url": "git://github.com/cmake-js/cmake-js.git"
   },
-  "bin": {
-    "cmake-js": "./bin/cmake-js"
-  },
+  "bin": "./bin/cmake-js",
   "engines": {
     "node": ">= 14.15.0"
   },
@@ -56,19 +55,37 @@
     "yargs": "^17.6.0"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.8",
+    "@types/fs-extra": "^11.0.1",
+    "@types/lodash.isplainobject": "^4.0.7",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.3.2",
+    "@types/npmlog": "^4.1.4",
+    "@types/rc": "^1.2.1",
+    "@types/semver": "^7.5.0",
+    "@types/tar": "^6.1.5",
+    "@types/url-join": "^4.0.1",
+    "@types/which": "^3.0.0",
     "mocha": "*",
     "nan": "^2.16.0",
-    "node-addon-api": "^6.0.0"
+    "node-addon-api": "^7.0.0",
+    "prettier": "^2.8.8",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6",
+    "vite": "^4.3.9",
+    "vite-node": "^0.32.2"
   },
   "scripts": {
-    "test": "mocha tests",
-    "lint": "eslint lib bin/cmake-js tests"
+    "build": "vite build",
+    "test": "mocha --require ts-node/register --extensions ts tests/index.ts",
+    "lint": "eslint src bin/cmake-js tests"
   },
   "files": [
-    "lib",
+    "build",
     "bin",
     "*.md",
     "bindings.js",
     "bindings.d.ts"
-  ]
+  ],
+  "packageManager": "yarn@3.6.0"
 }
