@@ -1,4 +1,6 @@
 import { defineConfig } from "vite";
+import dts from "vite-plugin-dts";
+
 import { dependencies, devDependencies } from "./package.json";
 
 const external = [
@@ -26,4 +28,7 @@ export default defineConfig({
     },
     minify: false,
   },
+  plugins: [
+    dts({ tsconfigPath: "./tsconfig.types.json", outDir: "build/types" }),
+  ],
 });

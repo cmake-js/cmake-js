@@ -22,6 +22,7 @@
   ],
   "main": "build/cmake-js.js",
   "module": "build/cmake-js.mjs",
+  "types": "build/types/index.d.ts",
   "version": "7.2.1",
   "author": "Gábor Mező aka unbornchikken",
   "maintainers": [
@@ -73,7 +74,7 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
     "vite": "^4.3.9",
-    "vite-node": "^0.32.2"
+    "vite-plugin-dts": "^3.0.1"
   },
   "scripts": {
     "build": "vite build",
