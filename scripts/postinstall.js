@@ -1,4 +1,13 @@
+const { exec } = require("child_process");
 const { writeFileSync } = require("fs");
 
-console.log(process.cwd());
-writeFileSync("./cwd", process.cwd());
+exec("npm run build", (err, stdout, stderr) => {
+  if (err) {
+    throw err;
+  }
+  if (stderr) {
+    throw stderr;
+  }
+
+  writeFileSync("build/.done", stdout);
+});
