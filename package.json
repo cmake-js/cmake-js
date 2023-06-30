@@ -80,7 +80,7 @@
     "build": "vite build",
     "test": "mocha --require ts-node/register --extensions ts tests/index.ts",
     "lint": "eslint src bin/cmake-js tests",
-    "postinstall": "yarn build"
+    "postinstall": "node scripts/postinstall.js"
   },
   "packageManager": "yarn@3.6.0"
 }
