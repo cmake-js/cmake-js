@@ -5,7 +5,7 @@ cmake_policy(SET CMP0042 NEW)
 project (addon2)
 
 if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU"))
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 endif()
 
 include_directories(${CMAKE_JS_INC})

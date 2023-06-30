@@ -1,0 +1,3 @@
+/home/mdreal/Projects/cmake-js/tests/es6/prototype2/build/CMakeFiles/addon2.dir
+/home/mdreal/Projects/cmake-js/tests/es6/prototype2/build/CMakeFiles/edit_cache.dir
+/home/mdreal/Projects/cmake-js/tests/es6/prototype2/build/CMakeFiles/rebuild_cache.dir
