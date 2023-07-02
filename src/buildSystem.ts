@@ -3,20 +3,30 @@ import isPlainObject from "lodash.isplainobject";
 import { CMake, CMakeOptions } from "./cMake";
 import { appCMakeJSConfig } from "./appCMakeJSConfig";
 import { npmConfig } from "./npmConfig";
+import { CMLog } from "./cmLog";
 
-export interface BuildSystemOptions extends CMakeOptions {}
+interface BuildSystemCmakeOptions extends CMakeOptions {
+  buildSystem?: "cmake";
+}
 
-export class BuildSystem extends CMake {
+type BuildSystemOptions = BuildSystemCmakeOptions;
+
+export class BuildSystem {
+  private readonly bs: CMake;
+  private readonly log: CMLog;
+
   private readonly runtimeDirectory?: string;
   private readonly msvsVersion?: string;
   private readonly runtime?: string;
   private readonly runtimeVersion?: string;
   private readonly arch?: string;
 
-  constructor(options: BuildSystemOptions = {}) {
-    super(options);
+  constructor(private options: BuildSystemOptions = {}) {
+    const BuildSystemClass = this._getBuildSystemClass(options.buildSystem);
+    this.bs = new BuildSystemClass(options);
+    this.log = new CMLog(options);
 
-    const appConfig = appCMakeJSConfig(this.projectRoot, this.log);
+    const appConfig = appCMakeJSConfig(this.bs.projectRoot, this.log);
     const npmOptions = npmConfig(this.log);
 
     if (isPlainObject(npmOptions) && Object.keys(npmOptions).length) {
@@ -44,16 +54,56 @@ export class BuildSystem extends CMake {
     this.log.verbose("CFG", JSON.stringify(this.options));
   }
 
-  install() {
-    return this._ensureInstalled();
+  async installRequirements() {
+    try {
+      await this.bs.toolset.initialize(true);
+      if (!this.bs.isNodeApi) {
+        await this.bs.dist.ensureDownloaded();
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        this._showError(e);
+      }
+      throw e;
+    }
   }
 
-  private async _ensureInstalled() {
+  configure() {
     try {
-      await this.toolset.initialize(true);
-      if (!this.isNodeApi) {
-        await this.dist.ensureDownloaded();
+      return this.bs.configure();
+    } catch (e) {
+      if (e instanceof Error) {
+        this._showError(e);
       }
+      throw e;
+    }
+  }
+
+  reconfigure() {
+    try {
+      return this.bs.reconfigure();
+    } catch (e) {
+      if (e instanceof Error) {
+        this._showError(e);
+      }
+      throw e;
+    }
+  }
+
+  build() {
+    try {
+      return this.bs.build();
+    } catch (e) {
+      if (e instanceof Error) {
+        this._showError(e);
+      }
+      throw e;
+    }
+  }
+
+  rebuild() {
+    try {
+      return this.bs.rebuild();
     } catch (e) {
       if (e instanceof Error) {
         this._showError(e);
@@ -72,6 +122,17 @@ export class BuildSystem extends CMake {
       this.log.error("OMG", e.stack!);
     } else {
       this.log.error("OMG", e.message);
+    }
+  }
+
+  private _getBuildSystemClass(
+    buildSystem: BuildSystemCmakeOptions["buildSystem"]
+  ) {
+    switch (buildSystem) {
+      case "cmake":
+        return CMake;
+      default:
+        return CMake;
     }
   }
 }

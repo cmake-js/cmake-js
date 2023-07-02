@@ -45,21 +45,19 @@ function isNodeApi(log: CMLog, projectRoot: string) {
 }
 
 export class CMake {
-  protected readonly projectRoot: string;
-  protected readonly workDir: string;
-  protected readonly config: string;
-  protected readonly buildDir: string;
-  protected readonly cMakeOptions: any;
-  protected readonly silent: boolean;
+  readonly projectRoot: string;
+  readonly workDir: string;
+  readonly config: string;
+  readonly buildDir: string;
+  readonly cMakeOptions: any;
+  readonly silent: boolean;
+  readonly isNodeApi: boolean;
 
-  protected extraCMakeArgs: string[];
+  extraCMakeArgs: string[];
 
-  protected readonly log: CMLog;
-  protected readonly dist: Dist;
-  protected readonly targetOptions: TargetOptions;
-
-  protected readonly isNodeApi: boolean;
-
+  readonly log: CMLog;
+  readonly dist: Dist;
+  readonly targetOptions: TargetOptions;
   readonly toolset: Toolset;
 
   constructor(protected readonly options: CMakeOptions) {
@@ -422,6 +420,32 @@ export class CMake {
     const buildCommand = await this.getBuildCommand();
     this.log.info("CMD", "BUILD");
     await this._run(buildCommand);
+  }
+
+  getInstallCommand() {
+    const command = [
+      this.path,
+      "--install",
+      this.workDir,
+      "--config",
+      this.config,
+    ];
+    if (this.options.target) {
+      command.push("--target", this.options.target);
+    }
+    if (this.options.parallel) {
+      command.push("--parallel", this.options.parallel.toString());
+    }
+    return Promise.resolve(command.concat(this.extraCMakeArgs));
+  }
+
+  async install() {
+    this.verifyIfAvailable();
+
+    await this.ensureConfigured();
+    const installCommand = await this.getInstallCommand();
+    this.log.info("CMD", "INSTALL");
+    await this._run(installCommand);
   }
 
   getCleanCommand() {

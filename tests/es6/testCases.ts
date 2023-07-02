@@ -11,7 +11,7 @@ export const testCases = {
       ...options,
     };
     const buildSystem = new BuildSystem(options);
-    await buildSystem.install();
+    await buildSystem.installRequirements();
     await buildSystem.rebuild();
     assert.ok(
       (
@@ -26,7 +26,7 @@ export const testCases = {
     process.chdir(path.resolve(path.join(__dirname, "./prototype2")));
     const buildSystem = new BuildSystem(options);
     try {
-      await buildSystem.install();
+      await buildSystem.installRequirements();
       await buildSystem.rebuild();
       assert.ok(
         (
@@ -44,7 +44,7 @@ export const testCases = {
     process.chdir(path.resolve(path.join(__dirname, "./prototype-napi")));
     const buildSystem = new BuildSystem(options);
     try {
-      await buildSystem.install();
+      await buildSystem.installRequirements();
       await buildSystem.rebuild();
       assert.ok(
         (
