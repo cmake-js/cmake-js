@@ -112,6 +112,17 @@ export class BuildSystem {
     }
   }
 
+  install() {
+    try {
+      return this.bs.install();
+    } catch (e) {
+      if (e instanceof Error) {
+        this._showError(e);
+      }
+      throw e;
+    }
+  }
+
   private _showError(e: Error) {
     if (this.log === undefined) {
       // handle internal errors (init failed)
