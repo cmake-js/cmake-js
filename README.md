@@ -135,6 +135,14 @@ endif()
   }
 ```
 
+- Add the following into your package.json, using the same NAPI_VERSION value you provided to cmake
+
+```json
+"binary": {
+    "napi_versions": [7]
+  },
+```
+
 #### Commandline
 
 With cmake-js installed as a depdendency or devDependency of your module, you can access run commands directly with:
@@ -302,6 +310,13 @@ you need to make your package depend on it with:
 
 cmake-js will then add it to the include search path automatically
 
+You should add the following to your package.json, with the correct version number, so that cmake-js knows the module is node-api and that it can skip downloading the nodejs headers
+
+```json
+"binary": {
+    "napi_versions": [7]
+  },
+```
 
 #### Electron
 
