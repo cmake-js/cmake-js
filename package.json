@@ -46,7 +46,7 @@
     "fs-extra": "^10.1.0",
     "lodash.isplainobject": "^4.0.6",
     "memory-stream": "^1.0.0",
-    "node-api-headers": "^0.0.2",
+    "node-api-headers": "^1.1.0",
     "npmlog": "^6.0.2",
     "rc": "^1.2.7",
     "semver": "^7.3.8",
