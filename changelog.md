@@ -1,3 +1,13 @@
+v7.3.0 - 15/01/23
+==========
+
+- feat(windows): replace custom libnode.def generation with version from node-api-headers
+- fix: support for vs2015 with nodejs 18 and older (#317)
+- fix(windows): always remove Path if PATH is also defined (#319) 
+- fix: Cmake arguments got converted to numbers (#314)
+- fix: update node-api-headers
+- chore: update dependencies
+
 v7.2.1 - 14/02/23
 ==========
 
