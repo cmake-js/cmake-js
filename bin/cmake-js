@@ -197,9 +197,14 @@ log.verbose("CON", "Parsing arguments");
 
 // Extract custom cMake options
 const customOptions = {};
-for (const [key, value] of Object.entries(argv)) {
-     if (value && key.startsWith("CD")) {
-        customOptions[key.substr(2)] = value;
+for (const arg of process.argv) {
+     if (arg.startsWith("--CD")) {
+        const separator = arg.indexOf('=');
+        if (separator < 5) continue;
+        const key = arg.substring(4, separator);
+        const value = arg.substring(separator + 1);
+        if (!value) continue;
+        customOptions[key] = value;
     }
 }
 
