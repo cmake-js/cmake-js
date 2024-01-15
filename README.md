@@ -385,6 +385,8 @@ build environment.
 ## Real examples
 
 * [@julusian/jpeg-turbo](https://github.com/julusian/node-jpeg-turbo) - A Node-API wrapping around libjpeg-turbo. cmake-js was a good fit here, as libjpeg-turbo provides cmake files that can be used, and would be hard to replicate correctly in node-gyp
+* [node-datachannel](https://github.com/murat-dogan/node-datachannel) - Easy to use WebRTC data channels and media transport
+* [aws-iot-device-sdk-v2](https://github.com/aws/aws-iot-device-sdk-js-v2) AWS IoT Device SDK for JavaScript v2
 
 Open a PR to add your own project here.
 
