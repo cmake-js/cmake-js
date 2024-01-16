@@ -1,11 +1,21 @@
 {
-    "parserOptions": {
-        "ecmaVersion": 2019,
-        "sourceType": "module"
-    },
-    "rules": {
-        "semi": 2,
-        "no-var": 2,
-        "prefer-const": 2
-    }
+	"extends": ["eslint:recommended", "prettier"],
+	"parserOptions": {
+		"ecmaVersion": 2023,
+		"sourceType": "commonjs"
+	},
+	"rules": {},
+	"env": {
+		"node": true,
+		"es6": true,
+		"es2023": true
+	},
+	"overrides": [
+		{
+			"files": "tests/**/*.js",
+			"env": {
+				"mocha": true
+			}
+		}
+	]
 }
