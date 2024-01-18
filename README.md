@@ -321,7 +321,7 @@ You should add the following to your package.json, with the correct version numb
 #### Electron
 
 On Windows, the [`win_delay_load_hook`](https://www.electronjs.org/docs/tutorial/using-native-node-modules#a-note-about-win_delay_load_hook) is required to be embedded in the module or it will fail to load in the render process.
-cmake-js will add the hook if the CMakeLists.txt contains the library `${CMAKE_JS_SRC}`.
+cmake-js will add the hook if the CMakeLists.txt contains the library `${CMAKE_JS_SRC}`. (Or `${CMAKE_JS_SRC_C}` for C modules.)
 
 Without the hook, the module can only be called from the render process using the Electron [remote](https://github.com/electron/electron/blob/master/docs/api/remote.md) module.
 
