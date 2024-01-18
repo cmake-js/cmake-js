@@ -10,7 +10,7 @@ endif()
 
 include_directories(${CMAKE_JS_INC})
 
-add_library(${PROJECT_NAME} SHARED src/addon.cpp)
+add_library(${PROJECT_NAME} SHARED src/addon.cpp ${CMAKE_JS_SRC})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 

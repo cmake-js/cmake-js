@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
 cmake_policy(SET CMP0042 NEW)
 
-project (addon_napi)
+project (addon_napi_c LANGUAGES C)
 
 if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU"))
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
@@ -10,7 +10,7 @@ endif()
 
 include_directories(${CMAKE_JS_INC})
 
-add_library(${PROJECT_NAME} SHARED src/addon.cpp ${CMAKE_JS_SRC})
+add_library(${PROJECT_NAME} SHARED src/addon.c ${CMAKE_JS_SRC})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 

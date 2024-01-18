@@ -48,6 +48,10 @@ describe('BuildSystem', function () {
 		await testCases.buildPrototypeNapi()
 	})
 
+	it('should build prototpye with nodeapi in c', async function () {
+		await testCases.buildPrototypeNapiC()
+	})
+
 	it('should run with old GNU compilers', async function () {
 		await testCases.shouldConfigurePreC11Properly()
 	})
