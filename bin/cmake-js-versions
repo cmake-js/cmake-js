@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+'use strict'
+
+const version = require('../package').version
+
+console.log(`CMAKEJS_VERSION ${version}`)
+console.log(`NODE_RUNTIME node`)
+console.log(`NODE_RUNTIMEVERSION ${process.version.slice(1)}`)
+console.log(`NODE_ARCH ${process.arch}`)
