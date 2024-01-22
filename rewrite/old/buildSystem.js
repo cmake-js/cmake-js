@@ -25,20 +25,11 @@ class BuildSystem {
 		this.options.out = path.resolve(this.options.out || path.join(this.options.directory, 'build'))
 		this.log = new CMLog(this.options)
 		this.options.isNodeApi = isNodeApi(this.log, this.options.directory)
-		const appConfig = appCMakeJSConfig(this.options.directory, this.log)
 		const npmOptions = npmConfig(this.log)
 
 		if (npmOptions && typeof npmOptions === 'object' && Object.keys(npmOptions).length) {
 			this.options.runtimeDirectory = npmOptions['nodedir']
 			this.options.msvsVersion = npmOptions['msvs_version']
-		}
-		if (appConfig && typeof appConfig === 'object' && Object.keys(appConfig).length) {
-			this.log.verbose('CFG', 'Applying CMake.js config from root package.json:')
-			this.log.verbose('CFG', JSON.stringify(appConfig))
-			// Applying applications's config, if there is no explicit runtime related options specified
-			this.options.runtime = this.options.runtime || appConfig.runtime
-			this.options.runtimeVersion = this.options.runtimeVersion || appConfig.runtimeVersion
-			this.options.arch = this.options.arch || appConfig.arch
 		}
 
 		this.log.verbose('CFG', 'Build system options:')
