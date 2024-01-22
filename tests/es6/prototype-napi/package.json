@@ -1,5 +1,5 @@
 {
-    "binary": {
-        "napi_versions": 7
-    }
+	"binary": {
+		"napi_versions": 7
+	}
 }

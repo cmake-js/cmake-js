@@ -4,7 +4,8 @@
 [![npm](https://img.shields.io/npm/v/cmake-js)](https://www.npmjs.com/package/cmake-js)
 
 ## About
-CMake.js is a Node.js native addon build tool which works (almost) *exactly* like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
+
+CMake.js is a Node.js native addon build tool which works (almost) _exactly_ like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
 
 - Node.js 14.15+ since CMake.js v7.0.0 (for older runtimes please use an earlier version of CMake.js). Newer versions can produce builds targeting older runtimes
 - [NW.js](https://github.com/nwjs/nw.js): all CMake.js based native modules are compatible with NW.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required
@@ -85,13 +86,13 @@ Options:
 
 - [CMake](http://www.cmake.org/download/)
 - A proper C/C++ compiler toolchain of the given platform
-    - **Windows**:
-        - [Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/). If you installed nodejs with the installer, you can install these when prompted.
-        - An alternate way is to install the [Chocolatey package manager](https://chocolatey.org/install), and run `choco install visualstudio2017-workload-vctools` in an Administrator Powershell
-        - If you have multiple versions installed, you can select a specific version with `npm config set msvs_version 2017` (Note: this will also affect `node-gyp`)
-    - **Unix/Posix**:
-        - Clang or GCC
-        - Ninja or Make (Ninja will be picked if both present)
+  - **Windows**:
+    - [Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/). If you installed nodejs with the installer, you can install these when prompted.
+    - An alternate way is to install the [Chocolatey package manager](https://chocolatey.org/install), and run `choco install visualstudio2017-workload-vctools` in an Administrator Powershell
+    - If you have multiple versions installed, you can select a specific version with `npm config set msvs_version 2017` (Note: this will also affect `node-gyp`)
+  - **Unix/Posix**:
+    - Clang or GCC
+    - Ninja or Make (Ninja will be picked if both present)
 
 ## Usage
 
@@ -99,7 +100,7 @@ Options:
 
 It is advised to use Node-API for new projects instead of NAN. It provides ABI stability making usage simpler and reducing maintainance.
 
-In a nutshell. *(For more complete documentation please see [the first tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)*
+In a nutshell. _(For more complete documentation please see [the first tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)_
 
 - Install cmake-js for your module `npm install --save cmake-js`
 - Put a CMakeLists.txt file into your module root with this minimal required content:
@@ -228,6 +229,7 @@ You can add custom CMake options by beginning option name with `CD`.
 #### Example
 
 In command prompt:
+
 ```
 cmake-js compile --CDFOO="bar"
 ```
@@ -258,27 +260,26 @@ You can configure runtimes for compiling target for all depending CMake.js modul
 
 ```json
 {
-  "name": "ta-taram-taram",
-  "description": "pa-param-pam-pam",
-  "version": "1.0.0",
-  "main": "app.js",
-  "cmake-js": {
-    "runtime": "node",
-    "runtimeVersion": "0.12.0",
-    "arch": "ia32"
-  }
+	"name": "ta-taram-taram",
+	"description": "pa-param-pam-pam",
+	"version": "1.0.0",
+	"main": "app.js",
+	"cmake-js": {
+		"runtime": "node",
+		"runtimeVersion": "0.12.0",
+		"arch": "ia32"
+	}
 }
 ```
 
 Available settings:
 
 - **runtime**: application's target runtime, possible values are:
-	- `node`: Node.js
-	- `nw`: nw.js
-	- `electron`: Electron
+  - `node`: Node.js
+  - `nw`: nw.js
+  - `electron`: Electron
 - **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
-- **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm64`, `arm`). *Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node runtime is gonna be used, so you have to choose a matching nw.js runtime.*
-
+- **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm64`, `arm`). _Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node runtime is gonna be used, so you have to choose a matching nw.js runtime._
 
 #### Node-API and `node-addon-api`
 
@@ -287,13 +288,14 @@ Available settings:
 which was previously known as N-API, supplies a set of C
 APIs that allow to compilation and loading of native modules by
 different versions of Node.js that support Node-API which includes
-all versions of Node.js v10.x and later. 
+all versions of Node.js v10.x and later.
 
 To compile a native module that uses only the
 [plain `C` Node-API calls](https://nodejs.org/api/n-api.html#n_api_node_api),
 follow the directions for plain `node` native modules.
 
 You must also add the following lines to your CMakeLists.txt, to allow for building on windows
+
 ```
 if(MSVC AND CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
   # Generate node.lib
@@ -339,18 +341,18 @@ To make compatible your NW.js application with any NAN CMake.js based modules, w
 
 ```json
 {
-  "cmake-js": {
-    "runtime": "nw",
-    "runtimeVersion": "nw.js-version-here",
-    "arch": "whatever-setting-is-appropriate-for-your-application's-windows-build"
-  }
+	"cmake-js": {
+		"runtime": "nw",
+		"runtimeVersion": "nw.js-version-here",
+		"arch": "whatever-setting-is-appropriate-for-your-application's-windows-build"
+	}
 }
 ```
 
 That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with NW.js out-of-the-box. For more complete documentation please see [the third tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js).
 
-
 #### Heroku
+
 [Heroku](https://heroku.com) uses the concept of a [buildpack](https://devcenter.heroku.com/articles/buildpacks) to define
 how an application should be prepared to run in a [dyno](https://devcenter.heroku.com/articles/dynos).
 The typical buildpack for note-based applications,
@@ -361,19 +363,18 @@ but not [CMake](http://cmake.org).
 The least "painful" way of addressing this is to use heroku's multipack facility:
 
 - Set the applications' buildpack to
-[https://github.com/heroku/heroku-buildpack-multi.git](https://github.com/heroku/heroku-buildpack-multi.git)
+  [https://github.com/heroku/heroku-buildpack-multi.git](https://github.com/heroku/heroku-buildpack-multi.git)
 
 - In the root directory of the application,
-create a file called `.buildpacks` with these two lines:
+  create a file called `.buildpacks` with these two lines:
 
-        https://github.com/brave/heroku-cmake-buildpack.git
-        https://github.com/heroku/heroku-buildpack-nodejs.git
+          https://github.com/brave/heroku-cmake-buildpack.git
+          https://github.com/heroku/heroku-buildpack-nodejs.git
 
 - Deploy the application to have the changes take effect
 
 The `heroku-buildpack-multi` will run each buildpack in order allowing the node application to reference CMake in the Heroku
 build environment.
-
 
 ## Tutorials
 
@@ -384,9 +385,9 @@ build environment.
 
 ## Real examples
 
-* [@julusian/jpeg-turbo](https://github.com/julusian/node-jpeg-turbo) - A Node-API wrapping around libjpeg-turbo. cmake-js was a good fit here, as libjpeg-turbo provides cmake files that can be used, and would be hard to replicate correctly in node-gyp
-* [node-datachannel](https://github.com/murat-dogan/node-datachannel) - Easy to use WebRTC data channels and media transport
-* [aws-iot-device-sdk-v2](https://github.com/aws/aws-iot-device-sdk-js-v2) AWS IoT Device SDK for JavaScript v2
+- [@julusian/jpeg-turbo](https://github.com/julusian/node-jpeg-turbo) - A Node-API wrapping around libjpeg-turbo. cmake-js was a good fit here, as libjpeg-turbo provides cmake files that can be used, and would be hard to replicate correctly in node-gyp
+- [node-datachannel](https://github.com/murat-dogan/node-datachannel) - Easy to use WebRTC data channels and media transport
+- [aws-iot-device-sdk-v2](https://github.com/aws/aws-iot-device-sdk-js-v2) AWS IoT Device SDK for JavaScript v2
 
 Open a PR to add your own project here.
 
