@@ -16,8 +16,10 @@ if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
 endif()
 
+set(NODE_PATH "node") # TODO - allow setting externally
+
 # Find versions info
-execute_process(COMMAND "${CMAKE_CURRENT_LIST_DIR}/bin/cmake-js-versions"
+execute_process(COMMAND ${NODE_PATH} "${CMAKE_CURRENT_LIST_DIR}/bin/cmake-js-versions"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     OUTPUT_VARIABLE CMAKE_JS_VERSIONS
 )
@@ -33,6 +35,8 @@ set(NODE_RUNTIMEVERSION ${CMAKE_MATCH_1})
 string(REGEX MATCH "NODE_ARCH ([0-9a-zA-Z\.]+)" _ ${CMAKE_JS_VERSIONS})
 set(NODE_ARCH ${CMAKE_MATCH_1})
 
+set(CMAKE_JS_PATH ${CMAKE_CURRENT_LIST_DIR}) # cache value of CMAKE_CURRENT_LIST_DIR, as it changes inside function calls
+
 # cmake-js version of CMake `add_library` specifically for node addons
 FUNCTION (cmake_js_add_node_addon PROJECT_NAME)
 	cmake_parse_arguments(
@@ -46,7 +50,7 @@ FUNCTION (cmake_js_add_node_addon PROJECT_NAME)
     # windows delay hook
     set(CMAKE_JS_SRC "") 
     if (MSVC)
-        list (append CMAKE_JS_SRC "${CMAKE_CURRENT_LIST_DIR}/cpp/win_delay_load_hook.cc")
+        list (APPEND CMAKE_JS_SRC "${CMAKE_JS_PATH}/lib/cpp/win_delay_load_hook.cc")
     endif()
 
 	# Setup the library and some default config
@@ -55,7 +59,7 @@ FUNCTION (cmake_js_add_node_addon PROJECT_NAME)
 
     if (OLD_ADDON_API)
         # # Try finding nan
-        # execute_process(COMMAND node -p "require('nan').include"
+        # execute_process(COMMAND ${NODE_PATH} -p "require('nan').include"
         #     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         #     OUTPUT_VARIABLE NODE_NAN_DIR
         #     OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -69,7 +73,7 @@ FUNCTION (cmake_js_add_node_addon PROJECT_NAME)
         # TODO nan and headers
     else()
         # Find node-addon-api
-        execute_process(COMMAND node -p "require('node-api-headers').include_dir"
+        execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').include_dir"
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             OUTPUT_VARIABLE NODE_API_HEADERS_DIR
             OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -82,7 +86,7 @@ FUNCTION (cmake_js_add_node_addon PROJECT_NAME)
         endif()
 
         # Try finding node-addon-api
-        execute_process(COMMAND node -p "require('node-addon-api').include"
+        execute_process(COMMAND ${NODE_PATH} -p "require('node-addon-api').include"
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             OUTPUT_VARIABLE NODE_ADDON_API_DIR
             OUTPUT_STRIP_TRAILING_WHITESPACE
