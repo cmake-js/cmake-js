@@ -35,7 +35,8 @@
 		"url": "git://github.com/cmake-js/cmake-js.git"
 	},
 	"bin": {
-		"cmake-js": "./bin/cmake-js"
+		"cmake-js": "./bin/cmake-js",
+		"cmake-js-cmake": "./bin/cmake-js-cmake.mjs"
 	},
 	"engines": {
 		"node": ">= 14.15.0"
@@ -55,12 +56,16 @@
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
+		"@tsconfig/node14": "^14.1.0",
+		"@types/node": "^14.18.63",
+		"@types/which": "^2.0.2",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"mocha": "*",
 		"nan": "^2.18.0",
 		"node-addon-api": "^6.1.0",
-		"prettier": "^3.2.2"
+		"prettier": "^3.2.2",
+		"typescript": "^5.3.3"
 	},
 	"scripts": {
 		"test": "mocha tests",

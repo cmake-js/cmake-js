@@ -28,6 +28,7 @@ node_modules
 build
 package-lock.json
 yarn.lock
+rewrite/dist
 
 # Users Environment Variables
 .lock-wscript

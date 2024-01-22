@@ -1,0 +1,15 @@
+{
+	"extends": "@tsconfig/node14/tsconfig.json",
+	"include": ["rewrite/src/**/*.ts"],
+	"exclude": ["node_modules/**", "src/**/*spec.ts", "src/**/__tests__/*", "src/**/__mocks__/*", "scratch/**"],
+	"compilerOptions": {
+		"outDir": "./rewrite/dist",
+		"baseUrl": "./",
+		"paths": {
+			"*": ["./node_modules/*"]
+		},
+		"types": ["node"],
+		"module": "Node16",
+		"typeRoots": ["./typings", "./node_modules/@types"]
+	}
+}
