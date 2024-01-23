@@ -13,10 +13,10 @@ const runtimePaths = {
 				winLibs: [
 					{
 						dir: targetOptions.isX64 ? 'x64' : '',
-						name: targetOptions.runtime + '.lib',
+						name: 'node.lib',
 					},
 				],
-				tarPath: targetOptions.runtime + '-v' + targetOptions.runtimeVersion + '.tar.gz',
+				tarPath: 'node-v' + targetOptions.runtimeVersion + '.tar.gz',
 				headerOnly: false,
 			}
 		} else {
@@ -25,10 +25,10 @@ const runtimePaths = {
 				winLibs: [
 					{
 						dir: targetOptions.isX64 ? 'win-x64' : 'win-x86',
-						name: targetOptions.runtime + '.lib',
+						name: 'node.lib',
 					},
 				],
-				tarPath: targetOptions.runtime + '-v' + targetOptions.runtimeVersion + '-headers.tar.gz',
+				tarPath: 'node-v' + targetOptions.runtimeVersion + '-headers.tar.gz',
 				headerOnly: true,
 			}
 		}
@@ -40,7 +40,7 @@ const runtimePaths = {
 				winLibs: [
 					{
 						dir: targetOptions.isX64 ? 'x64' : '',
-						name: targetOptions.runtime + '.lib',
+						name: 'nw.lib',
 					},
 					{
 						dir: targetOptions.isX64 ? 'x64' : '',
@@ -56,7 +56,7 @@ const runtimePaths = {
 			winLibs: [
 				{
 					dir: targetOptions.isX64 ? 'x64' : '',
-					name: targetOptions.runtime + '.lib',
+					name: 'nw.lib',
 				},
 			],
 			tarPath: 'nw-headers-v' + targetOptions.runtimeVersion + '.tar.gz',

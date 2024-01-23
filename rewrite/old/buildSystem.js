@@ -7,24 +7,12 @@ const npmConfig = require('./npmConfig')
 const path = require('path')
 const Toolset = require('./toolset')
 
-function isNodeApi(log, projectRoot) {
-	try {
-		const projectPkgJson = require(path.join(projectRoot, 'package.json'))
-		// Make sure the property exists
-		return !!projectPkgJson?.binary?.napi_versions
-	} catch (e) {
-		log.silly('CFG', "'package.json' not found.")
-		return false
-	}
-}
-
 class BuildSystem {
 	constructor(options) {
 		this.options = options || {}
 		this.options.directory = path.resolve(this.options.directory || process.cwd())
 		this.options.out = path.resolve(this.options.out || path.join(this.options.directory, 'build'))
 		this.log = new CMLog(this.options)
-		this.options.isNodeApi = isNodeApi(this.log, this.options.directory)
 		const npmOptions = npmConfig(this.log)
 
 		if (npmOptions && typeof npmOptions === 'object' && Object.keys(npmOptions).length) {

@@ -69,8 +69,20 @@ FUNCTION (cmake_js_add_node_addon PROJECT_NAME)
         #     message("Found nan: ${NODE_NAN_DIR}")
         #     target_include_directories(${PROJECT_NAME} PRIVATE ${NODE_NAN_DIR})
         # endif()
-
+        
         # TODO nan and headers
+
+        # include headers
+        set (NODE_HEADERS_DIR "") # TODO
+        target_include_directories(${PROJECT_NAME} PRIVATE
+            # some runtimes provide tidy headers
+            "${NODE_HEADERS_DIR}/include/node"
+            # some runtimes provide a lot more stuff
+            "${NODE_HEADERS_DIR}/src"
+            "${NODE_HEADERS_DIR}/deps/v8/include"
+            "${NODE_HEADERS_DIR}/deps/uv/include"
+        )
+        
     else()
         # Find node-addon-api
         execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').include_dir"

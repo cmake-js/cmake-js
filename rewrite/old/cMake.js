@@ -120,14 +120,6 @@ class CMake {
 			D.push({ CMAKE_LIBRARY_OUTPUT_DIRECTORY: this.buildDir })
 		}
 
-		// In some configurations MD builds will crash upon attempting to free memory.
-		// This tries to encourage MT builds which are larger but less likely to have this crash.
-		D.push({ CMAKE_MSVC_RUNTIME_LIBRARY: 'MultiThreaded$<$<CONFIG:Debug>:Debug>' })
-
-		// Includes:
-		const includesString = await this.getCmakeJsIncludeString()
-		D.push({ CMAKE_JS_INC: includesString })
-
 		// Runtime:
 		D.push({ NODE_RUNTIME: this.targetOptions.runtime })
 		D.push({ NODE_RUNTIMEVERSION: this.targetOptions.runtimeVersion })
@@ -205,30 +197,6 @@ class CMake {
 			}
 		}
 		return libs.join(';')
-	}
-	async getCmakeJsIncludeString() {
-		let incPaths = []
-		if (!this.options.isNodeApi) {
-			// Include and lib:
-			if (this.dist.headerOnly) {
-				incPaths = [path.join(this.dist.internalPath, '/include/node')]
-			} else {
-				const nodeH = path.join(this.dist.internalPath, '/src')
-				const v8H = path.join(this.dist.internalPath, '/deps/v8/include')
-				const uvH = path.join(this.dist.internalPath, '/deps/uv/include')
-				incPaths = [nodeH, v8H, uvH]
-			}
-
-			// NAN
-			const nanH = await locateNAN(this.projectRoot)
-			if (nanH) {
-				incPaths.push(nanH)
-			}
-		} else {
-			
-		}
-
-		return incPaths.join(';')
 	}
 	
 	async configure() {
