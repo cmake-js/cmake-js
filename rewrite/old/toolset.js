@@ -127,8 +127,6 @@ class Toolset {
 			this.linkerFlags.push('-undefined dynamic_lookup')
 		}
 
-		this.compilerFlags.push('-DBUILDING_NODE_EXTENSION')
-
 		// 4: Build target
 		if (this.options.target) {
 			this.log.info('TOOL', 'Building only the ' + this.options.target + ' target, as specified from the command line.')
@@ -178,14 +176,6 @@ class Toolset {
 			}
 		}
 
-		this.linkerFlags.push('/DELAYLOAD:NODE.EXE')
-
-		if (this.targetOptions.isX86) {
-			if (install) {
-				this.log.verbose('TOOL', 'Setting SAFESEH:NO linker flag.')
-			}
-			this.linkerFlags.push('/SAFESEH:NO')
-		}
 	}
 	async _getTopSupportedVisualStudioGenerator() {
 		const CMake = require('./cMake')

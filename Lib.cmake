@@ -27,7 +27,7 @@ if (NOT DEFINED CMAKE_JS_VERSIONS OR "${CMAKE_JS_VERSIONS}" STREQUAL "")
     message(FATAL_ERROR "Failed to find cmake-js and nodejs versions!")
 endif()
 string(REGEX MATCH "CMAKEJS_VERSION ([0-9a-zA-Z\.]+)" _ ${CMAKE_JS_VERSIONS})
-set(CMAKEJS_VERSION ${CMAKE_MATCH_1})
+set(CMAKE_JS_VERSION ${CMAKE_MATCH_1})
 string(REGEX MATCH "NODE_RUNTIME ([0-9a-zA-Z\.]+)" _ ${CMAKE_JS_VERSIONS})
 set(NODE_RUNTIME ${CMAKE_MATCH_1})
 string(REGEX MATCH "NODE_RUNTIMEVERSION ([0-9a-zA-Z\.]+)" _ ${CMAKE_JS_VERSIONS})
@@ -98,12 +98,32 @@ FUNCTION (cmake_js_add_node_addon PROJECT_NAME)
         endif()
 
         # Generate node.lib if needed
-        set(CMAKE_JS_NODELIB_DEF "") # TODO
-        if(MSVC AND CMAKE_JS_NODELIB_DEF)
-            # Generate node.lib 
-            set(CMAKE_JS_NODELIB_TARGET "${CMAKE_BINARY_DIR}/node.lib")
-            execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
-            target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_NODELIB_TARGET})
+        if(MSVC)
+            # Find node-addon-api
+            execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').def_paths.node_api_def"
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                OUTPUT_VARIABLE NODE_API_DEF_PATH
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+            )
+            if (DEFINED NODE_API_DEF_PATH AND NOT "${NODE_API_DEF_PATH}" STREQUAL "")
+                # Generate node.lib 
+                set(CMAKE_JS_NODELIB_TARGET "${CMAKE_BINARY_DIR}/node.lib")
+                execute_process(COMMAND ${CMAKE_AR} /def:${NODE_API_DEF_PATH} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
+                target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_NODELIB_TARGET})
+            else()
+                message(FATAL_ERROR "Failed to find node-api-headers node_api_def!")
+            endif()
+            
+        endif()
+    endif()
+
+    if (MSVC)
+        # setup delayload
+        target_link_options(${PROJECT_NAME} PRIVATE "/DELAYLOAD:NODE.EXE")
+        target_link_libraries(${PROJECT_NAME} PRIVATE delayimp)
+
+        if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)")
+            target_link_options(${PROJECT_NAME} PUBLIC "/SAFESEH:NO")
         endif()
     endif()
 

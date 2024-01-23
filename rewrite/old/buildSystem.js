@@ -79,12 +79,6 @@ class BuildSystem {
 	getCmakeJsLibString() {
 		return this._invokeCMake('getCmakeJsLibString')
 	}
-	getCmakeJsIncludeString() {
-		return this._invokeCMake('getCmakeJsIncludeString')
-	}
-	getCmakeJsSrcString() {
-		return this._invokeCMake('getCmakeJsSrcString')
-	}
 	configure() {
 		return this._invokeCMake('configure')
 	}

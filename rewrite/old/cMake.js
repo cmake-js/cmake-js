@@ -8,10 +8,8 @@ const CMLog = require('./cmLog')
 const TargetOptions = require('./targetOptions')
 const processHelpers = require('./processHelpers')
 const locateNAN = require('./locateNAN')
-const locateNodeApi = require('./locateNodeApi')
 const npmConfigData = require('rc')('npm')
 const Toolset = require('./toolset')
-const headers = require('node-api-headers')
 
 class CMake {
 	get path() {
@@ -111,8 +109,6 @@ class CMake {
 
 		const D = []
 
-		// CMake.js watermark
-		D.push({ CMAKE_JS_VERSION: environment.cmakeJsVersion })
 
 		// Build configuration:
 		D.push({ CMAKE_BUILD_TYPE: this.config })
@@ -131,10 +127,6 @@ class CMake {
 		// Includes:
 		const includesString = await this.getCmakeJsIncludeString()
 		D.push({ CMAKE_JS_INC: includesString })
-
-		// Sources:
-		const srcsString = this.getCmakeJsSrcString()
-		D.push({ CMAKE_JS_SRC: srcsString })
 
 		// Runtime:
 		D.push({ NODE_RUNTIME: this.targetOptions.runtime })
@@ -159,15 +151,6 @@ class CMake {
 
 		const libsString = this.getCmakeJsLibString()
 		D.push({ CMAKE_JS_LIB: libsString })
-
-		if (environment.isWin) {
-			const nodeLibDefPath = this.getNodeLibDefPath()
-			if (nodeLibDefPath) {
-				const nodeLibPath = path.join(this.workDir, 'node.lib')
-				D.push({ CMAKE_JS_NODELIB_DEF: nodeLibDefPath })
-				D.push({ CMAKE_JS_NODELIB_TARGET: nodeLibPath })
-			}
-		}
 
 		if (this.toolset.generator) {
 			command.push('-G', this.toolset.generator)
@@ -217,7 +200,6 @@ class CMake {
 		if (environment.isWin) {
 			const nodeLibDefPath = this.getNodeLibDefPath()
 			if (nodeLibDefPath) {
-				libs.push(path.join(this.workDir, 'node.lib'))
 			} else {
 				libs.push(...this.dist.winLibs)
 			}
@@ -243,32 +225,12 @@ class CMake {
 				incPaths.push(nanH)
 			}
 		} else {
-			// Base headers
-			const apiHeaders = require('node-api-headers')
-			incPaths.push(apiHeaders.include_dir)
-
-			// Node-api
-			const napiH = await locateNodeApi(this.projectRoot)
-			if (napiH) {
-				incPaths.push(napiH)
-			}
+			
 		}
 
 		return incPaths.join(';')
 	}
-	getCmakeJsSrcString() {
-		const srcPaths = []
-		if (environment.isWin) {
-			const delayHook = path.normalize(path.join(__dirname, 'cpp', 'win_delay_load_hook.cc'))
-
-			srcPaths.push(delayHook.replace(/\\/gm, '/'))
-		}
-
-		return srcPaths.join(';')
-	}
-	getNodeLibDefPath() {
-		return environment.isWin && this.options.isNodeApi ? headers.def_paths.node_api_def : undefined
-	}
+	
 	async configure() {
 		this.verifyIfAvailable()
 
