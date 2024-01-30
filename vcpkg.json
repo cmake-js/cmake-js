@@ -16,6 +16,14 @@
     {
       "name": "vcpkg-tool-nodejs",
       "host": true
+    },
+    {
+      "name": "node-api-headers",
+      "host": false
+    },
+    {
+      "name": "node-addon-api",
+      "host": false
     }
   ]
 }
