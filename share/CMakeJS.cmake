@@ -3,11 +3,11 @@
   Copyright (C) 2024 Nathan J. Hood
   MIT License
   See: https://github.com/nathanjhood/NapiAddon
-#]=============================================================================]
+]=============================================================================]#
 
 #[=============================================================================[
-  Check whether we have already been included (borrowed from CMakeRC)
-#]=============================================================================]
+Check whether we have already been included (borrowed from CMakeRC)
+]=============================================================================]#
 # Hypothetical CMakeJS version number...
 set(_version 8.0.0)
 
@@ -34,7 +34,7 @@ endif()
 
 #[=============================================================================[
 Internal helper (borrowed from CMakeRC).
-#]=============================================================================]
+]=============================================================================]#
 function(_cmakejs_normalize_path var)
     set(path "${${var}}")
     file(TO_CMAKE_PATH "${path}" path)
@@ -60,17 +60,17 @@ This module defines
 
   CMAKE_JS_INC, where to find node.h, etc.
   CMAKE_JS_LIB, the libraries required to use CMakeJs.
-  CMAKE_JS_SRC, where to find required *.cpp files, if any
+  CMAKE_JS_SRC, where to find required *.cpp files, if any,
+  CMAKE_JS_EXECUTABLE, the cmake-js binary (global)
+  CMAKE_JS_NPM_PACKAGE, the cmake-js binary (local)
 
-#]=======================================================================]
+]=======================================================================]#
 
 # CMAKE_JS_VERSION is defined on all platforms when calling from cmake-js.
 # By checking whether this var is pre-defined, we can determine if we are
 # running from an npm script (via cmake-js), or from CMake directly...
 
-# TODO: Unfortunately, this var is a little too close to 'CMAKE_VERSION'
-# for comfort... Kitware may need it. Should be moved into 'CMAKEJS_VERSION'!
-if (NOT DEFINED CMAKE_JS_VERSION)
+if (NOT DEFINED CMAKE_JS_VERSION) # TODO: Unfortunately, this var is a little too close to 'CMAKE_VERSION' for comfort... Kitware may need it. Should be moved into 'CMAKEJS_VERSION'!
 
     # ...and if we're calling from CMake directly, we need to set up some vars
     # that our build step depends on (these are predefined when calling via npm/cmake-js).
@@ -137,7 +137,7 @@ if (NOT DEFINED CMAKE_JS_VERSION)
     set(CMAKE_JS_SRC "${CMAKE_JS_SRC}" CACHE STRING "cmake-js source file." FORCE)
     set(CMAKE_JS_LIB "${CMAKE_JS_LIB}" CACHE STRING "cmake-js lib file." FORCE)
 
-    # At this point, some warnings may occur re: the below (still investigating);
+    # TODO: At this point, some warnings may occur re: the below (still investigating);
     # Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS.
     #set (NAPI_CPP_EXCEPTIONS TRUE CACHE STRING "Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS")
     add_definitions(-DNAPI_CPP_EXCEPTIONS) # Also needs /EHsc
@@ -165,8 +165,16 @@ if(VERBOSE)
 endif()
 
 #[=============================================================================[
-Provides NODE_EXECUTABLE for executing NodeJS commands in CMake scripts.
-#]=============================================================================]
+Get the in-use NodeJS binary for executing NodeJS commands in CMake scripts.
+
+Provides
+
+::
+
+  NODE_EXECUTABLE, the NodeJS runtime binary being used
+  NODE_VERSION, the version of the NodeJS runtime binary being used
+
+]=============================================================================]#
 function(cmakejs_acquire_node_executable)
     find_program(NODE_EXECUTABLE
       NAMES "node" "node.exe"
@@ -205,6 +213,7 @@ endif()
 # 2 - it also currently assumes a preference for yarn over npm (and the others)...
 # 3 - finally, because of how cmake-js works, it might create Ninja-build artefacts,
 # even when the CMake user specifies a different generator to CMake manually...
+# We could use 'add_custom_target()' with a user-side ARG for which package manager to use...
 if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
     execute_process(
       COMMAND yarn install
@@ -218,8 +227,15 @@ if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
 endif()
 
 #[=============================================================================[
-Provides NODE_API_HEADERS_DIR for NodeJS C Addon development files.
-#]=============================================================================]
+Get NodeJS C Addon development files.
+
+Provides
+::
+
+  NODE_API_HEADERS_DIR, where to find node_api.h, etc.
+  NODE_API_INC_FILES, the headers required to use Node Addon API.
+
+]=============================================================================]#
 function(cmakejs_acquire_napi_c_files)
     execute_process(
       COMMAND "${NODE_EXECUTABLE}" -p "require('node-api-headers').include_dir"
@@ -252,8 +268,15 @@ if(NOT DEFINED NODE_API_INC_FILES)
 endif()
 
 #[=============================================================================[
-Provides NODE_ADDON_API_DIR for NodeJS C++ Addon development files.
-#]=============================================================================]
+Get NodeJS C++ Addon development files.
+
+Provides
+::
+
+  NODE_ADDON_API_DIR, where to find napi.h, etc.
+  NODE_ADDON_API_INC_FILES, the headers required to use Node Addon API.
+
+]=============================================================================]#
 function(cmakejs_acquire_napi_cpp_files)
     execute_process(
       COMMAND "${NODE_EXECUTABLE}" -p "require('node-addon-api').include"
@@ -298,7 +321,7 @@ cmake-js::node-api
 cmake-js::node-addon-api
 cmake-js::cmake-js
 
-#]=============================================================================]
+]=============================================================================]#
 
 # NodeJS system installation headers
 # cmake-js::node-dev
@@ -345,11 +368,11 @@ endif()
 Exposes a user-side helper function for creating a dynamic '*.node' library,
 linked to the Addon API interface.
 
-cmakejs_create_napi_addon(<name>)
-cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>])
+cmakejs_create_napi_addon(<name> [<sources>])
+cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>] [<sources>])
 
 (This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
-#]=============================================================================]
+]=============================================================================]#
 function(cmakejs_create_napi_addon name)
 
     # Avoid duplicate target names
@@ -437,7 +460,7 @@ function(cmakejs_create_napi_addon name)
     cmakejs_napi_addon_add_sources(${name} ${ARG_UNPARSED_ARGUMENTS})
 
     cmakejs_napi_addon_add_definitions(${name}
-      PRIVATE # These two definitions only belong to this unique target
+      PRIVATE # These definitions only belong to this unique target
       "CMAKEJS_ADDON_NAME=${name}"
       "CMAKEJS_ADDON_ALIAS=${name_alt}"
       "NAPI_CPP_CUSTOM_NAMESPACE=${ARG_NAMESPACE}"
@@ -458,7 +481,7 @@ cmakejs_napi_addon_add_sources(<name> [items1...])
 cmakejs_napi_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
 cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...]])
 cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<dirs>...]] [items1...]...)
-#]=============================================================================]
+]=============================================================================]#
 function(cmakejs_napi_addon_add_sources name)
 
     # Check that this is a Node Addon target
@@ -532,7 +555,7 @@ Add pre-processor definitions to an existing Napi Addon target.
 
 cmakejs_napi_addon_add_definitions(<name> [items1...])
 cmakejs_napi_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
-#]=============================================================================]
+]=============================================================================]#
 function(cmakejs_napi_addon_add_definitions name)
 
     # Check that this is a Node Addon target
@@ -593,6 +616,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
 
 check_required_components(cmake-js)
 ]==])
+
 # create cmake config file
 configure_package_config_file (
     "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in"
@@ -608,8 +632,7 @@ write_basic_package_version_file (
 )
 
 unset(_version)
-
-# These vars are not very namespace friendly!
+# TODO: These vars are not very namespace friendly!
 unset (CMAKE_JS_SRC)
 unset (CMAKE_JS_INC)
 unset (CMAKE_JS_LIB)
