@@ -241,7 +241,7 @@ function(cmakejs_acquire_napi_c_files)
       COMMAND "${NODE_EXECUTABLE}" -p "require('node-api-headers').include_dir"
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
       OUTPUT_VARIABLE NODE_API_HEADERS_DIR
-      COMMAND_ERROR_IS_FATAL ANY
+      # COMMAND_ERROR_IS_FATAL ANY
     )
     string(REGEX REPLACE "[\r\n\"]" "" NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}")
     set(NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}" CACHE PATH "Node API Headers directory." FORCE)
@@ -282,7 +282,7 @@ function(cmakejs_acquire_napi_cpp_files)
       COMMAND "${NODE_EXECUTABLE}" -p "require('node-addon-api').include"
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
       OUTPUT_VARIABLE NODE_ADDON_API_DIR
-      COMMAND_ERROR_IS_FATAL ANY
+      # COMMAND_ERROR_IS_FATAL ANY
     )
     string(REGEX REPLACE "[\r\n\"]" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
     set(NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}" CACHE PATH "Node Addon API Headers directory." FORCE)
