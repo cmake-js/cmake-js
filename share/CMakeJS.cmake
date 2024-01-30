@@ -632,9 +632,9 @@ write_basic_package_version_file (
 )
 
 unset(_version)
-# TODO: These vars are not very namespace friendly!
-unset (CMAKE_JS_SRC)
-unset (CMAKE_JS_INC)
-unset (CMAKE_JS_LIB)
-unset (CMAKE_JS_VERSION)
-unset (CMAKE_JS_EXECUTABLE)
+# # TODO: These vars are not very namespace friendly!
+# unset (CMAKE_JS_SRC)
+# unset (CMAKE_JS_INC)
+# unset (CMAKE_JS_LIB)
+# unset (CMAKE_JS_VERSION)
+# unset (CMAKE_JS_EXECUTABLE)
