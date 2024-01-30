@@ -1,6 +1,6 @@
 {
   "name": "cmake-js",
-  "version": "7.3.0",
+  "version": "7.3.1",
   "homepage": "https://github.com/cmake-js/cmake-js",
   "description": "CMake.js - a Node.js native addon build tool.",
   "license": "MIT",
