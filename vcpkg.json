@@ -5,6 +5,12 @@
   "description": "CMake.js - a Node.js native addon build tool.",
   "license": "MIT",
   "builtin-baseline": "288e8bebf4ca67c1f8ebd49366b03650cfd9eb7d",
+  "features": {
+    "node-dev":       { "description": "NodeJS development headers",                    "dependencies": ["vcpkg-tool-nodejs"]},
+    "node-api":       { "description": "Node API (C) headers",                          "dependencies": ["node-api-headers"]},
+    "node-addon-api": { "description": "Node Addon API (C++) headers",                  "dependencies": ["node-addon-api"]},
+    "cmake-js":       { "description": "CMake.js - a Node.js native addon build tool.", "dependencies": ["vcpkg-tool-nodejs", "node-api-headers", "node-addon-api"]}
+  },
   "dependencies": [
     {
       "name" : "vcpkg-cmake",
