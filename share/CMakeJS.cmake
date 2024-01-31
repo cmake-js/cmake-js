@@ -633,6 +633,67 @@ write_basic_package_version_file (
 	COMPATIBILITY AnyNewerVersion
 )
 
+# Tell the user what to do
+message(STATUS "\ncmake-js v${_CMAKEJS_VERSION} has made the following targets available for linkage:\n")
+foreach(TARGET IN LISTS CMAKEJS_TARGETS)
+    message(STATUS "cmake-js::${TARGET}")
+endforeach()
+
+if(NOT CMakeJS_IS_TOP_LEVEL)
+    message(STATUS [==[
+--
+-- To build a Node.js addon,
+--
+-- Add this to your CMakeLists.txt:
+--
+
+cmakejs_create_napi_addon (
+    # CMAKEJS_ADDON_NAME
+    my_addon
+    # SOURCES
+    src/<vendor>/my_addon.cpp
+    # NAPI_CPP_CUSTOM_NAMESPACE
+    NAMESPACE <vendor>
+  )
+
+-- You will be able to load your addon in JavaScript code:
+--
+
+const my_addon = require("./build/lib/my_addon.node");
+
+console.log(`Napi Status:  ${my_addon.hello()}`);
+console.log(`Napi Version: ${my_addon.version()}`);
+
+-- You may use either the regular CMake interface, or the cmake-js CLI, to build your addon!
+--
+
+{
+    "name": "@<vendor>/my-addon",
+    "dependencies": {
+        "cmake-js": "^7.3.3"
+    },
+    "scripts": {
+        "install":     "cmake-js install",
+        "configure":   "cmake-js configure",
+        "reconfigure": "cmake-js reconfigure",
+        "build":       "cmake-js build",
+        "rebuild":     "cmake-js rebuild"
+        "clean":       "cmake-js clean"
+    // ...
+}
+
+-- Make sure to register a module in your C/C++ code like official example does:
+-- https://github.com/nodejs/node-addon-examples/blob/main/src/1-getting-started/1_hello_world/node-addon-api/hello.cc
+--
+-- Read more about our 'CMakeJS.cmake' API here:
+-- https://github.com/cmake-js/cmake-js/blob/cmakejs_cmake_api/README.md
+--
+-- See more node addon examples here:
+-- https://github.com/nodejs/node-addon-examples
+--
+-- ]==])
+endif()
+
 unset(_version)
 # # TODO: These vars are not very namespace friendly!
 # unset (CMAKE_JS_SRC)
