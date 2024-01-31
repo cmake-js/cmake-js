@@ -64,7 +64,22 @@
 	},
 	"scripts": {
 		"test": "mocha tests",
-		"lint": "eslint lib bin/cmake-js tests"
+		"lint": "eslint lib bin/cmake-js tests",
+
+    "cmake:configure":      "cmake -S . -B ./build",
+    "cmake:reconfigure":    "cmake --fresh -S . -B ./build",
+    "cmake:build":          "cmake --build ./build",
+    "cmake:rebuild":        "cmake --fresh -S . -B ./build && cmake --build ./build",
+    "cmake:help":           "cmake --help",
+
+    "ctest":                "ctest --test-dir ./build --rerun-failed --output-on-failure",
+    "ctest:help":           "ctest --help",
+
+    "cpack:all":            "cpack -B ./build --config ./build/CPackConfig.cmake",
+    "cpack:zip":            "cpack -B ./build --config ./build/CPackConfig.cmake --generator ZIP",
+    "cpack:tar":            "cpack -B ./build --config ./build/CPackConfig.cmake --generator TAR",
+    "cpack:source":         "cpack -B ./build --config ./build/CPackSourceConfig.cmake",
+    "cpack:help":           "cpack --help"
 	},
 	"files": [
 		"lib",
