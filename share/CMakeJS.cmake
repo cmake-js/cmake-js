@@ -8,8 +8,8 @@
 #[=============================================================================[
 Check whether we have already been included (borrowed from CMakeRC)
 ]=============================================================================]#
-# Hypothetical CMakeJS version number...
-set(_version 8.0.0)
+# TODO: Decouple CMakeJS.cmake API version number from cmake-js version number...?
+set(_version 7.3.3)
 
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(VERSION 3.15)
@@ -17,20 +17,22 @@ include(CMakeParseArguments)
 
 if(COMMAND cmakejs_napi_addon_add_sources)
     if(NOT DEFINED _CMAKEJS_VERSION OR NOT (_version STREQUAL _CMAKEJS_VERSION))
-        message(WARNING "More than one CMakeJS version has been included in this project.")
+        message(WARNING "More than one 'CMakeJS.cmake' version has been included in this project.")
     endif()
     # CMakeJS has already been included! Don't do anything
     return()
 endif()
 
-set(_CMAKEJS_VERSION "${_version}" CACHE INTERNAL "CMakeJS version. Used for checking for conflicts")
+set(_CMAKEJS_VERSION "${_version}" CACHE INTERNAL "Current 'CMakeJS.cmake' version. Used for checking for conflicts")
 
-set(_CMAKEJS_SCRIPT "${CMAKE_CURRENT_LIST_FILE}" CACHE INTERNAL "Path to 'CMakeJS.cmake' script")
+set(_CMAKEJS_SCRIPT "${CMAKE_CURRENT_LIST_FILE}" CACHE INTERNAL "Path to current 'CMakeJS.cmake' script")
 
 # Default build output directory, if not specified with '-DCMAKEJS_BINARY_DIR:PATH=/some/dir'
 if(NOT DEFINED CMAKEJS_BINARY_DIR)
     set(CMAKEJS_BINARY_DIR "${CMAKE_BINARY_DIR}")
 endif()
+
+message (STATUS "\n-- CMakeJS.cmake v${_CMAKEJS_VERSION}")
 
 #[=============================================================================[
 Internal helper (borrowed from CMakeRC).

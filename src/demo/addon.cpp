@@ -51,9 +51,9 @@ NODE_API_MODULE(CMAKEJS_ADDON_NAME, Init) // (name to use, initializer to use)
 } // namespace Napi
 
 // Export our custom namespace to outside of the Napi namespace, providing an
-// alias to the Napi Addon API; e.g., 'addon::Object()', along with the functions
-// defined above, such as 'addon::Hello()'.
-namespace CMAKEJS_ADDON_NAME {
+// alias to the Napi Addon API; e.g., 'CMakeJS::demo::Object()', along with the
+// functions defined above, such as 'CMakeJS::demo::Hello()'.
+namespace NAPI_CPP_CUSTOM_NAMESPACE::CMAKEJS_ADDON_NAME {
   using namespace Napi::NAPI_CPP_CUSTOM_NAMESPACE;
 }
 

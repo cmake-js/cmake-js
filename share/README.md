@@ -100,7 +100,7 @@ or
 $ yarn install
 ```
 
-*However*, the ```CMakeJS.cmake``` script does *not depend on being executed by cmake-js*, and can build addons independently of npm/yarn, using just native CMake commands (see ```package.json``` for some more):
+*However*, the ```CMakeJS.cmake``` script does *not depend on being executed by cmake-js*, and can build addons independently of npm/yarn, using just native CMake commands (see [this demo ```package.json```](https://github.com/nathanjhood/NapiAddon/blob/main/package.json) for some more):
 
 ```.sh
 $ cmake --fresh -S . -B ./build
@@ -136,7 +136,11 @@ See [```package.json```](https://github.com/nathanjhood/NapiAddon/blob/main/pack
 
 ## Deeper CMake integration
 
-By exporting an interface library under cmake-js' own namespace - ```cmake-js::cmake-js```, the CMakeJS.cmake file can easily be shipped in the cmake-js package tree, making the NodeJS Addon API automatically available to builders by simply having the cmake-js CLI pass in ```-DCMAKE_MODULE_PATH:PATH=/path/to/CMakeJS.cmake```, as well as providing the usual/expected means of integration with vcpkg, and other conventional CMake module consumers.
+By exporting an interface library under cmake-js' own namespace - ```cmake-js::cmake-js```, the CMakeJS.cmake file can easily be shipped in the cmake-js package tree, making the NodeJS Addon API automatically available to builders by simply having the cmake-js CLI pass in ```-DCMAKE_MODULE_PATH:PATH=/path/to/CMakeJS.cmake``` (pointing at the dir, not the file!), as well as providing the usual/expected means of integration with vcpkg, and other conventional CMake module consumers.
+
+If the module is appended via the CLI as above, then builders may activate ```CMakeJS.cmake``` programatically by calling ```include(CMakeJS)``` in their CMake project.
+
+Alternatively to using the module path on the CLI and activating the module programmatically, they can instead ```include("${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/share/CMakeJS.cmake")``` and the module will be activated on inclusion.
 
 Builders will also find that their cmake-js - powered Addon targets also work well with CMake's ```export()``` and ```install()``` routines, meaning that their Addon projects also work as CMake modules.
 
