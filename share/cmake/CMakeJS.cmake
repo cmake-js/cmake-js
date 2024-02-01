@@ -77,104 +77,24 @@ This module defines
 
 ::
 
-  CMAKE_JS_INC, where to find node.h, etc.
-  CMAKE_JS_LIB, the libraries required to use CMakeJs.
-  CMAKE_JS_SRC, where to find required *.cpp files, if any,
-  CMAKE_JS_EXECUTABLE, the cmake-js binary (global)
-  CMAKE_JS_NPM_PACKAGE, the cmake-js binary (local)
+  CMAKEJS_EXECUTABLE, the cmake-js binary
 
 ]=======================================================================]#
 
-# CMAKE_JS_VERSION is defined on all platforms when calling from cmake-js.
-# By checking whether this var is pre-defined, we can determine if we are
-# running from an npm script (via cmake-js), or from CMake directly...
-
-if (NOT DEFINED CMAKE_JS_VERSION)
-
-    # Check for cmake-js installations
-    find_program(CMAKE_JS_EXECUTABLE
-      NAMES "cmake-js" "cmake-js.exe"
-      PATHS "${_CMAKEJS_DIR}/bin"
-      DOC "cmake-js project-local npm package binary"
-      REQUIRED
-    )
-    if (NOT CMAKE_JS_EXECUTABLE)
-        message(FATAL_ERROR "cmake-js not found! Make sure you have installed your node dependencies fully.")
-        return()
-    endif()
-
-    _cmakejs_normalize_path(CMAKE_JS_EXECUTABLE)
-    string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_EXECUTABLE "${CMAKE_JS_EXECUTABLE}")
-
-    # Execute the CLI commands, and write their outputs into the cached vars
-    # where the remaining build processes expect them to be...
-    execute_process(
-      COMMAND "${CMAKE_JS_EXECUTABLE}" "print-cmakejs-include" "--log-level error" "--generator ${CMAKE_GENERATOR}"
-      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      OUTPUT_VARIABLE CMAKE_JS_INC
-    )
-
-    execute_process(
-      COMMAND "${CMAKE_JS_EXECUTABLE}" "print-cmakejs-src" "--log-level error" "--generator ${CMAKE_GENERATOR}"
-      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      OUTPUT_VARIABLE CMAKE_JS_SRC
-    )
-
-    execute_process(
-      COMMAND "${CMAKE_JS_EXECUTABLE}" "print-cmakejs-lib" "--log-level error" "--generator ${CMAKE_GENERATOR}"
-      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      OUTPUT_VARIABLE CMAKE_JS_LIB
-    )
-
-    # Strip the vars of any unusual chars that might break the paths...
-    _cmakejs_normalize_path(CMAKE_JS_INC)
-    _cmakejs_normalize_path(CMAKE_JS_SRC)
-    _cmakejs_normalize_path(CMAKE_JS_LIB)
-
-    string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_INC "${CMAKE_JS_INC}")
-    string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_SRC "${CMAKE_JS_SRC}")
-    string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_LIB "${CMAKE_JS_LIB}")
-
-    # relocate...
-    file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/**/*.h")
-    file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
-    unset(_CMAKE_JS_INC_FILES)
-
-    # target include directories (as if 'node-dev' were an isolated CMake project...)
-    set(CMAKE_JS_INC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
-      $<INSTALL_INTERFACE:include/node>
-    )
-
-    set(CMAKE_JS_INC "${CMAKE_JS_INC}" CACHE STRING "cmake-js include directory." FORCE)
-    set(CMAKE_JS_SRC "${CMAKE_JS_SRC}" CACHE STRING "cmake-js source file." FORCE)
-    set(CMAKE_JS_LIB "${CMAKE_JS_LIB}" CACHE STRING "cmake-js lib file." FORCE)
-
-    # TODO: At this point, some warnings may occur re: the below (still investigating);
-    # Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS.
-    #set (NAPI_CPP_EXCEPTIONS TRUE CACHE STRING "Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS")
-    add_definitions(-DNAPI_CPP_EXCEPTIONS) # Also needs /EHsc
-    # add_definitions(-DNAPI_DISABLE_CPP_EXCEPTIONS)
-
-else ()
-
-    # ... we already are calling via npm/cmake-js, so we should already have all the vars we need!
-    if(VERBOSE)
-        message(DEBUG "CMakeJS Calling...")
-    endif()
-
-endif ()
-
-set(CMAKE_JS_INC_FILES "") # prevent repetitive globbing on each run
-file(GLOB CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/**.h")
-source_group("cmake-js v${_version} Node ${NODE_VERSION}" FILES "${CMAKE_JS_INC_FILES}")
-
-# Log the vars to the console for sanity...
-if(VERBOSE)
-    message(DEBUG "CMAKE_JS_INC = ${CMAKE_JS_INC}")
-    message(DEBUG "CMAKE_JS_SRC = ${CMAKE_JS_SRC}")
-    message(DEBUG "CMAKE_JS_LIB = ${CMAKE_JS_LIB}")
+# Check for cmake-js installations
+find_program(CMAKEJS_EXECUTABLE
+  NAMES "cmake-js" "cmake-js.exe"
+  PATHS "${_CMAKEJS_DIR}/bin"
+  DOC "cmake-js project-local npm package binary"
+  REQUIRED
+)
+if (NOT CMAKEJS_EXECUTABLE)
+    message(FATAL_ERROR "cmake-js not found! Make sure you have installed your node dependencies fully.")
+    return()
 endif()
+
+_cmakejs_normalize_path(CMAKEJS_EXECUTABLE)
+string(REGEX REPLACE "[\r\n\"]" "" CMAKEJS_EXECUTABLE "${CMAKEJS_EXECUTABLE}")
 
 #[=============================================================================[
 Get the in-use NodeJS binary for executing NodeJS commands in CMake scripts.
@@ -226,7 +146,7 @@ Provides
 function(cmakejs_acquire_napi_c_files)
     execute_process(
       COMMAND "${NODE_EXECUTABLE}" -p "require('node-api-headers').include_dir"
-      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      WORKING_DIRECTORY "${_CMAKEJS_DIR}"
       OUTPUT_VARIABLE NODE_API_HEADERS_DIR
       # COMMAND_ERROR_IS_FATAL ANY
     )
@@ -323,16 +243,15 @@ if(CMAKEJS_NODE_DEV)
   # cmake-js::node-dev
   add_library                 (node-dev INTERFACE)
   add_library                 (cmake-js::node-dev ALIAS node-dev)
-  target_include_directories  (node-dev INTERFACE "${CMAKE_JS_INC}")
-  target_sources              (node-dev INTERFACE "${CMAKE_JS_SRC}")
-  target_sources              (node-dev INTERFACE "${CMAKE_JS_INC_FILES}")
-  target_link_libraries       (node-dev INTERFACE "${CMAKE_JS_LIB}")
+  if (MSVC)
+    target_sources              (node-dev INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
+  endif()
+
   list(APPEND CMAKEJS_TARGETS  node-dev)
   set_target_properties       (node-dev PROPERTIES VERSION ${NODE_VERSION})
 endif()
 
 if(CMAKEJS_NODE_API)
-
   # Acquire if needed...
   if(NOT DEFINED NODE_API_HEADERS_DIR)
     cmakejs_acquire_napi_c_files()
@@ -344,6 +263,7 @@ if(CMAKEJS_NODE_API)
     endif()
   endif()
 
+
   # Node API (C) - requires NodeJS system installation headers
   # cmake-js::node-api
   add_library                 (node-api INTERFACE)
@@ -352,6 +272,25 @@ if(CMAKEJS_NODE_API)
   target_sources              (node-api INTERFACE "${NODE_API_INC_FILES}")
   target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
   set_target_properties       (node-api PROPERTIES VERSION 6.1.0)
+
+
+  # find the node api definition to generate into node.lib
+  if (MSVC)
+    execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').def_paths.node_api_def"
+        WORKING_DIRECTORY ${_CMAKEJS_DIR}
+        OUTPUT_VARIABLE CMAKEJS_NODELIB_DEF
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    if (DEFINED CMAKEJS_NODELIB_DEF)
+        message(FATAL_ERROR "Failed to find `node-api-headers` api definition")
+    endif()
+
+    set(CMAKEJS_NODELIB_TARGET "${CMAKE_BINARY_DIR}/node.lib")
+    execute_process(COMMAND ${CMAKE_AR} /def:${CMAKEJS_NODELIB_DEF} /out:${CMAKEJS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
+    target_link_libraries (node-api INTERFACE "${CMAKEJS_NODELIB_TARGET}")
+  endif()
+  
   list(APPEND CMAKEJS_TARGETS  node-api)
 endif()
 
@@ -390,12 +329,9 @@ if(CMAKEJS_CMAKEJS)
   set_target_properties       (cmake-js PROPERTIES VERSION   7.3.3)
   set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
   set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING cmake-js_MAJOR_VERSION)
-  # Generate definitions
+
   if(MSVC)
       set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
-      if(CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
-          execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
-      endif()
   endif()
 
   list(APPEND CMAKEJS_TARGETS cmake-js)
@@ -677,10 +613,10 @@ write_basic_package_version_file (
 	COMPATIBILITY AnyNewerVersion
 )
 
-# copy headers (and definitions?) to build dir for distribution
-if(CMAKEJS_NODE_DEV)
-  install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "include/node")
-endif()
+# # copy headers (and definitions?) to build dir for distribution
+# if(CMAKEJS_NODE_DEV)
+#   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "include/node")
+# endif()
 
 if(CMAKEJS_NODE_API)
   install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
@@ -805,9 +741,3 @@ console.log(`Napi Version: ${my_addon.version()}`);
 endif()
 
 unset(_version)
-# # TODO: These vars are not very namespace friendly!
-# unset (CMAKE_JS_SRC)
-# unset (CMAKE_JS_INC)
-# unset (CMAKE_JS_LIB)
-# unset (CMAKE_JS_VERSION)
-# unset (CMAKE_JS_EXECUTABLE)
