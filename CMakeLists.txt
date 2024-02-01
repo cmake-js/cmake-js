@@ -59,6 +59,8 @@ if (CMakeJS_IS_TOP_LEVEL
 --
 -- You must use the regular CMake interface to build this demo project (not the cmake-js CLI)!
 --
+-- See our 'package.json' for some command aliases that can be used to build the demo.
+--
 -- The demo target was constructed using our custom CMake API:
 --
 
