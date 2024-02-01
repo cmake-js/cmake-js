@@ -660,9 +660,24 @@ configure_package_config_file (
 )
 # generate the version file for the cmake config file
 write_basic_package_version_file (
-	share/cmake/CMakeJSConfigVersion.cmake
+	"${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfigVersion.cmake"
 	VERSION ${_version}
 	COMPATIBILITY AnyNewerVersion
+)
+
+install(TARGETS ${CMAKEJS_TARGETS}
+  EXPORT CMakeJSTargets
+  LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+  ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+  RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
+  INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
+
+# install config files
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfigVersion.cmake"
+  DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/CMakeJS"
 )
 
 if(CMAKEJS_NODE_DEV)
