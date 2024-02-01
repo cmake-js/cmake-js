@@ -13,7 +13,6 @@ if (DEFINED CMAKE_JS_VERSION)
     message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, instead you should use cmake-js2 or cmake")
 endif()
 
-
 #[=============================================================================[
 Internal helper (borrowed from CMakeRC).
 ]=============================================================================]#
@@ -174,15 +173,6 @@ function(cmakejs_acquire_napi_c_files)
       $<INSTALL_INTERFACE:include/node-api-headers>
     )
     set(NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}" CACHE PATH "Node API Headers directory." FORCE)
-
-    unset(NODE_API_INC_FILES)
-    file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-    set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
-    source_group("Node Addon API (C)" FILES "${NODE_API_INC_FILES}")
-
-    if(VERBOSE)
-        message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
-    endif()
 endfunction()
 
 #[=============================================================================[
@@ -216,15 +206,6 @@ function(cmakejs_acquire_napi_cpp_files)
       $<INSTALL_INTERFACE:include/node-addon-api>
     )
     set(NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}" CACHE PATH "Node Addon API Headers directory." FORCE)
-
-    unset(NODE_ADDON_API_INC_FILES)
-    file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-    set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE FILEPATH "Node Addon API Header files." FORCE)
-    source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
-
-    if(VERBOSE)
-        message(STATUS "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
-    endif()
 endfunction()
 
 
@@ -253,11 +234,12 @@ if(CMAKEJS_NODE_API)
   if(NOT DEFINED NODE_API_HEADERS_DIR)
     cmakejs_acquire_napi_c_files()
     message(DEBUG "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
-    if(NOT DEFINED NODE_API_INC_FILES)
-      file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-      set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
-      source_group("Node Addon API (C)" FILES "${NODE_API_INC_FILES}")
-    endif()
+    unset(NODE_API_INC_FILES)
+  endif()
+  if(NOT DEFINED NODE_API_INC_FILES)
+    file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+    set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
+    source_group("Node Addon API (C)" FILES "${NODE_API_INC_FILES}")
   endif()
 
 
@@ -306,11 +288,12 @@ if(CMAKEJS_NODE_ADDON_API)
   if(NOT DEFINED NODE_ADDON_API_DIR)
     cmakejs_acquire_napi_cpp_files()
     message(DEBUG "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
-    if(NOT DEFINED NODE_ADDON_API_INC_FILES)
-      file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-      set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE FILEPATH "Node Addon API Header files." FORCE)
-      source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
-    endif()
+    unset(NODE_ADDON_API_INC_FILES)
+  endif()
+  if(NOT DEFINED NODE_ADDON_API_INC_FILES)
+    file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+    set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE FILEPATH "Node Addon API Header files." FORCE)
+    source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
   endif()
 
   # Node Addon API (C++) - requires Node API (C)
