@@ -68,6 +68,8 @@
 		"test": "mocha tests",
 		"lint": "eslint lib bin/cmake-js tests",
 
+    "postinstall":       "cmake         -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
+
 		"cmake:configure":   "cmake         -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
 		"cmake:reconfigure": "cmake --fresh -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
 		"cmake:build":       "cmake --build ./build",
