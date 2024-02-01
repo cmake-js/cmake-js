@@ -68,13 +68,13 @@
 		"test": "mocha tests",
 		"lint": "eslint lib bin/cmake-js tests",
 
-		"cmake:configure":   "cmake         -S . -B ./build -DBUILD_TESTS",
-		"cmake:reconfigure": "cmake --fresh -S . -B ./build -DBUILD_TESTS",
+		"cmake:configure":   "cmake         -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
+		"cmake:reconfigure": "cmake --fresh -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
 		"cmake:build":       "cmake --build ./build",
 		"cmake:rebuild":     "cmake --fresh -S . -B ./build && cmake --build ./build",
 		"cmake:help":        "cmake --help",
 
-		"ctest:all":         "ctest --test-dir ./build --rerun-failed --output-on-failure",
+		"ctest":             "ctest --test-dir ./build --rerun-failed --output-on-failure",
 		"ctest:help":        "ctest --help",
 
 		"cpack:all":         "cpack -B ./build --config ./build/CPackConfig.cmake",
