@@ -20,7 +20,7 @@ Builders are able to get Addons to compile and run using a very minimal CMake bu
 cmake_minimum_required(VERSION 3.15)
 
 # path to CMakeJS.cmake
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/share")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/share/cmake")
 
 include(CMakeJS)
 
@@ -140,7 +140,7 @@ By exporting an interface library under cmake-js' own namespace - ```cmake-js::c
 
 If the module is appended via the CLI as above, then builders may activate ```CMakeJS.cmake``` programatically by calling ```include(CMakeJS)``` in their CMake project.
 
-Alternatively to using the module path on the CLI and activating the module programmatically, they can instead ```include("${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/share/CMakeJS.cmake")``` and the module will be activated on inclusion.
+Alternatively to using the module path on the CLI and activating the module programmatically, they can instead ```include("${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/share/cmake/CMakeJS.cmake")``` and the module will be activated on inclusion.
 
 Builders will also find that their cmake-js - powered Addon targets also work well with CMake's ```export()``` and ```install()``` routines, meaning that their Addon projects also work as CMake modules.
 
