@@ -95,8 +95,8 @@ if (NOT DEFINED CMAKE_JS_VERSION)
     # Check for cmake-js installations
     find_program(CMAKE_JS_EXECUTABLE
       NAMES "cmake-js" "cmake-js.exe"
-      PATHS "$ENV{PATH}" "$ENV{ProgramFiles}/cmake-js"
-      DOC "cmake-js system executable binary"
+      PATHS "${CMAKE_CURRENT_LIST_DIR}/../../bin"
+      DOC "cmake-js project-local npm package binary"
       REQUIRED
     )
     if (NOT CMAKE_JS_EXECUTABLE)
@@ -106,17 +106,6 @@ if (NOT DEFINED CMAKE_JS_VERSION)
 
     _cmakejs_normalize_path(CMAKE_JS_EXECUTABLE)
     string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_EXECUTABLE "${CMAKE_JS_EXECUTABLE}")
-
-    find_program(CMAKE_JS_NPM_PACKAGE
-      NAMES "cmake-js" "cmake-js.exe"
-      PATHS "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/bin"
-      DOC "cmake-js project-local npm package binary"
-      REQUIRED
-    )
-    if (NOT CMAKE_JS_NPM_PACKAGE)
-        message(FATAL_ERROR "cmake-js project-local npm package not found! Please run 'npm install' and try again.")
-        return()
-    endif()
 
     # Execute the CLI commands, and write their outputs into the cached vars
     # where the remaining build processes expect them to be...
