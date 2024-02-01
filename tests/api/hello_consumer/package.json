@@ -1,0 +1,13 @@
+{
+  "name": "@vendor/hello_consumer",
+  "version": "1.0.0",
+  "description": "A test addon consumer made using CMakeJS.cmake",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node ./index.js"
+  },
+  "dependencies": {
+    "@vendor/hello": "../hello/"
+  }
+}
