@@ -721,6 +721,32 @@ if(CMAKEJS_NODE_ADDON_API)
   install(FILES ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
 endif()
 
+# This whole block that follows, and the last changes I made to this file (re: 'file/directory reolcation')
+# is all predicated on the idea that our consumers want to control certain vars themselves:
+#
+# - CMAKE_BINARY_DIR - where they want CMake's 'configure/build' output to go
+# - CMAKE_INSTALL_PREFIX - where they want CMake's 'install' output to go
+#
+# Our users should be free to specify things like the above as they wish; we can't possibly
+# know in advance, and we don't want to be opinionated...
+#
+# So, instead, we copied all of our files into a 'CMake-space' and next
+# we will configure the (unknowable-to-us) CMAKE_INSTALL_* vars to prefix the directories
+# of our dependencies. Our users will set CMAKE_INSTALL_* themselves, and *their* CMake
+# will know where our shipped files went (as will they, since they set it). They just do
+# 'target_link_libraries(<name> cmake-js::our-lib)', and *their* CMake will know where
+# it put those files on *their* system.
+#
+# In summary: you don't ship absolute paths. :)
+#
+# It's not just users who will set CMAKE_INSTALL_* though; it's vcpkg and other package
+# managers and installers too! (see CPack)
+#
+# Note that none of these commands install anything. It just prepares an 'install'
+# target, that users can install to wherever they set CMAKE_INSTALL_PREFIX to.
+# To do this, they set '-DCMAKE_INSTALL_PREFIX=./install', configure, then build the
+# 'install' target.
+
 include(GNUInstallDirs)
 
 # configure a 'CMakeJSTargets' export file for install
