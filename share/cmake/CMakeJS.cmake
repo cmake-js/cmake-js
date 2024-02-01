@@ -349,7 +349,7 @@ if(CMAKEJS_CMAKEJS)
       cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
 
       # Generate the identifier for the resource library's namespace
-      set(ns_re "[a-zA-Z_][a-zA-Z0-9_]*")
+      set(ns_re "^[a-zA-Z_][a-zA-Z0-9_]*$")
 
       if(NOT DEFINED ARG_NAMESPACE)
           # Check that the library name is also a valid namespace
