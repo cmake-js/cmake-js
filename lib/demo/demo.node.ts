@@ -14,4 +14,4 @@ interface demo {
   version(): number;
 }
 const demo: demo = require('../../build/lib/demo.node');
-export default demo;
+export = demo;
