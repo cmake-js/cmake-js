@@ -723,7 +723,7 @@ endif()
 
 include(GNUInstallDirs)
 
-# configure a 'CMakeJSTargets' for install
+# configure a 'CMakeJSTargets' export file for install
 install(TARGETS ${CMAKEJS_TARGETS}
   EXPORT CMakeJSTargets
   LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"

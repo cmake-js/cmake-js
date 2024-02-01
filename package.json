@@ -68,7 +68,7 @@
 		"test": "mocha tests",
 		"lint": "eslint lib bin/cmake-js tests",
 
-    "postinstall":       "cmake         -S . -B ./build -DBUILD_TESTS:BOOL=TRUE && cmake --build ./build && cmake --install ./build --prefix ./install && ctest --test-dir ./build --rerun-failed --output-on-failure && cpack -B ./install --config ./build/CPackConfig.cmake && cpack -B ./install --config ./build/CPackSourceConfig.cmake",
+    "postinstall":       "cmake         -S . -B ./build -DBUILD_TESTS:BOOL=TRUE && cmake --build ./build && cmake --install ./build --prefix ./install && ctest --test-dir ./build --rerun-failed --output-on-failure --verbose && cpack -B ./install --config ./build/CPackConfig.cmake && cpack -B ./install --config ./build/CPackSourceConfig.cmake",
 
     "configure":         "cmake         -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
 		"reconfigure":       "cmake --fresh -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
@@ -83,7 +83,7 @@
     "cmake:install":     "cmake --install ./build --prefix ./install",
 		"cmake:help":        "cmake --help",
 
-		"ctest":             "ctest --test-dir ./build --rerun-failed --output-on-failure",
+		"ctest":             "ctest --test-dir ./build --rerun-failed --output-on-failure --verbose",
 		"ctest:help":        "ctest --help",
 
 		"cpack:all":         "cpack -B ./build --config ./build/CPackConfig.cmake",
