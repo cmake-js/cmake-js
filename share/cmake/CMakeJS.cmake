@@ -11,6 +11,10 @@ Check whether we have already been included (borrowed from CMakeRC)
 # TODO: Decouple CMakeJS.cmake API version number from cmake-js version number...?
 set(_version 7.3.3)
 
+if (DEFINED CMAKE_JS_VERSION)
+    message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, instead you should use cmake-js2 or cmake")
+endif()
+
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(VERSION 3.15)
 include(CMakeParseArguments)
@@ -26,6 +30,7 @@ endif()
 set(_CMAKEJS_VERSION "${_version}" CACHE INTERNAL "Current 'CMakeJS.cmake' version. Used for checking for conflicts")
 
 set(_CMAKEJS_SCRIPT "${CMAKE_CURRENT_LIST_FILE}" CACHE INTERNAL "Path to current 'CMakeJS.cmake' script")
+set(_CMAKEJS_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE INTERNAL "Path to cmake-js directory")
 
 # Default build output directory, if not specified with '-DCMAKEJS_BINARY_DIR:PATH=/some/dir'
 if(NOT DEFINED CMAKEJS_BINARY_DIR)
@@ -86,21 +91,15 @@ This module defines
 
 if (NOT DEFINED CMAKE_JS_VERSION)
 
-    # ...and if we're calling from CMake directly, we need to set up some vars
-    # that our build step depends on (these are predefined when calling via npm/cmake-js).
-    if(VERBOSE)
-        message(STATUS "CMake Calling...")
-    endif()
-
     # Check for cmake-js installations
     find_program(CMAKE_JS_EXECUTABLE
       NAMES "cmake-js" "cmake-js.exe"
-      PATHS "${CMAKE_CURRENT_LIST_DIR}/../../bin"
+      PATHS "${_CMAKEJS_DIR}/bin"
       DOC "cmake-js project-local npm package binary"
       REQUIRED
     )
     if (NOT CMAKE_JS_EXECUTABLE)
-        message(FATAL_ERROR "cmake-js system installation not found! Please run 'npm -g install cmake-js@latest' and try again.")
+        message(FATAL_ERROR "cmake-js not found! Make sure you have installed your node dependencies fully.")
         return()
     endif()
 
