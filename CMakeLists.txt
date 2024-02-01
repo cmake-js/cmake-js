@@ -26,7 +26,7 @@ if(NOT (PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR))
   set (CMakeJS_IS_MASTER_PROJECT TRUE)
 endif()
 
-include ("${CMAKE_CURRENT_LIST_DIR}/share/CMakeJS.cmake")
+include ("${CMAKE_CURRENT_LIST_DIR}/share/cmake/CMakeJS.cmake")
 
 # CMakeJS's own targets are abstract 'INTERFACE' targets which only exist
 # within CMake's build cache - so, there is nothing to compile, here.
@@ -98,14 +98,21 @@ console.log(`Napi Version: ${demo.version()}`);
 --
 -- ]==])
 
-  # # copy the types
-  # file(COPY
-  #   "${CMAKE_CURRENT_LIST_DIR}/lib/demo/demo.node.js"
-  #   "${CMAKE_CURRENT_LIST_DIR}/lib/demo/demo.node.ts"
-  #   "${CMAKE_CURRENT_LIST_DIR}/lib/demo/demo.node.d.ts"
-  #   DESTINATION
-  #   "${PROJECT_BINARY_DIR}/lib"
-  # )
+  # copy the demo types
+  file(COPY
+    "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.js"
+    "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.d.ts"
+    DESTINATION
+    "${PROJECT_BINARY_DIR}/lib"
+  )
+
+  # copy the CMake API
+  file(COPY
+    "${CMAKE_CURRENT_LIST_DIR}/share/cmake/CMakeJS.cmake"
+    DESTINATION
+    "${PROJECT_BINARY_DIR}/share"
+  )
 
   if(BUILD_TESTS)
       # include(CTest) # If you want to see all the test dashboard targets, uncomment this include()

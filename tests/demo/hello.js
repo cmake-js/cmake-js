@@ -4,7 +4,7 @@ function test_hello() {
 
   try {
 
-    const demo = require("../../lib/demo/demo.node");
+    const demo = require("../../lib/demo.node");
 
     console.log(demo.hello());
 

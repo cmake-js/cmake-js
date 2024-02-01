@@ -13,5 +13,5 @@ interface demo {
    */
   version(): number;
 }
-const demo: demo = require('../../build/lib/demo.node');
+const demo: demo = require('../build/lib/demo.node');
 export = demo;
