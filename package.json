@@ -55,31 +55,30 @@
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
+		"@types/node": "^20.11.14",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"mocha": "*",
 		"nan": "^2.18.0",
 		"node-addon-api": "^6.1.0",
-		"prettier": "^3.2.2"
+		"prettier": "^3.2.2",
+		"typescript": "^5.3.3"
 	},
 	"scripts": {
 		"test": "mocha tests",
 		"lint": "eslint lib bin/cmake-js tests",
-
-    "cmake:configure":      "cmake -S . -B ./build",
-    "cmake:reconfigure":    "cmake --fresh -S . -B ./build",
-    "cmake:build":          "cmake --build ./build",
-    "cmake:rebuild":        "cmake --fresh -S . -B ./build && cmake --build ./build",
-    "cmake:help":           "cmake --help",
-
-    "ctest":                "ctest --test-dir ./build --rerun-failed --output-on-failure",
-    "ctest:help":           "ctest --help",
-
-    "cpack:all":            "cpack -B ./build --config ./build/CPackConfig.cmake",
-    "cpack:zip":            "cpack -B ./build --config ./build/CPackConfig.cmake --generator ZIP",
-    "cpack:tar":            "cpack -B ./build --config ./build/CPackConfig.cmake --generator TAR",
-    "cpack:source":         "cpack -B ./build --config ./build/CPackSourceConfig.cmake",
-    "cpack:help":           "cpack --help"
+		"cmake:configure": "cmake -S . -B ./build",
+		"cmake:reconfigure": "cmake --fresh -S . -B ./build",
+		"cmake:build": "cmake --build ./build",
+		"cmake:rebuild": "cmake --fresh -S . -B ./build && cmake --build ./build",
+		"cmake:help": "cmake --help",
+		"ctest": "ctest --test-dir ./build --rerun-failed --output-on-failure",
+		"ctest:help": "ctest --help",
+		"cpack:all": "cpack -B ./build --config ./build/CPackConfig.cmake",
+		"cpack:zip": "cpack -B ./build --config ./build/CPackConfig.cmake --generator ZIP",
+		"cpack:tar": "cpack -B ./build --config ./build/CPackConfig.cmake --generator TAR",
+		"cpack:source": "cpack -B ./build --config ./build/CPackSourceConfig.cmake",
+		"cpack:help": "cpack --help"
 	},
 	"files": [
 		"lib",
