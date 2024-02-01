@@ -97,9 +97,9 @@ console.log(`Napi Version: ${demo.version()}`);
 -- ]==])
 
   if(BUILD_TESTS)
-      # include(CTest) # If you want to see all the test dashboard targets, uncomment this include()
+      include(CTest) # If you want to see all the test dashboard targets, uncomment this include()
       enable_testing()
-      include("${PROJECT_SOURCE_DIR}/tests/demo/tests.cmake")
+      include("${CMAKE_CURRENT_LIST_DIR}/tests/demo/tests.cmake")
   endif()
 
 endif ()
