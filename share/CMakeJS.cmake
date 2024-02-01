@@ -397,237 +397,237 @@ if(CMAKEJS_CMAKEJS)
 
   list(APPEND CMAKEJS_TARGETS cmake-js)
 
-# Node that the below function definitions are contained inside 'if(CMAKEJS_CMAKEJS)' (our main helper library)....
+  # Node that the below function definitions are contained inside 'if(CMAKEJS_CMAKEJS)' (our main helper library)....
 
-#[=============================================================================[
-Exposes a user-side helper function for creating a dynamic '*.node' library,
-linked to the Addon API interface.
+  #[=============================================================================[
+  Exposes a user-side helper function for creating a dynamic '*.node' library,
+  linked to the Addon API interface.
 
-cmakejs_create_napi_addon(<name> [<sources>])
-cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>] [<sources>])
+  cmakejs_create_napi_addon(<name> [<sources>])
+  cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>] [<sources>])
 
-(This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
-]=============================================================================]#
-function(cmakejs_create_napi_addon name)
+  (This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
+  ]=============================================================================]#
+  function(cmakejs_create_napi_addon name)
 
-    # Avoid duplicate target names
-    if(TARGET ${name})
-        message(SEND_ERROR "'cmakejs_create_napi_addon()' given target '${name}' which is already exists. Please choose a unique name for this Addon target.")
-        return()
-    endif()
+      # Avoid duplicate target names
+      if(TARGET ${name})
+          message(SEND_ERROR "'cmakejs_create_napi_addon()' given target '${name}' which is already exists. Please choose a unique name for this Addon target.")
+          return()
+      endif()
 
-    set(options)
-    set(args ALIAS NAMESPACE NAPI_VERSION)
-    set(list_args)
-    cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
+      set(options)
+      set(args ALIAS NAMESPACE NAPI_VERSION)
+      set(list_args)
+      cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
 
-    # Generate the identifier for the resource library's namespace
-    set(ns_re "[a-zA-Z_][a-zA-Z0-9_]*")
+      # Generate the identifier for the resource library's namespace
+      set(ns_re "[a-zA-Z_][a-zA-Z0-9_]*")
 
-    if(NOT DEFINED ARG_NAMESPACE)
-        # Check that the library name is also a valid namespace
-        if(NOT name MATCHES "${ns_re}")
-            message(SEND_ERROR "Library name is not a valid namespace. Specify the NAMESPACE argument")
-            return()
-        endif()
-        set(ARG_NAMESPACE "${name}")
-    else()
-        if(NOT ARG_NAMESPACE MATCHES "${ns_re}")
-            message(SEND_ERROR "NAMESPACE for ${name} is not a valid C++ namespace identifier (${ARG_NAMESPACE})")
-            return()
-        endif()
-    endif()
+      if(NOT DEFINED ARG_NAMESPACE)
+          # Check that the library name is also a valid namespace
+          if(NOT name MATCHES "${ns_re}")
+              message(SEND_ERROR "Library name is not a valid namespace. Specify the NAMESPACE argument")
+              return()
+          endif()
+          set(ARG_NAMESPACE "${name}")
+      else()
+          if(NOT ARG_NAMESPACE MATCHES "${ns_re}")
+              message(SEND_ERROR "NAMESPACE for ${name} is not a valid C++ namespace identifier (${ARG_NAMESPACE})")
+              return()
+          endif()
+      endif()
 
-    # Needs more validation...
-    if(DEFINED ARG_NAPI_VERSION AND (ARG_NAPI_VERSION LESS_EQUAL 0))
-        message(SEND_ERROR "NAPI_VERSION for ${name} is not a valid Integer number (${ARG_NAPI_VERSION})")
-        return()
-    endif()
+      # Needs more validation...
+      if(DEFINED ARG_NAPI_VERSION AND (ARG_NAPI_VERSION LESS_EQUAL 0))
+          message(SEND_ERROR "NAPI_VERSION for ${name} is not a valid Integer number (${ARG_NAPI_VERSION})")
+          return()
+      endif()
 
-    if(NOT DEFINED ARG_NAPI_VERSION)
-        if(NOT DEFINED NAPI_VERSION)
-            # default NAPI version to use if none specified
-            set(NAPI_VERSION 8)
-        endif()
-        set(ARG_NAPI_VERSION ${NAPI_VERSION})
-    endif()
+      if(NOT DEFINED ARG_NAPI_VERSION)
+          if(NOT DEFINED NAPI_VERSION)
+              # default NAPI version to use if none specified
+              set(NAPI_VERSION 8)
+          endif()
+          set(ARG_NAPI_VERSION ${NAPI_VERSION})
+      endif()
 
-    if(ARG_ALIAS)
-        set(name_alt "${ARG_ALIAS}")
-    else()
-        set(name_alt "${ARG_NAMESPACE}")
-    endif()
+      if(ARG_ALIAS)
+          set(name_alt "${ARG_ALIAS}")
+      else()
+          set(name_alt "${ARG_NAMESPACE}")
+      endif()
 
-    if(VERBOSE)
-        message(STATUS "Configuring Napi Addon: ${name}")
-    endif()
+      if(VERBOSE)
+          message(STATUS "Configuring Napi Addon: ${name}")
+      endif()
 
-    # Begin a new Napi Addon target
+      # Begin a new Napi Addon target
 
-    add_library(${name} SHARED)
-    add_library(${name_alt}::${name} ALIAS ${name})
+      add_library(${name} SHARED)
+      add_library(${name_alt}::${name} ALIAS ${name})
 
-    target_link_libraries(${name} PRIVATE cmake-js::cmake-js)
+      target_link_libraries(${name} PRIVATE cmake-js::cmake-js)
 
-    set_property(
-      TARGET ${name}
-      PROPERTY "${name}_IS_NAPI_ADDON_LIBRARY" TRUE
-    )
+      set_property(
+        TARGET ${name}
+        PROPERTY "${name}_IS_NAPI_ADDON_LIBRARY" TRUE
+      )
 
-    set_target_properties(${name}
-      PROPERTIES
+      set_target_properties(${name}
+        PROPERTIES
 
-      LIBRARY_OUTPUT_NAME "${name}"
-      PREFIX ""
-      SUFFIX ".node"
+        LIBRARY_OUTPUT_NAME "${name}"
+        PREFIX ""
+        SUFFIX ".node"
 
-      ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib"
-      LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib"
-      RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin"
 
-      # # Conventional C++-style debug settings might be useful to have...
-      # LIBRARY_OUTPUT_NAME_DEBUG "d${name}"
-      # ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
-      # LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
-      # RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/bin/Debug"
-    )
+        # # Conventional C++-style debug settings might be useful to have...
+        # LIBRARY_OUTPUT_NAME_DEBUG "d${name}"
+        # ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
+        # LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
+        # RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/bin/Debug"
+      )
 
-    cmakejs_napi_addon_add_sources(${name} ${ARG_UNPARSED_ARGUMENTS})
+      cmakejs_napi_addon_add_sources(${name} ${ARG_UNPARSED_ARGUMENTS})
 
-    cmakejs_napi_addon_add_definitions(${name}
-      PRIVATE # These definitions only belong to this unique target
-      "CMAKEJS_ADDON_NAME=${name}"
-      "CMAKEJS_ADDON_ALIAS=${name_alt}"
-      "NAPI_CPP_CUSTOM_NAMESPACE=${ARG_NAMESPACE}"
-    )
+      cmakejs_napi_addon_add_definitions(${name}
+        PRIVATE # These definitions only belong to this unique target
+        "CMAKEJS_ADDON_NAME=${name}"
+        "CMAKEJS_ADDON_ALIAS=${name_alt}"
+        "NAPI_CPP_CUSTOM_NAMESPACE=${ARG_NAMESPACE}"
+      )
 
-    cmakejs_napi_addon_add_definitions(${name}
-      PUBLIC # These definitions are shared with anything that links to this addon
-      "NAPI_VERSION=${ARG_NAPI_VERSION}"
-      "BUILDING_NODE_EXTENSION"
-    )
+      cmakejs_napi_addon_add_definitions(${name}
+        PUBLIC # These definitions are shared with anything that links to this addon
+        "NAPI_VERSION=${ARG_NAPI_VERSION}"
+        "BUILDING_NODE_EXTENSION"
+      )
 
-endfunction()
+  endfunction()
 
-#[=============================================================================[
-Add source files to an existing Napi Addon target.
+  #[=============================================================================[
+  Add source files to an existing Napi Addon target.
 
-cmakejs_napi_addon_add_sources(<name> [items1...])
-cmakejs_napi_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
-cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...]])
-cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<dirs>...]] [items1...]...)
-]=============================================================================]#
-function(cmakejs_napi_addon_add_sources name)
+  cmakejs_napi_addon_add_sources(<name> [items1...])
+  cmakejs_napi_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
+  cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...]])
+  cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<dirs>...]] [items1...]...)
+  ]=============================================================================]#
+  function(cmakejs_napi_addon_add_sources name)
 
-    # Check that this is a Node Addon target
-    get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
-    if(NOT TARGET ${name} OR NOT is_addon_lib)
-        message(SEND_ERROR "'cmakejs_napi_addon_add_sources()' called on '${name}' which is not an existing napi addon library")
-        return()
-    endif()
+      # Check that this is a Node Addon target
+      get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
+      if(NOT TARGET ${name} OR NOT is_addon_lib)
+          message(SEND_ERROR "'cmakejs_napi_addon_add_sources()' called on '${name}' which is not an existing napi addon library")
+          return()
+      endif()
 
-    set(options)
-    set(args BASE_DIRS)
-    set(list_args INTERFACE PRIVATE PUBLIC)
-    cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
+      set(options)
+      set(args BASE_DIRS)
+      set(list_args INTERFACE PRIVATE PUBLIC)
+      cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
 
-    if(NOT ARG_BASE_DIRS)
-        # Default base directory of the passed-in source file(s)
-        set(ARG_BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
-    endif()
-    _cmakejs_normalize_path(ARG_BASE_DIRS)
-    get_filename_component(ARG_BASE_DIRS "${ARG_BASE_DIRS}" ABSOLUTE)
+      if(NOT ARG_BASE_DIRS)
+          # Default base directory of the passed-in source file(s)
+          set(ARG_BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
+      endif()
+      _cmakejs_normalize_path(ARG_BASE_DIRS)
+      get_filename_component(ARG_BASE_DIRS "${ARG_BASE_DIRS}" ABSOLUTE)
 
-    # Generate the identifier for the resource library's namespace
-    get_target_property(lib_namespace "${name}" ${name}_ADDON_NAMESPACE)
+      # Generate the identifier for the resource library's namespace
+      get_target_property(lib_namespace "${name}" ${name}_ADDON_NAMESPACE)
 
-    # All remaining unparsed args 'should' be source files for this target, so...
-    foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
+      # All remaining unparsed args 'should' be source files for this target, so...
+      foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
 
-        _cmakejs_normalize_path(input)
-        get_filename_component(abs_in "${input}" ABSOLUTE)
-        file(RELATIVE_PATH relpath "${ARG_BASE_DIRS}" "${abs_in}")
-        if(relpath MATCHES "^\\.\\.")
-            # For now we just error on files that exist outside of the source dir.
-            message(SEND_ERROR "Cannot add file '${input}': File must be in a subdirectory of ${ARG_BASE_DIRS}")
-            return()
-        endif()
+          _cmakejs_normalize_path(input)
+          get_filename_component(abs_in "${input}" ABSOLUTE)
+          file(RELATIVE_PATH relpath "${ARG_BASE_DIRS}" "${abs_in}")
+          if(relpath MATCHES "^\\.\\.")
+              # For now we just error on files that exist outside of the source dir.
+              message(SEND_ERROR "Cannot add file '${input}': File must be in a subdirectory of ${ARG_BASE_DIRS}")
+              return()
+          endif()
 
-        set(rel_file "${ARG_BASE_DIRS}/${relpath}")
-        _cmakejs_normalize_path(rel_file)
-        get_filename_component(source_file "${input}" ABSOLUTE)
-        # If we are here, source file is valid. Add IDE support
-        source_group("${name}" FILES "${source_file}")
+          set(rel_file "${ARG_BASE_DIRS}/${relpath}")
+          _cmakejs_normalize_path(rel_file)
+          get_filename_component(source_file "${input}" ABSOLUTE)
+          # If we are here, source file is valid. Add IDE support
+          source_group("${name}" FILES "${source_file}")
 
-        if(DEFINED ARG_INTERFACE)
-            foreach(item IN LISTS ARG_INTERFACE)
-                target_sources(${name} INTERFACE "${source_file}")
-            endforeach()
-        endif()
+          if(DEFINED ARG_INTERFACE)
+              foreach(item IN LISTS ARG_INTERFACE)
+                  target_sources(${name} INTERFACE "${source_file}")
+              endforeach()
+          endif()
 
-        if(DEFINED ARG_PRIVATE)
-            foreach(item IN LISTS ARG_PRIVATE)
-                target_sources(${name} PRIVATE "${source_file}")
-            endforeach()
-        endif()
+          if(DEFINED ARG_PRIVATE)
+              foreach(item IN LISTS ARG_PRIVATE)
+                  target_sources(${name} PRIVATE "${source_file}")
+              endforeach()
+          endif()
 
-        if(DEFINED ARG_PUBLIC)
-            foreach(item IN LISTS ARG_PUBLIC)
-                target_sources(${name} PUBLIC "${source_file}")
-            endforeach()
-        endif()
+          if(DEFINED ARG_PUBLIC)
+              foreach(item IN LISTS ARG_PUBLIC)
+                  target_sources(${name} PUBLIC "${source_file}")
+              endforeach()
+          endif()
 
-        foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
-            target_sources(${name} PRIVATE "${source_file}")
-        endforeach()
+          foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
+              target_sources(${name} PRIVATE "${source_file}")
+          endforeach()
 
-    endforeach()
+      endforeach()
 
-endfunction()
+  endfunction()
 
-#[=============================================================================[
-Add pre-processor definitions to an existing Napi Addon target.
+  #[=============================================================================[
+  Add pre-processor definitions to an existing Napi Addon target.
 
-cmakejs_napi_addon_add_definitions(<name> [items1...])
-cmakejs_napi_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
-]=============================================================================]#
-function(cmakejs_napi_addon_add_definitions name)
+  cmakejs_napi_addon_add_definitions(<name> [items1...])
+  cmakejs_napi_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
+  ]=============================================================================]#
+  function(cmakejs_napi_addon_add_definitions name)
 
-    # Check that this is a Node Addon target
-    get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
-    if(NOT TARGET ${name} OR NOT is_addon_lib)
-        message(SEND_ERROR "'cmakejs_napi_addon_add_definitions()' called on '${name}' which is not an existing napi addon library")
-        return()
-    endif()
+      # Check that this is a Node Addon target
+      get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
+      if(NOT TARGET ${name} OR NOT is_addon_lib)
+          message(SEND_ERROR "'cmakejs_napi_addon_add_definitions()' called on '${name}' which is not an existing napi addon library")
+          return()
+      endif()
 
-    set(options)
-    set(args)
-    set(list_args INTERFACE PRIVATE PUBLIC)
-    cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
+      set(options)
+      set(args)
+      set(list_args INTERFACE PRIVATE PUBLIC)
+      cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
 
-    if(DEFINED ARG_INTERFACE)
-        foreach(item IN LISTS ARG_INTERFACE)
-            target_compile_definitions(${name} INTERFACE "${item}")
-        endforeach()
-    endif()
+      if(DEFINED ARG_INTERFACE)
+          foreach(item IN LISTS ARG_INTERFACE)
+              target_compile_definitions(${name} INTERFACE "${item}")
+          endforeach()
+      endif()
 
-    if(DEFINED ARG_PRIVATE)
-        foreach(item IN LISTS ARG_PRIVATE)
-            target_compile_definitions(${name} PRIVATE "${item}")
-        endforeach()
-    endif()
+      if(DEFINED ARG_PRIVATE)
+          foreach(item IN LISTS ARG_PRIVATE)
+              target_compile_definitions(${name} PRIVATE "${item}")
+          endforeach()
+      endif()
 
-    if(DEFINED ARG_PUBLIC)
-        foreach(item IN LISTS ARG_PUBLIC)
-            target_compile_definitions(${name} PUBLIC "${item}")
-        endforeach()
-    endif()
+      if(DEFINED ARG_PUBLIC)
+          foreach(item IN LISTS ARG_PUBLIC)
+              target_compile_definitions(${name} PUBLIC "${item}")
+          endforeach()
+      endif()
 
-    foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
-        target_compile_definitions(${name} "${item}")
-    endforeach()
+      foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
+          target_compile_definitions(${name} "${item}")
+      endforeach()
 
-endfunction()
+  endfunction()
 
 endif() # CMAKEJS_CMAKEJS
 
