@@ -34,16 +34,17 @@ endif()
 
 message (STATUS "\n-- CMakeJS.cmake v${_CMAKEJS_VERSION}")
 
-#[[
-Setup optional targets dependency chain, e.g., for use with VCPKG_FEATURE_FLAGS
-]]#
+#[=============================================================================[
+Setup optional targets dependency chain, e.g., for end-user specification with
+VCPKG_FEATURE_FLAGS or by passing for example '-DCMAKE_NODE_API:BOOL=FALSE'
+]=============================================================================]#
+
 set (CMAKEJS_TARGETS "")
 include(CMakeDependentOption)
 option                (CMAKEJS_NODE_DEV         "Supply cmake-js::node-dev target for linkage" ON)
 cmake_dependent_option(CMAKEJS_NODE_API         "Supply cmake-js::node-api target for linkage"       ON CMAKEJS_NODE_DEV OFF)
 cmake_dependent_option(CMAKEJS_NODE_ADDON_API   "Supply cmake-js::node-addon-api target for linkage" ON CMAKEJS_NODE_API OFF)
 cmake_dependent_option(CMAKEJS_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_NODE_ADDON_API OFF)
-
 
 #[=============================================================================[
 Internal helper (borrowed from CMakeRC).
