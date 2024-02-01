@@ -665,6 +665,18 @@ write_basic_package_version_file (
 	COMPATIBILITY AnyNewerVersion
 )
 
+if(CMAKEJS_NODE_DEV)
+  file(COPY ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
+endif()
+
+if(CMAKEJS_NODE_API)
+  file(COPY ${NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
+endif()
+
+if(CMAKEJS_NODE_ADDON_API)
+  file(COPY ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
+endif()
+
 # Tell the user what to do
 message(STATUS "\ncmake-js v${_CMAKEJS_VERSION} has made the following targets available for linkage:\n")
 foreach(TARGET IN LISTS CMAKEJS_TARGETS)
