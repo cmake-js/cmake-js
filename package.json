@@ -70,10 +70,17 @@
 
     "postinstall":       "cmake         -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
 
+    "configure":         "cmake         -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
+		"reconfigure":       "cmake --fresh -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
+		"build":             "cmake --build ./build",
+		"rebuild":           "cmake --fresh -S . -B ./build && cmake --build ./build",
+
+
 		"cmake:configure":   "cmake         -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
 		"cmake:reconfigure": "cmake --fresh -S . -B ./build -DBUILD_TESTS:BOOL=TRUE",
 		"cmake:build":       "cmake --build ./build",
 		"cmake:rebuild":     "cmake --fresh -S . -B ./build && cmake --build ./build",
+    "cmake:install":     "cmake --install ./build --prefix ./install",
 		"cmake:help":        "cmake --help",
 
 		"ctest":             "ctest --test-dir ./build --rerun-failed --output-on-failure",

@@ -26,6 +26,7 @@ node_modules
 
 # Build
 build
+install
 package-lock.json
 yarn.lock
 
