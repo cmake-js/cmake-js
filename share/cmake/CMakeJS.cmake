@@ -214,25 +214,6 @@ function(cmakejs_acquire_node_executable)
     endif()
 endfunction()
 
-# Resolve NodeJS development headers
-# TODO: This code block is quite problematic, since:
-# 1 - it might trigger a build run, depending on how the builder has set up their package.json scripts...
-# 2 - it also currently assumes a preference for yarn over npm (and the others)...
-# 3 - finally, because of how cmake-js works, it might create Ninja-build artefacts,
-# even when the CMake user specifies a different generator to CMake manually...
-# We could use 'add_custom_target()' with a user-side ARG for which package manager to use...
-if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
-    execute_process(
-      COMMAND yarn install
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      OUTPUT_VARIABLE NODE_MODULES_DIR
-    )
-    if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
-        message(FATAL_ERROR "Something went wrong - NodeJS modules installation failed!")
-        return()
-    endif()
-endif()
-
 #[=============================================================================[
 Get NodeJS C Addon development files.
 
