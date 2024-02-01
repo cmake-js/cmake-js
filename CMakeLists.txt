@@ -98,11 +98,73 @@ console.log(`Napi Version: ${demo.version()}`);
 --
 -- ]==])
 
+  # # copy the types
+  # file(COPY
+  #   "${CMAKE_CURRENT_LIST_DIR}/lib/demo/demo.node.js"
+  #   "${CMAKE_CURRENT_LIST_DIR}/lib/demo/demo.node.ts"
+  #   "${CMAKE_CURRENT_LIST_DIR}/lib/demo/demo.node.d.ts"
+  #   DESTINATION
+  #   "${PROJECT_BINARY_DIR}/lib"
+  # )
+
   if(BUILD_TESTS)
       # include(CTest) # If you want to see all the test dashboard targets, uncomment this include()
       enable_testing()
       include("${CMAKE_CURRENT_LIST_DIR}/tests/demo/tests.cmake")
   endif()
+
+  # offer a basic/messy CPack
+  # set(CPACK_PACKAGE_CHECKSUM "${PROJECT_VERSION_TWEAK}") # git rev-parse is a good idea for this...
+  set(CPACK_PACKAGE_VENDOR "cmake-js")
+  set(CPACK_PACKAGE_NAME              "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+  set(CPACK_PACKAGE_FILE_NAME         "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}") # Compiled binary distribution
+  set(CPACK_SOURCE_PACKAGE_FILE_NAME  "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-Source") # No system spec as this is un-compiled source file distribution
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_DESCRIPTION})
+  set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+  set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_VERSION_MINOR})
+  set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_VERSION_PATCH})
+  set(CPACK_PACKAGE_VERSION_TWEAK ${PROJECT_VERSION_VERSION_TWEAK})
+  set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/LICENSE)
+  set(CPACK_RESOURCE_FILE_README  ${PROJECT_SOURCE_DIR}/README.md)
+  set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+  set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+  set(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
+  set(CPACK_SOURCE_IGNORE_FILES
+      _CPack_Packages
+      /*.zip
+      /*.tar
+      /*.tar.*
+      /.env*
+      /.git/*
+      /.cmake
+      /.github
+      /.vs
+      /.vscode
+      /.cache
+      /.config
+      /.local
+      /doc
+      /docs
+      #/bin
+      #/lib
+      /usr
+      /out
+      /build
+      /Release
+      /Debug
+      /MinSizeRel
+      /RelWithDebInfo
+      /downloads
+      /installed
+      /install
+      /node_modules
+      /vcpkg
+      /.*build.*
+      /package-lock.json
+      /yarn.lock
+      /\\\\.DS_Store
+  )
+  include(CPack)
 
 endif ()
 
