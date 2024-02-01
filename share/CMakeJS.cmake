@@ -34,6 +34,17 @@ endif()
 
 message (STATUS "\n-- CMakeJS.cmake v${_CMAKEJS_VERSION}")
 
+#[[
+Setup optional targets dependency chain, e.g., for use with VCPKG_FEATURE_FLAGS
+]]#
+set (CMAKEJS_TARGETS "")
+include(CMakeDependentOption)
+option                (CMAKEJS_NODE_DEV         "Supply cmake-js::node-dev target for linkage" ON)
+cmake_dependent_option(CMAKEJS_NODE_API         "Supply cmake-js::node-api target for linkage"       ON CMAKEJS_NODE_DEV OFF)
+cmake_dependent_option(CMAKEJS_NODE_ADDON_API   "Supply cmake-js::node-addon-api target for linkage" ON CMAKEJS_NODE_API OFF)
+cmake_dependent_option(CMAKEJS_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_NODE_ADDON_API OFF)
+
+
 #[=============================================================================[
 Internal helper (borrowed from CMakeRC).
 ]=============================================================================]#
@@ -203,12 +214,6 @@ function(cmakejs_acquire_node_executable)
     endif()
 endfunction()
 
-if(NOT DEFINED NODE_EXECUTABLE)
-    cmakejs_acquire_node_executable()
-    message(STATUS "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
-    message(STATUS "NODE_VERSION: ${NODE_VERSION}")
-endif()
-
 # Resolve NodeJS development headers
 # TODO: This code block is quite problematic, since:
 # 1 - it might trigger a build run, depending on how the builder has set up their package.json scripts...
@@ -258,17 +263,6 @@ function(cmakejs_acquire_napi_c_files)
     endif()
 endfunction()
 
-# Acquire if needed...
-if(NOT DEFINED NODE_API_HEADERS_DIR)
-    cmakejs_acquire_napi_c_files()
-    message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
-    if(NOT DEFINED NODE_API_INC_FILES)
-        file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-        set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
-        source_group("Node Addon API (C)" FILES "${NODE_API_INC_FILES}")
-    endif()
-endif()
-
 #[=============================================================================[
 Get NodeJS C++ Addon development files.
 
@@ -299,16 +293,6 @@ function(cmakejs_acquire_napi_cpp_files)
     endif()
 endfunction()
 
-# Acquire if needed...
-if(NOT DEFINED NODE_ADDON_API_DIR)
-    cmakejs_acquire_napi_cpp_files()
-    message(STATUS "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
-    if(NOT DEFINED NODE_ADDON_API_INC_FILES)
-	file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-	set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE FILEPATH "Node Addon API Header files." FORCE)
-        source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
-    endif()
-endif()
 
 #[=============================================================================[
 Silently create an interface library (no output) with all Addon API dependencies
@@ -324,47 +308,95 @@ cmake-js::node-addon-api
 cmake-js::cmake-js
 
 ]=============================================================================]#
+if(CMAKEJS_NODE_DEV)
 
-# NodeJS system installation headers
-# cmake-js::node-dev
-add_library                 (node-dev INTERFACE)
-add_library                 (cmake-js::node-dev ALIAS node-dev)
-target_include_directories  (node-dev INTERFACE "${CMAKE_JS_INC}")
-target_sources              (node-dev INTERFACE "${CMAKE_JS_SRC}")
-target_sources              (node-dev INTERFACE "${CMAKE_JS_INC_FILES}")
-target_link_libraries       (node-dev INTERFACE "${CMAKE_JS_LIB}")
+  # acquire if needed...
+  if(NOT DEFINED NODE_EXECUTABLE)
+    cmakejs_acquire_node_executable()
+    message(STATUS "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
+    message(STATUS "NODE_VERSION: ${NODE_VERSION}")
+  endif()
 
-# Node API (C) - requires NodeJS system installation headers
-# cmake-js::node-api
-add_library                 (node-api INTERFACE)
-add_library                 (cmake-js::node-api ALIAS node-api)
-target_include_directories  (node-api INTERFACE "${NODE_API_HEADERS_DIR}")
-target_sources              (node-api INTERFACE "${NODE_API_INC_FILES}")
-target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
-
-# Node Addon API (C++) - requires Node API (C)
-# cmake-js::node-addon-api
-add_library                 (node-addon-api INTERFACE)
-add_library                 (cmake-js::node-addon-api ALIAS node-addon-api)
-target_include_directories  (node-addon-api INTERFACE "${NODE_ADDON_API_DIR}")
-target_sources              (node-addon-api INTERFACE "${NODE_ADDON_API_INC_FILES}")
-target_link_libraries       (node-addon-api INTERFACE cmake-js::node-api)
-
-# CMakeJS API - requires Node Addon API (C++), resolves the full Napi Addon dependency chain
-# cmake-js::cmake-js
-add_library                 (cmake-js INTERFACE)
-add_library                 (cmake-js::cmake-js ALIAS cmake-js)
-target_link_libraries       (cmake-js INTERFACE cmake-js::node-addon-api)
-target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
-target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
-
-# Generate definitions
-if(MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
-    if(CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
-        execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
-    endif()
+  # NodeJS system installation headers
+  # cmake-js::node-dev
+  add_library                 (node-dev INTERFACE)
+  add_library                 (cmake-js::node-dev ALIAS node-dev)
+  target_include_directories  (node-dev INTERFACE "${CMAKE_JS_INC}")
+  target_sources              (node-dev INTERFACE "${CMAKE_JS_SRC}")
+  target_sources              (node-dev INTERFACE "${CMAKE_JS_INC_FILES}")
+  target_link_libraries       (node-dev INTERFACE "${CMAKE_JS_LIB}")
+  list(APPEND CMAKEJS_TARGETS  node-dev)
+  set_target_properties       (node-dev PROPERTIES VERSION ${NODE_VERSION})
 endif()
+
+if(CMAKEJS_NODE_API)
+
+  # Acquire if needed...
+  if(NOT DEFINED NODE_API_HEADERS_DIR)
+    cmakejs_acquire_napi_c_files()
+    message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
+    if(NOT DEFINED NODE_API_INC_FILES)
+      file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+      set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
+      source_group("Node Addon API (C)" FILES "${NODE_API_INC_FILES}")
+    endif()
+  endif()
+
+  # Node API (C) - requires NodeJS system installation headers
+  # cmake-js::node-api
+  add_library                 (node-api INTERFACE)
+  add_library                 (cmake-js::node-api ALIAS node-api)
+  target_include_directories  (node-api INTERFACE "${NODE_API_HEADERS_DIR}")
+  target_sources              (node-api INTERFACE "${NODE_API_INC_FILES}")
+  target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
+  set_target_properties       (node-api PROPERTIES VERSION 6.1.0)
+  list(APPEND CMAKEJS_TARGETS  node-api)
+endif()
+
+if(CMAKEJS_NODE_ADDON_API)
+
+  # Acquire if needed...
+  if(NOT DEFINED NODE_ADDON_API_DIR)
+    cmakejs_acquire_napi_cpp_files()
+    message(STATUS "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
+    if(NOT DEFINED NODE_ADDON_API_INC_FILES)
+      file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+      set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE FILEPATH "Node Addon API Header files." FORCE)
+      source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
+    endif()
+  endif()
+
+  # Node Addon API (C++) - requires Node API (C)
+  # cmake-js::node-addon-api
+  add_library                 (node-addon-api INTERFACE)
+  add_library                 (cmake-js::node-addon-api ALIAS node-addon-api)
+  target_include_directories  (node-addon-api INTERFACE "${NODE_ADDON_API_DIR}")
+  target_sources              (node-addon-api INTERFACE "${NODE_ADDON_API_INC_FILES}")
+  target_link_libraries       (node-addon-api INTERFACE cmake-js::node-api)
+  set_target_properties       (node-addon-api PROPERTIES VERSION 1.1.0)
+  list(APPEND CMAKEJS_TARGETS  node-addon-api)
+endif()
+
+if(CMAKEJS_CMAKEJS)
+  # CMakeJS API - requires Node Addon API (C++), resolves the full Napi Addon dependency chain
+  # cmake-js::cmake-js
+  add_library                 (cmake-js INTERFACE)
+  add_library                 (cmake-js::cmake-js ALIAS cmake-js)
+  target_link_libraries       (cmake-js INTERFACE cmake-js::node-addon-api)
+  target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
+  target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
+  set_target_properties       (cmake-js PROPERTIES VERSION 7.3.3)
+  # Generate definitions
+  if(MSVC)
+      set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
+      if(CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
+          execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
+      endif()
+  endif()
+
+  list(APPEND CMAKEJS_TARGETS cmake-js)
+
+# Node that the below function definitions are contained inside 'if(CMAKEJS_CMAKEJS)' (our main helper library)....
 
 #[=============================================================================[
 Exposes a user-side helper function for creating a dynamic '*.node' library,
@@ -596,13 +628,12 @@ function(cmakejs_napi_addon_add_definitions name)
 
 endfunction()
 
-set (CMAKEJS_TARGETS)
-list (APPEND CMAKEJS_TARGETS
-  node-dev
-  node-api
-  node-addon-api
-  cmake-js
-)
+endif() # CMAKEJS_CMAKEJS
+
+#[=============================================================================[
+Collect targets and allow CMake to provide them
+]=============================================================================]#
+
 export (
   TARGETS ${CMAKEJS_TARGETS}
   FILE share/cmake/CMakeJSTargets.cmake
@@ -636,7 +667,8 @@ write_basic_package_version_file (
 # Tell the user what to do
 message(STATUS "\ncmake-js v${_CMAKEJS_VERSION} has made the following targets available for linkage:\n")
 foreach(TARGET IN LISTS CMAKEJS_TARGETS)
-    message(STATUS "cmake-js::${TARGET}")
+    get_target_property(_v ${TARGET} VERSION)
+    message(STATUS "cmake-js::${TARGET} ${_v}")
 endforeach()
 
 if(NOT CMakeJS_IS_TOP_LEVEL)
