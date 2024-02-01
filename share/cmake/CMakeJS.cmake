@@ -5,21 +5,58 @@
   See: https://github.com/nathanjhood/NapiAddon
 ]=============================================================================]#
 
-if (DEFINED CMAKE_JS_VERSION)
-    message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, instead you should use cmake-js2 or cmake")
-endif()
-
-#[=============================================================================[
-Check whether we have already been included (borrowed from CMakeRC)
-]=============================================================================]#
-# TODO: Decouple CMakeJS.cmake API version number from cmake-js version number...?
-set(_version 7.3.3)
-
-
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(VERSION 3.15)
 include(CMakeParseArguments)
 
+if (DEFINED CMAKE_JS_VERSION)
+    message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, instead you should use cmake-js2 or cmake")
+endif()
+
+
+#[=============================================================================[
+Internal helper (borrowed from CMakeRC).
+]=============================================================================]#
+function(_cmakejs_normalize_path var)
+    set(path "${${var}}")
+    file(TO_CMAKE_PATH "${path}" path)
+    while(path MATCHES "//")
+        string(REPLACE "//" "/" path "${path}")
+    endwhile()
+    string(REGEX REPLACE "/+$" "" path "${path}")
+    set("${var}" "${path}" PARENT_SCOPE)
+endfunction()
+
+set(_CMAKEJS_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE INTERNAL "Path to cmake-js directory")
+
+# Find the cmake-js helper
+find_program(CMAKEJS_HELPER_EXECUTABLE
+  NAMES "cmake-js-helper.mjs"
+  PATHS "${_CMAKEJS_DIR}/bin"
+  DOC "cmake-js helper binary"
+  REQUIRED
+)
+if (NOT CMAKEJS_HELPER_EXECUTABLE)
+  message(FATAL_ERROR "Failed to find cmake-js helper!")
+  return()
+endif()
+
+_cmakejs_normalize_path(CMAKEJS_HELPER_EXECUTABLE)
+string(REGEX REPLACE "[\r\n\"]" "" CMAKEJS_HELPER_EXECUTABLE "${CMAKEJS_HELPER_EXECUTABLE}")
+
+# get the cmake-js version number
+execute_process(
+  COMMAND "${CMAKEJS_HELPER_EXECUTABLE}" "version"
+  WORKING_DIRECTORY ${_CMAKEJS_DIR}
+  OUTPUT_VARIABLE _version
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if (NOT DEFINED _version OR "${_version}" STREQUAL "")
+  message(FATAL_ERROR "Failed to get cmake-js version!")
+  return()
+endif()
+
+# check multiple versions havent been loaded
 if(COMMAND cmakejs_napi_addon_add_sources)
     if(NOT DEFINED _CMAKEJS_VERSION OR NOT (_version STREQUAL _CMAKEJS_VERSION))
         message(WARNING "More than one 'CMakeJS.cmake' version has been included in this project.")
@@ -29,9 +66,6 @@ if(COMMAND cmakejs_napi_addon_add_sources)
 endif()
 
 set(_CMAKEJS_VERSION "${_version}" CACHE INTERNAL "Current 'CMakeJS.cmake' version. Used for checking for conflicts")
-
-set(_CMAKEJS_SCRIPT "${CMAKE_CURRENT_LIST_FILE}" CACHE INTERNAL "Path to current 'CMakeJS.cmake' script")
-set(_CMAKEJS_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE INTERNAL "Path to cmake-js directory")
 
 # Default build output directory, if not specified with '-DCMAKEJS_BINARY_DIR:PATH=/some/dir'
 if(NOT DEFINED CMAKEJS_BINARY_DIR)
@@ -51,18 +85,9 @@ option                (CMAKEJS_NODE_API         "Supply cmake-js::node-api targe
 cmake_dependent_option(CMAKEJS_NODE_ADDON_API   "Supply cmake-js::node-addon-api target for linkage" ON CMAKEJS_NODE_API OFF)
 cmake_dependent_option(CMAKEJS_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_NODE_API OFF)
 
-#[=============================================================================[
-Internal helper (borrowed from CMakeRC).
-]=============================================================================]#
-function(_cmakejs_normalize_path var)
-    set(path "${${var}}")
-    file(TO_CMAKE_PATH "${path}" path)
-    while(path MATCHES "//")
-        string(REPLACE "//" "/" path "${path}")
-    endwhile()
-    string(REGEX REPLACE "/+$" "" path "${path}")
-    set("${var}" "${path}" PARENT_SCOPE)
-endfunction()
+if(MSVC)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
+endif()
 
 #[=======================================================================[
 FindCMakeJs.cmake
@@ -77,24 +102,10 @@ This module defines
 
 ::
 
-  CMAKEJS_EXECUTABLE, the cmake-js binary
+  CMAKEJS_HELPER_EXECUTABLE, the cmake-js helper binary
 
 ]=======================================================================]#
 
-# Check for cmake-js installations
-find_program(CMAKEJS_EXECUTABLE
-  NAMES "cmake-js" "cmake-js.exe"
-  PATHS "${_CMAKEJS_DIR}/bin"
-  DOC "cmake-js project-local npm package binary"
-  REQUIRED
-)
-if (NOT CMAKEJS_EXECUTABLE)
-    message(FATAL_ERROR "cmake-js not found! Make sure you have installed your node dependencies fully.")
-    return()
-endif()
-
-_cmakejs_normalize_path(CMAKEJS_EXECUTABLE)
-string(REGEX REPLACE "[\r\n\"]" "" CMAKEJS_EXECUTABLE "${CMAKEJS_EXECUTABLE}")
 
 #[=============================================================================[
 Get the in-use NodeJS binary for executing NodeJS commands in CMake scripts.
@@ -186,9 +197,10 @@ Provides
 ]=============================================================================]#
 function(cmakejs_acquire_napi_cpp_files)
     execute_process(
-      COMMAND "${NODE_EXECUTABLE}" -p "require('node-addon-api').include"
+      COMMAND "${NODE_EXECUTABLE}" -p "require('node-addon-api').include_dir || require('node-addon-api').include"
       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
       OUTPUT_VARIABLE NODE_ADDON_API_DIR
+      OUTPUT_STRIP_TRAILING_WHITESPACE
       # COMMAND_ERROR_IS_FATAL ANY
     )
     string(REGEX REPLACE "[\r\n\"]" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
@@ -323,13 +335,9 @@ if(CMAKEJS_CMAKEJS)
   target_link_libraries       (cmake-js INTERFACE cmake-js::node-api)
   target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
   target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
-  set_target_properties       (cmake-js PROPERTIES VERSION   7.3.3)
+  set_target_properties       (cmake-js PROPERTIES VERSION   ${_CMAKEJS_VERSION})
   set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
   set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING cmake-js_MAJOR_VERSION)
-
-  if(MSVC)
-      set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
-  endif()
 
   list(APPEND CMAKEJS_TARGETS cmake-js)
 
