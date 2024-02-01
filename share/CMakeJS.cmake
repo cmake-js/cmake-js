@@ -84,7 +84,7 @@ This module defines
 # By checking whether this var is pre-defined, we can determine if we are
 # running from an npm script (via cmake-js), or from CMake directly...
 
-if (NOT DEFINED CMAKE_JS_VERSION) # TODO: Unfortunately, this var is a little too close to 'CMAKE_VERSION' for comfort... Kitware may need it. Should be moved into 'CMAKEJS_VERSION'!
+if (NOT DEFINED CMAKE_JS_VERSION)
 
     # ...and if we're calling from CMake directly, we need to set up some vars
     # that our build step depends on (these are predefined when calling via npm/cmake-js).
@@ -314,8 +314,8 @@ if(CMAKEJS_NODE_DEV)
   # acquire if needed...
   if(NOT DEFINED NODE_EXECUTABLE)
     cmakejs_acquire_node_executable()
-    message(STATUS "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
-    message(STATUS "NODE_VERSION: ${NODE_VERSION}")
+    message(DEBUG "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
+    message(DEBUG "NODE_VERSION: ${NODE_VERSION}")
   endif()
 
   # NodeJS system installation headers
@@ -335,7 +335,7 @@ if(CMAKEJS_NODE_API)
   # Acquire if needed...
   if(NOT DEFINED NODE_API_HEADERS_DIR)
     cmakejs_acquire_napi_c_files()
-    message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
+    message(DEBUG "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
     if(NOT DEFINED NODE_API_INC_FILES)
       file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
       set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
@@ -359,7 +359,7 @@ if(CMAKEJS_NODE_ADDON_API)
   # Acquire if needed...
   if(NOT DEFINED NODE_ADDON_API_DIR)
     cmakejs_acquire_napi_cpp_files()
-    message(STATUS "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
+    message(DEBUG "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
     if(NOT DEFINED NODE_ADDON_API_INC_FILES)
       file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
       set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE FILEPATH "Node Addon API Header files." FORCE)
