@@ -5,15 +5,16 @@
   See: https://github.com/nathanjhood/NapiAddon
 ]=============================================================================]#
 
+if (DEFINED CMAKE_JS_VERSION)
+    message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, instead you should use cmake-js2 or cmake")
+endif()
+
 #[=============================================================================[
 Check whether we have already been included (borrowed from CMakeRC)
 ]=============================================================================]#
 # TODO: Decouple CMakeJS.cmake API version number from cmake-js version number...?
 set(_version 7.3.3)
 
-if (DEFINED CMAKE_JS_VERSION)
-    message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, instead you should use cmake-js2 or cmake")
-endif()
 
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(VERSION 3.15)
@@ -46,10 +47,9 @@ VCPKG_FEATURE_FLAGS or by passing for example '-DCMAKE_NODE_API:BOOL=FALSE'
 
 set (CMAKEJS_TARGETS "")
 include(CMakeDependentOption)
-option                (CMAKEJS_NODE_DEV         "Supply cmake-js::node-dev target for linkage" ON)
-cmake_dependent_option(CMAKEJS_NODE_API         "Supply cmake-js::node-api target for linkage"       ON CMAKEJS_NODE_DEV OFF)
+option                (CMAKEJS_NODE_API         "Supply cmake-js::node-api target for linkage"       ON)
 cmake_dependent_option(CMAKEJS_NODE_ADDON_API   "Supply cmake-js::node-addon-api target for linkage" ON CMAKEJS_NODE_API OFF)
-cmake_dependent_option(CMAKEJS_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_NODE_ADDON_API OFF)
+cmake_dependent_option(CMAKEJS_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_NODE_API OFF)
 
 #[=============================================================================[
 Internal helper (borrowed from CMakeRC).
@@ -224,31 +224,16 @@ resolved, for Addon targets to link with.
 
 Targets:
 
-cmake-js::node-dev
 cmake-js::node-api
 cmake-js::node-addon-api
 cmake-js::cmake-js
 
 ]=============================================================================]#
-if(CMAKEJS_NODE_DEV)
 
-  # acquire if needed...
-  if(NOT DEFINED NODE_EXECUTABLE)
-    cmakejs_acquire_node_executable()
-    message(DEBUG "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
-    message(DEBUG "NODE_VERSION: ${NODE_VERSION}")
-  endif()
-
-  # NodeJS system installation headers
-  # cmake-js::node-dev
-  add_library                 (node-dev INTERFACE)
-  add_library                 (cmake-js::node-dev ALIAS node-dev)
-  if (MSVC)
-    target_sources              (node-dev INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
-  endif()
-
-  list(APPEND CMAKEJS_TARGETS  node-dev)
-  set_target_properties       (node-dev PROPERTIES VERSION ${NODE_VERSION})
+if(NOT DEFINED NODE_EXECUTABLE)
+  cmakejs_acquire_node_executable()
+  message(DEBUG "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
+  message(DEBUG "NODE_VERSION: ${NODE_VERSION}")
 endif()
 
 if(CMAKEJS_NODE_API)
@@ -270,12 +255,12 @@ if(CMAKEJS_NODE_API)
   add_library                 (cmake-js::node-api ALIAS node-api)
   target_include_directories  (node-api INTERFACE "${NODE_API_HEADERS_DIR}")
   target_sources              (node-api INTERFACE "${NODE_API_INC_FILES}")
-  target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
   set_target_properties       (node-api PROPERTIES VERSION 6.1.0)
 
-
   # find the node api definition to generate into node.lib
-  if (MSVC)
+  if (MSVC) 
+    target_sources (node-api INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
+  
     execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').def_paths.node_api_def"
         WORKING_DIRECTORY ${_CMAKEJS_DIR}
         OUTPUT_VARIABLE CMAKEJS_NODELIB_DEF
@@ -289,6 +274,15 @@ if(CMAKEJS_NODE_API)
     set(CMAKEJS_NODELIB_TARGET "${CMAKE_BINARY_DIR}/node.lib")
     execute_process(COMMAND ${CMAKE_AR} /def:${CMAKEJS_NODELIB_DEF} /out:${CMAKEJS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
     target_link_libraries (node-api INTERFACE "${CMAKEJS_NODELIB_TARGET}")
+  endif()
+
+  if (MSVC)
+    # setup delayload
+    target_link_options(node-api PRIVATE "/DELAYLOAD:NODE.EXE")
+    target_link_libraries(node-api PRIVATE delayimp)
+    if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)")
+        target_link_options(node-api PUBLIC "/SAFESEH:NO")
+    endif()
   endif()
   
   list(APPEND CMAKEJS_TARGETS  node-api)
@@ -323,7 +317,10 @@ if(CMAKEJS_CMAKEJS)
   # cmake-js::cmake-js
   add_library                 (cmake-js INTERFACE)
   add_library                 (cmake-js::cmake-js ALIAS cmake-js)
-  target_link_libraries       (cmake-js INTERFACE cmake-js::node-addon-api)
+  if(CMAKEJS_NODE_ADDON_API)
+    target_link_libraries       (cmake-js INTERFACE cmake-js::node-addon-api)
+  endif()
+  target_link_libraries       (cmake-js INTERFACE cmake-js::node-api)
   target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
   target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
   set_target_properties       (cmake-js PROPERTIES VERSION   7.3.3)
@@ -612,11 +609,6 @@ write_basic_package_version_file (
 	VERSION ${_version}
 	COMPATIBILITY AnyNewerVersion
 )
-
-# # copy headers (and definitions?) to build dir for distribution
-# if(CMAKEJS_NODE_DEV)
-#   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "include/node")
-# endif()
 
 if(CMAKEJS_NODE_API)
   install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
