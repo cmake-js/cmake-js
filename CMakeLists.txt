@@ -133,8 +133,8 @@ console.log(`Napi Version: ${demo.version()}`);
   set(CPACK_PACKAGE_VERSION_TWEAK ${PROJECT_VERSION_VERSION_TWEAK})
   set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/LICENSE)
   set(CPACK_RESOURCE_FILE_README  ${PROJECT_SOURCE_DIR}/README.md)
-  set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
-  set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+  set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY ON)
+  set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY ON)
   set(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
   set(CPACK_SOURCE_IGNORE_FILES
       _CPack_Packages
@@ -156,7 +156,7 @@ console.log(`Napi Version: ${demo.version()}`);
       #/lib
       /usr
       /out
-      /build
+      #/build
       /Release
       /Debug
       /MinSizeRel

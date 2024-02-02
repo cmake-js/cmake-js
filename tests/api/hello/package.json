@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node ./index.js",
-    "postinstall": "cmake-js install",
+    "install": "cmake-js install",
+    "postinstall": "cmake-js compile",
     "configure": "cmake-js configure",
     "reconfigure": "cmake-js reconfigure",
     "build": "cmake-js build",
