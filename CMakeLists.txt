@@ -34,6 +34,8 @@ include ("${CMAKE_CURRENT_LIST_DIR}/share/cmake/CMakeJS.cmake")
 # We instead offer a simple test/demonstration of our API, and reserve the
 # CMakeJS vendor namespace in C++/CMake land.
 
+# PROOF OF CONCEPT:
+
 # If this is not a subproject...
 if (CMakeJS_IS_TOP_LEVEL
     # (and we're not building into the source tree)
@@ -121,6 +123,12 @@ console.log(`Napi Version: ${demo.version()}`);
   endif()
 
   # offer a basic/messy CPack
+  # TODO: I don't think this is fully working because there is no built
+  # addon inside the binary tar outputs.
+  # It's distracting from the simplicity of the demo, and only here for
+  # more proof of concept. Remove it if you wish, it isn't part of the
+  # proposed API itself at all (same with CTest above).
+
   # set(CPACK_PACKAGE_CHECKSUM "${PROJECT_VERSION_TWEAK}") # git rev-parse is a good idea for this...
   set(CPACK_PACKAGE_VENDOR "cmake-js")
   set(CPACK_PACKAGE_NAME              "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")

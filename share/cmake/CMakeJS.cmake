@@ -248,7 +248,7 @@ Provides
 ::
 
   NODE_API_HEADERS_DIR, where to find node_api.h, etc.
-  NODE_API_INC_FILES, the headers required to use Node Addon API.
+  NODE_API_INC_FILES, the headers required to use Node API.
 
 ]=============================================================================]#
 function(cmakejs_acquire_napi_c_files)
@@ -275,7 +275,7 @@ function(cmakejs_acquire_napi_c_files)
     unset(NODE_API_INC_FILES)
     file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
     set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
-    source_group("Node Addon API (C)" FILES "${NODE_API_INC_FILES}")
+    source_group("Node API (C)" FILES "${NODE_API_INC_FILES}")
 
     if(VERBOSE)
         message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
@@ -326,7 +326,7 @@ endfunction()
 
 #[=============================================================================[
 Silently create an interface library (no output) with all Addon API dependencies
-resolved, for Addon targets to link with.
+resolved, for each feature that we offer; this is for Addon targets to link with.
 
 (This should contain most of cmake-js globally-required configuration)
 
@@ -497,6 +497,38 @@ if(CMAKEJS_CMAKEJS)
 
       add_library(${name} SHARED)
       add_library(${name_alt}::${name} ALIAS ${name})
+
+      # TODO: If we instead set up a var like 'CMAKEJS_LINK_LEVEL',
+      # it can carry an integer number corresponding to which
+      # dependency level the builder wants. The value of this
+      # integer can be determined somehow from the result of the
+      # 'CMakeDependentOption's at the top of this file.
+      #
+      # i.e. (psudeo code);
+      #
+      #   if options = 0; set (CMAKEJS_LINK_LEVEL "cmake-js::node-dev")
+      #   if options = 1; set (CMAKEJS_LINK_LEVEL "cmake-js::node-api")
+      #   if options = 2; set (CMAKEJS_LINK_LEVEL "cmake-js::node-addon-api")
+      #   if options = 3; set (CMAKEJS_LINK_LEVEL "cmake-js::cmake-js")
+      #
+      # target_link_libraries(${name} PRIVATE ${CMAKEJS_LINK_LEVEL})
+      #
+      # Why?
+      #
+      # Because currently, our 'create_napi_addon()' depends on cmake-js::cmake-js,
+      # Which is why I had to wrap our nice custom functions inside of
+      # this 'CMAKEJS_CMAKEJS=TRUE' block, for now.
+      #
+      # If do we make our functions available at all times, we must also
+      # validate that all the possible configurations work (or fail safely,
+      # and with a prompt.)
+      #
+      # Testing (and supporting) the above could be exponentially complex.
+      # I think most people won't use the target toggles anyway,
+      # and those that do, won't have access to any broken/untested
+      # variations of our functions.
+      #
+      # Just my suggestion; do as you will :)
 
       target_link_libraries(${name} PRIVATE cmake-js::cmake-js)
 
