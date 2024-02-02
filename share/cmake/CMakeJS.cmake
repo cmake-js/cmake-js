@@ -705,6 +705,33 @@ endforeach()
 
 #[=============================================================================[
 Collect targets and allow CMake to provide them
+
+Builders working with CMake at any level know how fussy CMake is about stuff
+like filepaths, and how to resolve your project's dependencies. Enough people
+went "agh if CMake is gonna be so fussy about my project's filepaths, why can't
+it just look after that stuff by itself? Why have I got to do this?" and CMake
+went "ok then, do these new 'export()' and 'install()' functions and I'll sort it
+all out myself, for you. I'll also sort it out for your users, and their users too!"
+
+DISCLAIMER: the names 'export()' and 'install()' are just old CMake parlance -
+very misleading, at first - try to not think about 'installing' in the traditional
+system-level sense, nobody does that until much later downstream from here...
+
+Earlier, we scooped up all the different header files, logically arranged them into
+seperate 'targets' (with a little bit of inter-dependency management), and copied
+them into the binary dir. In doing so, we effectively 'chopped off' their
+absolute paths; they now 'exist' (temporarily) on a path that *we have not
+defined yet*, which is CMAKE_BINARY_DIR.
+
+In using the BUILD_ and INSTALL_ interfaces, we told CMake how to relocate those
+files as it pleases. CMake will move them around as it pleases, but no matter
+where those files end up, they will *always* be at 'CMAKE_BINARY_DIR/include/dir',
+as far as CMake cares; it will put those files anywhere it needs to, at any time,
+*but* we (and our consumers' CMake) can depend on *always* finding them at
+'CMAKE_BINARY_DIR/include/dir', no matter what anybody sets their CMAKE_BINARY_DIR
+to be.
+
+It's not quite over yet, but the idea should be becoming clear now...
 ]=============================================================================]#
 
 export (
