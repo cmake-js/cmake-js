@@ -144,20 +144,21 @@ if (NOT DEFINED CMAKE_JS_VERSION)
     string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_SRC "${CMAKE_JS_SRC}")
     string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_LIB "${CMAKE_JS_LIB}")
 
-    # relocate...
+    # relocate... (only runs if no node_modules to fallback on.. i.e., on a fresh git clone. Expected behaviour..?)
     file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
-    # TODO: this next one is not really done correctly, because;
-    # - we absolutely should be recreating the whole filetree (including the named dirs and which headers go where)
-    # - it is possible to copy whole directories (perhaps one by one?) with cmake functions.
-    # - But, that way, we're not passing the globbed files into 'source_group', a function which gives excellent IDE support (and nothing else).
-    # - A long-winded notion involves setting up 'cmake-js::node-dev::v8' and other targets (cmake-js::node-dev could be made to depend on them)
-    # I avoided doing any of these things so far because this hasn't been critical,
-    # but I believe that consumers of cmake-js::node-dev (alone) might have intellisense
-    # issues currently, since the filesystem doesn't strictly resemble what it's supposed to.
-    # And overall it seems to be working enough for now :)
-    file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/**/*.h")
     file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
     unset(_CMAKE_JS_INC_FILES)
+
+    set(_NODE_DEV_DEPS "")
+    list(APPEND _NODE_DEV_DEPS cppgc openssl uv libplatform)
+    foreach(_DEP IN LISTS _NODE_DEV_DEPS)
+      if(IS_DIRECTORY "${CMAKE_JS_INC}/${_DEP}")
+        file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/${_DEP}/*.h")
+        file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node/${_DEP}")
+        unset(_CMAKE_JS_INC_FILES)
+      endif()
+    endforeach()
+    unset(_NODE_DEV_DEPS)
 
     # target include directories (as if 'node-dev' were an isolated CMake project...)
     set(CMAKE_JS_INC
@@ -185,7 +186,8 @@ else ()
 endif ()
 
 set(CMAKE_JS_INC_FILES "") # prevent repetitive globbing on each run
-file(GLOB CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/**.h")
+file(GLOB CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/*.h")
+file(GLOB CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/**/*.h")
 source_group("cmake-js v${_version} Node ${NODE_VERSION}" FILES "${CMAKE_JS_INC_FILES}")
 
 # Log the vars to the console for sanity...
