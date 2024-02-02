@@ -790,19 +790,6 @@ write_basic_package_version_file (
 	COMPATIBILITY AnyNewerVersion
 )
 
-# copy headers (and definitions?) to build dir for distribution
-if(CMAKEJS_NODE_DEV)
-  install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "include/node")
-endif()
-
-if(CMAKEJS_NODE_API)
-  install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
-endif()
-
-if(CMAKEJS_NODE_ADDON_API)
-  install(FILES ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
-endif()
-
 # This whole block that follows, and the last changes I made to this file (re: 'file/directory reolcation')
 # is all predicated on the idea that our consumers want to control certain vars themselves:
 #
@@ -830,6 +817,23 @@ endif()
 # 'install' target.
 
 include(GNUInstallDirs)
+
+# copy headers (and definitions?) to build dir for distribution
+if(CMAKEJS_NODE_DEV)
+  install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node")
+endif()
+
+if(CMAKEJS_NODE_API)
+  install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node-api-headers")
+endif()
+
+if(CMAKEJS_NODE_ADDON_API)
+  install(FILES ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node-addon-api")
+endif()
+
+if(CMAKEJS_CMAKEJS)
+  install(FILES ${_CMAKEJS_SCRIPT} DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS")
+endif()
 
 # configure a 'CMakeJSTargets' export file for install
 install(TARGETS ${CMAKEJS_TARGETS}
