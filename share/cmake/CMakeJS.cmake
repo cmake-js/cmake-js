@@ -144,38 +144,6 @@ if (NOT DEFINED CMAKE_JS_VERSION)
     string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_SRC "${CMAKE_JS_SRC}")
     string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_LIB "${CMAKE_JS_LIB}")
 
-    # relocate... (only runs if no node_modules to fallback on.. i.e., on a fresh git clone. Expected behaviour..?)
-    file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
-    file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
-    unset(_CMAKE_JS_INC_FILES)
-
-    set(_NODE_DEV_DEPS "")
-    list(APPEND _NODE_DEV_DEPS cppgc openssl uv libplatform)
-    foreach(_DEP IN LISTS _NODE_DEV_DEPS)
-      if(IS_DIRECTORY "${CMAKE_JS_INC}/${_DEP}")
-        file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/${_DEP}/*.h")
-        file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node/${_DEP}")
-        unset(_CMAKE_JS_INC_FILES)
-      endif()
-    endforeach()
-    unset(_NODE_DEV_DEPS)
-
-    # target include directories (as if 'node-dev' were an isolated CMake project...)
-    set(CMAKE_JS_INC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
-      $<INSTALL_INTERFACE:include/node>
-    )
-
-    set(CMAKE_JS_INC "${CMAKE_JS_INC}" CACHE STRING "cmake-js include directory." FORCE)
-    set(CMAKE_JS_SRC "${CMAKE_JS_SRC}" CACHE STRING "cmake-js source file." FORCE)
-    set(CMAKE_JS_LIB "${CMAKE_JS_LIB}" CACHE STRING "cmake-js lib file." FORCE)
-
-    # TODO: At this point, some warnings may occur re: the below (still investigating);
-    # Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS.
-    #set (NAPI_CPP_EXCEPTIONS TRUE CACHE STRING "Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS")
-    add_definitions(-DNAPI_CPP_EXCEPTIONS) # Also needs /EHsc
-    # add_definitions(-DNAPI_DISABLE_CPP_EXCEPTIONS)
-
 else ()
 
     # ... we already are calling via npm/cmake-js, so we should already have all the vars we need!
@@ -184,6 +152,43 @@ else ()
     endif()
 
 endif ()
+
+# 'always-on' codeblock; we provide the following blob, no matter the config.
+
+# relocate... (only runs if no node_modules to fallback on.. i.e., on a fresh git clone. Expected behaviour..?)
+file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
+file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
+unset(_CMAKE_JS_INC_FILES)
+
+set(_NODE_DEV_DEPS "")
+list(APPEND _NODE_DEV_DEPS cppgc openssl uv libplatform)
+foreach(_DEP IN LISTS _NODE_DEV_DEPS)
+  if(IS_DIRECTORY "${CMAKE_JS_INC}/${_DEP}")
+    file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/${_DEP}/*.h")
+    file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node/${_DEP}")
+    unset(_CMAKE_JS_INC_FILES)
+  endif()
+endforeach()
+unset(_NODE_DEV_DEPS)
+
+# relocate... (this is crucial for 'install()' to work on user's addons)
+unset(CMAKE_JS_INC)
+
+# target include directories (as if 'node-dev' were an isolated CMake project...)
+set(CMAKE_JS_INC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
+  $<INSTALL_INTERFACE:include/node>
+)
+
+set(CMAKE_JS_INC "${CMAKE_JS_INC}" CACHE STRING "cmake-js include directory." FORCE)
+set(CMAKE_JS_SRC "${CMAKE_JS_SRC}" CACHE STRING "cmake-js source file." FORCE)
+set(CMAKE_JS_LIB "${CMAKE_JS_LIB}" CACHE STRING "cmake-js lib file." FORCE)
+
+# TODO: At this point, some warnings may occur re: the below (still investigating);
+# Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS.
+#set (NAPI_CPP_EXCEPTIONS TRUE CACHE STRING "Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS")
+add_definitions(-DNAPI_CPP_EXCEPTIONS) # Also needs /EHsc
+# add_definitions(-DNAPI_DISABLE_CPP_EXCEPTIONS)
 
 set(CMAKE_JS_INC_FILES "") # prevent repetitive globbing on each run
 file(GLOB CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/*.h")
