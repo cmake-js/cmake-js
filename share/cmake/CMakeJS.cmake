@@ -145,6 +145,16 @@ if (NOT DEFINED CMAKE_JS_VERSION)
     string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_LIB "${CMAKE_JS_LIB}")
 
     # relocate...
+    file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
+    # TODO: this next one is not really done correctly, because;
+    # - we absolutely should be recreating the whole filetree (including the named dirs and which headers go where)
+    # - it is possible to copy whole directories (perhaps one by one?) with cmake functions.
+    # - But, that way, we're not passing the globbed files into 'source_group', a function which gives excellent IDE support (and nothing else).
+    # - A long-winded notion involves setting up 'cmake-js::node-dev::v8' and other targets (cmake-js::node-dev could be made to depend on them)
+    # I avoided doing any of these things so far because this hasn't been critical,
+    # but I believe that consumers of cmake-js::node-dev (alone) might have intellisense
+    # issues currently, since the filesystem doesn't strictly resemble what it's supposed to.
+    # And overall it seems to be working enough for now :)
     file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/**/*.h")
     file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
     unset(_CMAKE_JS_INC_FILES)
