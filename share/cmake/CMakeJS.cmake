@@ -535,7 +535,7 @@ if(CMAKEJS_CMAKEJS)
       endif()
 
       set(options)
-      set(args ALIAS NAMESPACE NAPI_VERSION)
+      set(args ALIAS NAMESPACE NAPI_VERSION EXCEPTIONS)
       set(list_args)
       cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
 
@@ -574,6 +574,22 @@ if(CMAKEJS_CMAKEJS)
           set(name_alt "${ARG_ALIAS}")
       else()
           set(name_alt "${ARG_NAMESPACE}")
+      endif()
+
+      if(NOT ARG_EXCEPTIONS)
+        set(ARG_EXCEPTIONS "MAYBE") # YES, NO, or MAYBE...
+      endif()
+
+      if((NOT DEFINED NAPI_CPP_EXCEPTIONS) OR (NOT DEFINED NAPI_DISABLE_CPP_EXCEPTIONS) OR (NOT DEFINED NAPI_CPP_EXCEPTIONS_MAYBE))
+
+        if(ARG_EXCEPTIONS STREQUAL "YES")
+          set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_CPP_EXCEPTIONS")
+        elseif(ARG_EXCEPTIONS STREQUAL "NO")
+          set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_DISABLE_CPP_EXCEPTIONS")
+        else()
+          set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_CPP_EXCEPTIONS_MAYBE")
+        endif()
+
       endif()
 
       if(VERBOSE)
@@ -664,7 +680,11 @@ if(CMAKEJS_CMAKEJS)
         PUBLIC # These definitions are shared with anything that links to this addon
         "NAPI_VERSION=${ARG_NAPI_VERSION}"
         "BUILDING_NODE_EXTENSION"
+        "${_NAPI_GLOBAL_EXCEPTIONS_POLICY}"
       )
+
+      # Global exceptions policy
+      unset(_NAPI_GLOBAL_EXCEPTIONS_POLICY)
 
   endfunction()
 
