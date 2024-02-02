@@ -519,9 +519,18 @@ if(CMAKEJS_CMAKEJS)
       # Which is why I had to wrap our nice custom functions inside of
       # this 'CMAKEJS_CMAKEJS=TRUE' block, for now.
       #
-      # If do we make our functions available at all times, we must also
-      # validate that all the possible configurations work (or fail safely,
-      # and with a prompt.)
+      # cmake-js cli users could then be offered a new flag for setting a
+      # preferred dependency level for their project, controlling the
+      # values on the JS side before being passed to the command line
+      # (default to 3 if not set):
+      #
+      # $ cmake-js configure --link-level=2
+      #
+      # The above would provide dependency resolution up to cmake-js::node-adon-api level.
+      #
+      # If do we make our functions available at all times this way,
+      # we must also validate that all the possible configurations work
+      # (or fail safely, and with a prompt.)
       #
       # Testing (and supporting) the above could be exponentially complex.
       # I think most people won't use the target toggles anyway,
