@@ -789,6 +789,8 @@ write_basic_package_version_file (
 	VERSION ${_version}
 	COMPATIBILITY AnyNewerVersion
 )
+# pass our module along
+file(COPY "${_CMAKEJS_SCRIPT}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/cmake")
 
 # This whole block that follows, and the last changes I made to this file (re: 'file/directory reolcation')
 # is all predicated on the idea that our consumers want to control certain vars themselves:
