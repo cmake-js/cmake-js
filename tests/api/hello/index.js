@@ -6,5 +6,5 @@ var buildDir = "/build/lib/";
 if(platform === "win32")
   buildDir = "\\build\\bin\\Release\\";
 
-const hello = require(`..${buildDir}addon.node`);
+const hello = require(`.${buildDir}addon.node`);
 module.exports = hello;

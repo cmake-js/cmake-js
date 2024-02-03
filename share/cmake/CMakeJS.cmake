@@ -171,7 +171,7 @@ foreach(_DEP IN LISTS _NODE_DEV_DEPS)
 endforeach()
 unset(_NODE_DEV_DEPS)
 
-# # relocate... (this is crucial to get for 'install()' to work on user's addons)
+# # relocate... (this is crucial to get right for 'install()' to work on user's addons)
 # set(CMAKE_JS_INC "")
 
 # # target include directories (as if 'node-dev' were an isolated CMake project...)
