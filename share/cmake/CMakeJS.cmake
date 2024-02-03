@@ -171,31 +171,36 @@ endif ()
 # 'always-on' codeblock; we provide the following blob, no matter the config.
 
 # relocate... (only runs if no node_modules to fallback on.. i.e., on a fresh git clone. Expected behaviour..?)
-file(GLOB_RECURSE _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
-file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
-unset(_CMAKE_JS_INC_FILES)
 
-set(_NODE_DEV_DEPS "")
-list(APPEND _NODE_DEV_DEPS cppgc openssl uv libplatform)
-foreach(_DEP IN LISTS _NODE_DEV_DEPS)
-  if(IS_DIRECTORY "${CMAKE_JS_INC}/${_DEP}")
-    file(GLOB_RECURSE _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/${_DEP}/*.h")
-    file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node/${_DEP}")
-    unset(_CMAKE_JS_INC_FILES)
-  endif()
-endforeach()
-unset(_NODE_DEV_DEPS)
+# This is too specific... see comments around the node-dev target fileset
+# file(GLOB_RECURSE _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
+# file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
+# unset(_CMAKE_JS_INC_FILES)
+
+# set(_NODE_DEV_DEPS "")
+# list(APPEND _NODE_DEV_DEPS cppgc openssl uv libplatform)
+# foreach(_DEP IN LISTS _NODE_DEV_DEPS)
+#   if(IS_DIRECTORY "${CMAKE_JS_INC}/${_DEP}")
+#     file(GLOB_RECURSE _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/${_DEP}/**/*.h")
+#     file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node/${_DEP}")
+#     unset(_CMAKE_JS_INC_FILES)
+#   endif()
+# endforeach()
+# unset(_NODE_DEV_DEPS)
+
+# do this instead!
+install(DIRECTORY "${CMAKE_JS_INC}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node" FILES_MATCHING PATTERN "*.h")
 
 # relocate... (this is crucial to get right for 'install()' to work on user's addons)
-# set(CMAKE_JS_INC "")
+set(CMAKE_JS_INC "")
 
-# # target include directories (as if 'node-dev' were an isolated CMake project...)
-# set(CMAKE_JS_INC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
-#   $<INSTALL_INTERFACE:include/node>
-# )
+# target include directories (as if 'node-dev' were an isolated CMake project...)
+set(CMAKE_JS_INC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
+  $<INSTALL_INTERFACE:include/node>
+)
 
-# set(CMAKE_JS_INC ${CMAKE_JS_INC} CACHE PATH     "cmake-js include directory." FORCE)
+set(CMAKE_JS_INC ${CMAKE_JS_INC} CACHE PATH     "cmake-js include directory." FORCE)
 set(CMAKE_JS_SRC ${CMAKE_JS_SRC} CACHE FILEPATH "cmake-js source file."       FORCE)
 set(CMAKE_JS_LIB ${CMAKE_JS_LIB} CACHE FILEPATH "cmake-js lib file."          FORCE)
 
@@ -386,95 +391,138 @@ if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or hig
   target_link_libraries       (node-dev INTERFACE ${CMAKE_JS_LIB}) # tip: don't enclose this in strings! (or it won't be null if the file is nonexistent)
   set_target_properties       (node-dev PROPERTIES VERSION ${NODE_VERSION})
 
-  set(NODE_DEV_FILES "")
-  list(APPEND NODE_DEV_FILES
-    # NodeJS core
-    "node_buffer.h"
-    "node_object_wrap.h"
-    "node_version.h"
-    "node.h"
-    # NodeJS addon
-    "node_api.h"
-    "node_api_types.h"
-    "js_native_api.h"
-    "js_native_api_types.h"
-    # uv
-    "uv.h"
-    # v8
-    "v8config.h"
-    "v8-array-buffer.h"
-    "v8-callbacks.h"
-    "v8-container.h"
-    "v8-context.h"
-    "v8-data.h"
-    "v8-date.h"
-    "v8-debug.h"
-    "v8-embedder-heap.h"
-    "v8-embedder-state-scope.h"
-    "v8-exception.h"
-    "v8-extension.h"
-    "v8-forward.h"
-    "v8-function-callback.h"
-    "v8-function.h"
-    "v8-initialization.h"
-    "v8-internal.h"
-    "v8-isolate.h"
-    "v8-json.h"
-    "v8-local-handle.h"
-    "v8-locker.h"
-    "v8-maybe.h"
-    "v8-memory-span.h"
-    "v8-message.h"
-    "v8-microtask-queue.h"
-    "v8-microtask.h"
-    "v8-object.h"
-    "v8-persistent-handle.h"
-    "v8-platform.h"
-    "v8-primitive-object.h"
-    "v8-primitive.h"
-    "v8-profiler.h"
-    "v8-promise.h"
-    "v8-proxy.h"
-    "v8-regexp.h"
-    "v8-script.h"
-    "v8-snapshot.h"
-    "v8-statistics.h"
-    "v8-template.h"
-    "v8-traced-handle.h"
-    "v8-typed-array.h"
-    "v8-unwinder.h"
-    "v8-util.h"
-    "v8-value-serializer-version.h"
-    "v8-value-serializer.h"
-    "v8-value.h"
-    "v8-version.h"
-    "v8-version-string.h"
-    "v8-wasm.h"
-    "v8-wasm-trap-handler-posix.h"
-    "v8-wasm-trap-handler-win.h"
-    "v8-weak-callback.h"
-    "v8.h"
-    "v8-config.h"
-    # zlib
-    "zconf.h"
-    "zlib.h"
-  )
+  # TODO: this list would be un-manageable for all iterations of NodeJS dev files
+  # across versions; even minor versions seem to have lots of different files!
+  # Fortunately for us, HEADERS should never really go to 'target_sources',
+  # because HEADERS are *not supposed to be compiled*, they are only used
+  # for lookup by the compiler. They are just symbolic, nothing more.
+  #
+  # The two 'correct' mechanisms for adding headers to a target in CMake are:
+  #
+  # Modern CMake: you can put them in 'target_sources()' - one by one, never
+  # by globbing expressions! - if you create a FILE_SET of TYPE HEADERS
+  # and follow the strict naming conventions and BASE_DIRS thing.
+  #
+  # Classic CMake: You don't actually pass any header files to your target
+  # explicitly; instead, you just put their path on 'target_include_directories()',
+  # and your compiler/CMake/IDE/intellisense will loop up the file relative to
+  # that path. So you can then '#include <from/that/path.h>'
+  #
+  # This manual listing of files maybe wouldnt be so bad if we just globbed
+  # everything recursively and dumped them all into one massive dir. But (aHa!),
+  # they have all been authored to '#include <very/specific/paths.h>', and for
+  # very good reason - these libnode-dev headers contain familiar libs such as
+  # openssl, but these ones are doctored by team NodeJS according to their custom
+  # needs, and that's why NodeJS ships these third-party copies under their own
+  # include line.
+  #
+  # We can glob the files; we can even have CMake just pick up the base dir and
+  # throw that around; but, we'd have to generate the entire FILESET below with
+  # a fully-maintained filetree and include line, specific to whichever version
+  # of NodeJS that cmake.js has picked up for us.
+  #
+  # So instead of taking on unthinkable complexity of maintaining this, we can
+  # just pass the relocatable '*_INCLUDE_DIR' from under these copied files that
+  # CMake is already passing around, and just pass that to our target's
+  # 'target_include_directories()' and let it do the 'Classical lookup-only header'
+  # approach. We lose nothing, really, since none of these files are supposed to be
+  # compiled in. CMake only ever just needed to know where the base dir is that
+  # it can instruct the compiler and linker do their symbol lookups from, and
+  # the dir we're passing in has been made CMake-relocatable thanks to it's
+  # BUILD_ and INSTALL_ interfaces and generator expressions. That is really
+  # the definition of an INTERFACE library in CMake parlance anyway - a CMake
+  # - formatted header-only library :)
 
-  foreach(FILE IN LISTS NODE_DEV_FILES)
-    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}")
-      message(DEBUG "Found NodeJS developer header: ${FILE}")
-      target_sources(node-dev INTERFACE
-      FILE_SET node_dev_INTERFACE_HEADERS
-      TYPE HEADERS
-      BASE_DIRS
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-      FILES
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}>
-        $<INSTALL_INTERFACE:include/node/${FILE}>
-    )
-    endif()
-  endforeach()
+
+  # set(NODE_DEV_FILES "")
+  # list(APPEND NODE_DEV_FILES
+  #   # NodeJS core
+  #   "node_buffer.h"
+  #   "node_object_wrap.h"
+  #   "node_version.h"
+  #   "node.h"
+  #   # NodeJS addon
+  #   "node_api.h"
+  #   "node_api_types.h"
+  #   "js_native_api.h"
+  #   "js_native_api_types.h"
+  #   # uv
+  #   "uv.h"
+  #   # v8
+  #   "v8config.h"
+  #   "v8-array-buffer.h"
+  #   "v8-callbacks.h"
+  #   "v8-container.h"
+  #   "v8-context.h"
+  #   "v8-data.h"
+  #   "v8-date.h"
+  #   "v8-debug.h"
+  #   "v8-embedder-heap.h"
+  #   "v8-embedder-state-scope.h"
+  #   "v8-exception.h"
+  #   "v8-extension.h"
+  #   "v8-forward.h"
+  #   "v8-function-callback.h"
+  #   "v8-function.h"
+  #   "v8-initialization.h"
+  #   "v8-internal.h"
+  #   "v8-isolate.h"
+  #   "v8-json.h"
+  #   "v8-local-handle.h"
+  #   "v8-locker.h"
+  #   "v8-maybe.h"
+  #   "v8-memory-span.h"
+  #   "v8-message.h"
+  #   "v8-microtask-queue.h"
+  #   "v8-microtask.h"
+  #   "v8-object.h"
+  #   "v8-persistent-handle.h"
+  #   "v8-platform.h"
+  #   "v8-primitive-object.h"
+  #   "v8-primitive.h"
+  #   "v8-profiler.h"
+  #   "v8-promise.h"
+  #   "v8-proxy.h"
+  #   "v8-regexp.h"
+  #   "v8-script.h"
+  #   "v8-snapshot.h"
+  #   "v8-statistics.h"
+  #   "v8-template.h"
+  #   "v8-traced-handle.h"
+  #   "v8-typed-array.h"
+  #   "v8-unwinder.h"
+  #   "v8-util.h"
+  #   "v8-value-serializer-version.h"
+  #   "v8-value-serializer.h"
+  #   "v8-value.h"
+  #   "v8-version.h"
+  #   "v8-version-string.h"
+  #   "v8-wasm.h"
+  #   "v8-wasm-trap-handler-posix.h"
+  #   "v8-wasm-trap-handler-win.h"
+  #   "v8-weak-callback.h"
+  #   "v8.h"
+  #   "v8-config.h"
+  #   # zlib
+  #   "zconf.h"
+  #   "zlib.h"
+  # )
+
+  # foreach(FILE IN LISTS NODE_DEV_FILES)
+  #   if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}")
+  #     message(DEBUG "Found NodeJS developer header: ${FILE}")
+  #     target_sources(node-dev INTERFACE
+  #     FILE_SET node_dev_INTERFACE_HEADERS
+  #     TYPE HEADERS
+  #     BASE_DIRS
+  #       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  #       $<INSTALL_INTERFACE:include>
+  #     FILES
+  #       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}>
+  #       $<INSTALL_INTERFACE:include/node/${FILE}>
+  #   )
+  #   endif()
+  # endforeach()
 
   list(APPEND CMAKEJS_TARGETS  node-dev)
 endif()
