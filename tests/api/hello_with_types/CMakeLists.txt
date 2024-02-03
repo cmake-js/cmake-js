@@ -12,4 +12,5 @@ include(CMakeJS)
 cmakejs_create_napi_addon(
   addon
   src/hello/addon.cpp
+  NAMESPACE vendor
 )
