@@ -1093,12 +1093,86 @@ foreach(TARGET IN LISTS CMAKEJS_TARGETS)
 endforeach()
 
 if(NOT CMakeJS_IS_TOP_LEVEL)
+
+  # cmake-js --link-level=0
+  if(CMAKEJS_USING_NODE_DEV AND (NOT CMAKEJS_USING_NODE_API))
+    message(STATUS [==[
+--
+-- To build with the Node.js developer API,
+--
+-- Add this to your CMakeLists.txt:
+--
+
+include(CMakeJS)
+
+add_library(my_library SHARED)
+target_sources(my_library PRIVATE src/<vendor>/my_library.cc)
+target_link_libraries(my_library PRIVATE cmake-js::node-dev)
+
+--
+-- You can include '<node_api.h>' in 'my_library.cc' and start building
+-- with the Node API, including v8, uv, and all its' dependencies.
+--
+]==])
+    endif() # CMAKEJS_USING_NODE_API
+
+  # cmake-js --link-level=1
+  if(CMAKEJS_USING_NODE_API AND (NOT CMAKEJS_USING_NODE_ADDON_API))
+    message(STATUS [==[
+--
+-- To build a Node.js addon in C,
+--
+-- Add this to your CMakeLists.txt:
+--
+
+include(CMakeJS)
+
+add_library(my_addon SHARED)
+target_sources(my_addon PRIVATE src/<vendor>/my_addon.c)
+target_link_libraries(my_addon PRIVATE cmake-js::node-api)
+set_target_properties(my_addon PROPERTIES PREFIX "" SUFFIX ".node")
+
+--
+-- You can include '<node_api.h>' in 'my_addon.c' and start building
+-- with the Node Addon API in C.
+--
+]==])
+    endif() # CMAKEJS_USING_NODE_API
+
+  # cmake-js --link-level=2
+  if(CMAKEJS_USING_NODE_ADDON_API AND (NOT CMAKEJS_USING_CMAKEJS))
+    message(STATUS [==[
+--
+-- To build a Node.js addon in C++,
+--
+-- Add this to your CMakeLists.txt:
+--
+
+include(CMakeJS)
+
+add_library(my_addon SHARED)
+target_sources(my_addon PRIVATE src/<vendor>/my_addon.cpp)
+target_link_libraries(my_addon PRIVATE cmake-js::node-addon-api)
+set_target_properties(my_addon PROPERTIES PREFIX "" SUFFIX ".node")
+add_target_definitions(my_addon PRIVATE BUILDING_NODE_EXTENSION)
+
+--
+-- You can include '<napi.h>' in 'my_addon.cpp' and start building
+-- with the Node Addon API in C++.
+--
+]==])
+    endif() # CMAKEJS_USING_NODE_ADDON_API
+
+    # cmake-js --link-level=3 (default)
+    if(CMAKEJS_USING_CMAKEJS)
     message(STATUS [==[
 --
 -- To build a Node.js addon,
 --
 -- Add this to your CMakeLists.txt:
 --
+
+include(CMakeJS)
 
 cmakejs_create_napi_addon (
     # CMAKEJS_ADDON_NAME
@@ -1109,16 +1183,18 @@ cmakejs_create_napi_addon (
     NAMESPACE <vendor>
   )
 
--- You will be able to load your addon in JavaScript code:
---
+]==])
 
-const my_addon = require("./build/lib/my_addon.node");
+    # cmake-js --link-level=4 (experimental)
+    if(CMAKEJS_USING_NODE_SEA_CONFIG)
+      # https://nodejs.org/api/single-executable-applications.html
+    endif()
 
-console.log(`Napi Status:  ${my_addon.hello()}`);
-console.log(`Napi Version: ${my_addon.version()}`);
-
+# Global message (our CLI applies in all scenarios)
+message(STATUS [==[
 -- You may use either the regular CMake interface, or the cmake-js CLI, to build your addon!
 --
+-- Add this to your package.json:
 
 {
     "name": "@<vendor>/my-addon",
@@ -1135,6 +1211,15 @@ console.log(`Napi Version: ${my_addon.version()}`);
     // ...
 }
 
+-- You will be able to load your built addon in JavaScript code:
+--
+
+const my_addon = require("./build/lib/my_addon.node");
+
+console.log(`Napi Status:  ${my_addon.hello()}`);
+console.log(`Napi Version: ${my_addon.version()}`);
+
+
 -- Make sure to register a module in your C/C++ code like official example does:
 -- https://github.com/nodejs/node-addon-examples/blob/main/src/1-getting-started/1_hello_world/node-addon-api/hello.cc
 --
@@ -1145,6 +1230,7 @@ console.log(`Napi Version: ${my_addon.version()}`);
 -- https://github.com/nodejs/node-addon-examples
 --
 -- ]==])
+    endif() # CMAKEJS_USING_CMAKEJS
 endif()
 
 unset(_version)
