@@ -1,7 +1,7 @@
 {
   "name": "@vendor/hello_with_types",
   "version": "1.0.0",
-  "description": "A test addon made using CMakeJS.cmake",
+  "description": "A test addon with Typescript support made using CMakeJS.cmake",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
