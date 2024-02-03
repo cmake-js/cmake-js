@@ -117,9 +117,9 @@ console.log(`Napi Version: ${demo.version()}`);
   )
 
   if(BUILD_TESTS)
-      # include(CTest) # If you want to see all the test dashboard targets, uncomment this include()
       enable_testing()
       include("${CMAKE_CURRENT_LIST_DIR}/tests/demo/tests.cmake")
+      include(CTest) # If you want to see all the test dashboard targets, uncomment this include()
   endif()
 
   # offer a basic/messy CPack
@@ -143,7 +143,7 @@ console.log(`Napi Version: ${demo.version()}`);
   set(CPACK_RESOURCE_FILE_README  ${PROJECT_SOURCE_DIR}/README.md)
   set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY ON)
   set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY ON)
-  set(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
+  set(CPACK_SOURCE_GENERATOR "TGZ;ZIP") # Check out CPack's 'NSIS' installer for Win32, and the others!
   set(CPACK_SOURCE_IGNORE_FILES
       _CPack_Packages
       /*.zip

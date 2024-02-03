@@ -66,7 +66,14 @@
 	},
 	"scripts": {
 		"test": "mocha tests",
-		"lint": "eslint lib bin/cmake-js tests"
+		"lint": "eslint lib bin/cmake-js tests",
+
+    "demo:configure": "cmake --fresh -S . -B ./build -DBUILD_TESTS:BOOL=TRUE -DCMAKE_INSTALL_PREFIX:PATH=./install -G Ninja",
+    "demo:build":     "cmake --build    ./build",
+    "demo:install":   "cmake --install  ./build",
+    "demo:ctest":     "ctest --test-dir ./build",
+    "demo:cpack":     "cpack --config   ./build/CPackSourceConfig.cmake -B ./install",
+    "demo:cdist":     "cpack --config   ./build/CPackConfig.cmake       -B ./install"
 	},
 	"files": [
 		"lib",

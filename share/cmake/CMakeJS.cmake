@@ -368,7 +368,7 @@ cmake-js::node-addon-api
 cmake-js::cmake-js
 
 ]=============================================================================]#
-if(CMAKEJS_USING_NODE_DEV)
+if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or higher
 
   # acquire if needed...
   if(NOT DEFINED NODE_EXECUTABLE)
@@ -479,7 +479,7 @@ if(CMAKEJS_USING_NODE_DEV)
   list(APPEND CMAKEJS_TARGETS  node-dev)
 endif()
 
-if(CMAKEJS_USING_NODE_API)
+if(CMAKEJS_USING_NODE_API) # user did 'cmake-js configure --link-level=1' or higher
 
   # Acquire if needed...
   if(NOT DEFINED NODE_API_HEADERS_DIR) # Why the NODE_API_* namespace? Because 'node-api-headers' from vcpkg also provides this exact var, so we can help our users from vcpkg-land avoid picking up headers they already have ; but, we still need to process those headers into our target(s) for them!
@@ -528,7 +528,7 @@ if(CMAKEJS_USING_NODE_API)
   list(APPEND CMAKEJS_TARGETS node-api)
 endif()
 
-if(CMAKEJS_USING_NODE_ADDON_API)
+if(CMAKEJS_USING_NODE_ADDON_API) # user did 'cmake-js configure --link-level=2' or higher
 
   # Acquire if needed...
   if(NOT DEFINED NODE_ADDON_API_DIR) # Why the NODE_ADDON_API_* namespace? Because 'node-addon-api' from vcpkg also provides this exact var, so we can help our users from vcpkg-land avoid picking up headers they already have ; but, we still need to process those headers into our target(s) for them!
@@ -577,7 +577,8 @@ if(CMAKEJS_USING_NODE_ADDON_API)
   list(APPEND CMAKEJS_TARGETS  node-addon-api)
 endif()
 
-if(CMAKEJS_USING_CMAKEJS)
+if(CMAKEJS_USING_CMAKEJS) # user did 'cmake-js configure --link-level=3', or did not specify a link level (fallback case)
+
   # CMakeJS API - requires Node Addon API (C++), resolves the full Napi Addon dependency chain
   # cmake-js::cmake-js
   add_library                 (cmake-js INTERFACE)
