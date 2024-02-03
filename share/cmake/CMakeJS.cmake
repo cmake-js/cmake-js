@@ -909,12 +909,30 @@ export (
 
 
 include (CMakePackageConfigHelpers)
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in" [==[
+file (WRITE "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in" [==[
 @PACKAGE_INIT@
 
-include(${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
+include (${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
 
-check_required_components(cmake-js)
+check_required_components (cmake-js)
+
+set (CMAKE_JS_SRC "@CMAKE_JS_SRC@")
+set (CMAKE_JS_INC "@CMAKE_JS_INC@")
+set (CMAKE_JS_LIB "@CMAKE_JS_LIB@")
+set (CMAKE_JS_VERSION "@CMAKE_JS_VERSION@")
+set (CMAKE_JS_EXECUTABLE "@CMAKE_JS_EXECUTABLE@")
+set (CMAKE_JS_INC_FILES "@CMAKE_JS_INC_FILES@")
+
+if (CMAKEJS_NODE_API)
+    set (NODE_API_HEADERS_DIR "@NODE_API_HEADERS_DIR@")
+    set (NODE_API_INC_FILES "@NODE_API_INC_FILES@")
+endif()
+
+if (CMAKE_JS_NODE_ADDON_API)
+    set (NODE_ADDON_API_DIR "@NODE_ADDON_API_DIR@")
+    set (NODE_ADDON_API_INC_FILES "@NODE_ADDON_API_INC_FILES@")
+endif ()
+
 ]==])
 
 # create cmake config file
