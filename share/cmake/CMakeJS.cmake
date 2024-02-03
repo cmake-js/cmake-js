@@ -383,6 +383,54 @@ if(CMAKEJS_NODE_DEV)
     # uv
     "uv.h"
     # v8
+    "v8-array-buffer.h"
+    "v8-callbacks.h"
+    "v8-container.h"
+    "v8-context.h"
+    "v8-data.h"
+    "v8-date.h"
+    "v8-debug.h"
+    "v8-embedder-heap.h"
+    "v8-embedder-state-scope.h"
+    "v8-exception.h"
+    "v8-extension.h"
+    "v8-forward.h"
+    "v8-function-callback.h"
+    "v8-function.h"
+    "v8-initialization.h"
+    "v8-internal.h"
+    "v8-isolate.h"
+    "v8-json.h"
+    "v8-local-handle.h"
+    "v8-locker.h"
+    "v8-maybe.h"
+    "v8-memory-span.h"
+    "v8-message.h"
+    "v8-microtask-queue.h"
+    "v8-microtask.h"
+    "v8-object.h"
+    "v8-persistent-handle.h"
+    "v8-platform.h"
+    "v8-primitive-object.h"
+    "v8-primitive.h"
+    "v8-profiler.h"
+    "v8-promise.h"
+    "v8-proxy.h"
+    "v8-regexp.h"
+    "v8-script.h"
+    "v8-snapshot.h"
+    "v8-statistics.h"
+    "v8-template.h"
+    "v8-traced-handle.h"
+    "v8-typed-array.h"
+    "v8-unwinder.h"
+    "v8-value-serializer.h"
+    "v8-value.h"
+    "v8-version.h"
+    "v8-wasm.h"
+    "v8-weak-callback.h"
+    "v8.h"
+    "v8-config.h"
     # zlib
     "zconf.h"
     "zlib.h"
@@ -390,7 +438,8 @@ if(CMAKEJS_NODE_DEV)
 
   foreach(FILE IN LISTS NODE_DEV_FILES)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}")
-    target_sources(node-dev INTERFACE
+      message(STATUS "Found NodeJS developer header: ${FILE}")
+      target_sources(node-dev INTERFACE
       FILE_SET node_dev_INTERFACE_HEADERS
       TYPE HEADERS
       BASE_DIRS
