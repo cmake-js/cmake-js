@@ -582,17 +582,18 @@ if(CMAKEJS_USING_CMAKEJS)
 
   list(APPEND CMAKEJS_TARGETS cmake-js)
 
-  # Node that the below function definitions are contained inside 'if(CMAKEJS_CMAKEJS)' (our main helper library)....
+# Note that the below function definitions are contained inside
+# 'if(CMAKEJS_CMAKEJS)' (because they require our main helper library)....
 
-  #[=============================================================================[
-  Exposes a user-side helper function for creating a dynamic '*.node' library,
-  linked to the Addon API interface.
+#[=============================================================================[
+Exposes a user-side helper function for creating a dynamic '*.node' library,
+linked to the Addon API interface.
 
-  cmakejs_create_napi_addon(<name> [<sources>])
-  cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>] [<sources>])
+cmakejs_create_napi_addon(<name> [<sources>])
+cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>] [<sources>])
 
-  (This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
-  ]=============================================================================]#
+(This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
+]=============================================================================]#
   function(cmakejs_create_napi_addon name)
 
       # Avoid duplicate target names
@@ -643,11 +644,34 @@ if(CMAKEJS_USING_CMAKEJS)
           set(name_alt "${ARG_NAMESPACE}")
       endif()
 
+      # TODO: How the exceptions are set in fallback cases can be very tricky
+      # to ascertain. There are numerous different '-D' flags for different
+      # compilers and platforms for either enabling or disabling exceptions;
+      # It is also not a good idea to use mixed exceptions policies, or
+      # link different libraries together with different exceptions policies;
+      # The user could call this nice new EXCEPTIONS arg in our function, which
+      # sets a PUBLIC definition (meaning, it propagates to anything that might
+      # be linked with it); our arg accepts YES, NO, or MAYBE as per <napi.h>.
+      # Default is MAYBE (as in, no opinion of our own...)
+      # But, this is not taking into account the users that would rather set
+      # '-D_UNWIND', '-DCPP_EXCEPTIONS', or some other flag specific to their
+      # system. If they did, and we are not honouring it, then we are risking
+      # breaking their global exceptions policy...
+      # I suggest taking a look at the header file that CMakeRC generates
+      # to understand how to grep a variety of different possiple exceptions flags
+      # all into a custom one which handles all cases. The Napi way of having
+      # three seperate args, that can each be defined against logic, is unfortunate
+      # and we don't want to break compatibility of existing users' projects.
+      # I have made one attempt at this in the past which I will revisit
+      # shortly... but definitely a case of, all ideas welcome!
       if(NOT ARG_EXCEPTIONS)
         set(ARG_EXCEPTIONS "MAYBE") # YES, NO, or MAYBE...
       endif()
 
-      if((NOT DEFINED NAPI_CPP_EXCEPTIONS) OR (NOT DEFINED NAPI_DISABLE_CPP_EXCEPTIONS) OR (NOT DEFINED NAPI_CPP_EXCEPTIONS_MAYBE))
+      if((NOT DEFINED NAPI_CPP_EXCEPTIONS) OR
+         (NOT DEFINED NAPI_DISABLE_CPP_EXCEPTIONS) OR
+         (NOT DEFINED NAPI_CPP_EXCEPTIONS_MAYBE)
+        )
 
         if(ARG_EXCEPTIONS STREQUAL "YES")
           set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_CPP_EXCEPTIONS")
@@ -713,7 +737,7 @@ if(CMAKEJS_USING_CMAKEJS)
 
       set_property(
         TARGET ${name}
-        PROPERTY "${name}_IS_NAPI_ADDON_LIBRARY" TRUE
+        PROPERTY "${name}_IS_NAPI_ADDON_LIBRARY" TRUE # Custom property
       )
 
       set_target_properties(${name}
@@ -756,14 +780,14 @@ if(CMAKEJS_USING_CMAKEJS)
 
   endfunction()
 
-  #[=============================================================================[
-  Add source files to an existing Napi Addon target.
+#[=============================================================================[
+Add source files to an existing Napi Addon target.
 
-  cmakejs_napi_addon_add_sources(<name> [items1...])
-  cmakejs_napi_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
-  cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...]])
-  cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<dirs>...]] [items1...]...)
-  ]=============================================================================]#
+cmakejs_napi_addon_add_sources(<name> [items1...])
+cmakejs_napi_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
+cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...]])
+cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<dirs>...]] [items1...]...)
+]=============================================================================]#
   function(cmakejs_napi_addon_add_sources name)
 
       # Check that this is a Node Addon target
@@ -832,12 +856,12 @@ if(CMAKEJS_USING_CMAKEJS)
 
   endfunction()
 
-  #[=============================================================================[
-  Add pre-processor definitions to an existing Napi Addon target.
+#[=============================================================================[
+Add pre-processor definitions to an existing Napi Addon target.
 
-  cmakejs_napi_addon_add_definitions(<name> [items1...])
-  cmakejs_napi_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
-  ]=============================================================================]#
+cmakejs_napi_addon_add_definitions(<name> [items1...])
+cmakejs_napi_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
+]=============================================================================]#
   function(cmakejs_napi_addon_add_definitions name)
 
       # Check that this is a Node Addon target
@@ -878,7 +902,8 @@ if(CMAKEJS_USING_CMAKEJS)
 
 endif() # CMAKEJS_CMAKEJS
 
-# This should enable each target to behave well with intellisense (in case they weren't already)
+# This should enable each target to behave well with intellisense
+# (in case they weren't already)
 foreach(TARGET IN LISTS CMAKEJS_TARGETS)
   target_include_directories(${TARGET}
     INTERFACE
@@ -935,7 +960,7 @@ check_required_components (cmake-js)
 
 # Not sure if this is needed...
 set (CMAKE_JS_SRC "@CMAKE_JS_SRC@")
-set (CMAKE_JS_INC "@CMAKE_JS_INC@")
+set (CMAKE_JS_INC @CMAKE_JS_INC@)
 set (CMAKE_JS_LIB "@CMAKE_JS_LIB@")
 set (CMAKE_JS_VERSION "@CMAKE_JS_VERSION@")
 set (CMAKE_JS_EXECUTABLE "@CMAKE_JS_EXECUTABLE@")
@@ -943,7 +968,7 @@ set (CMAKE_JS_INC_FILES "")
 list (APPEND CMAKE_JS_INC_FILES "@CMAKE_JS_INC_FILES@")
 
 if (CMAKEJS_NODE_API)
-   set (NODE_API_HEADERS_DIR "@NODE_API_HEADERS_DIR@")
+   set (NODE_API_HEADERS_DIR @NODE_API_HEADERS_DIR@)
    set (NODE_API_INC_FILES "")
    list (APPEND NODE_API_INC_FILES "@NODE_API_INC_FILES@")
 endif()
