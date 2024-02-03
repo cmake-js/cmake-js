@@ -505,8 +505,8 @@ if(CMAKEJS_USING_NODE_API)
           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
           $<INSTALL_INTERFACE:include>
         FILES
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api/${FILE}>
-          $<INSTALL_INTERFACE:include/node-addon-api/${FILE}>
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers/${FILE}>
+          $<INSTALL_INTERFACE:include/node-api-headers/${FILE}>
       )
     endif()
   endforeach()
