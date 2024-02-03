@@ -14,6 +14,8 @@ set(_version 7.3.3)
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(VERSION 3.15)
 include(CMakeParseArguments)
+include(GNUInstallDirs)
+include(CMakeDependentOption)
 
 if(COMMAND cmakejs_napi_addon_add_sources)
     if(NOT DEFINED _CMAKEJS_VERSION OR NOT (_version STREQUAL _CMAKEJS_VERSION))
@@ -39,12 +41,25 @@ Setup optional targets dependency chain, e.g., for end-user specification with
 VCPKG_FEATURE_FLAGS or by passing for example '-DCMAKE_NODE_API:BOOL=FALSE'
 ]=============================================================================]#
 
-set (CMAKEJS_TARGETS "")
-include(CMakeDependentOption)
+set                   (CMAKEJS_TARGETS "") # This list will auto-populate from --link-level
 option                (CMAKEJS_USING_NODE_DEV         "Supply cmake-js::node-dev target for linkage" ON)
 cmake_dependent_option(CMAKEJS_USING_NODE_API         "Supply cmake-js::node-api target for linkage"       ON CMAKEJS_USING_NODE_DEV OFF)
 cmake_dependent_option(CMAKEJS_USING_NODE_ADDON_API   "Supply cmake-js::node-addon-api target for linkage" ON CMAKEJS_USING_NODE_API OFF)
 cmake_dependent_option(CMAKEJS_USING_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_USING_NODE_ADDON_API OFF)
+
+# TODO: re; the above.
+# I propose instead of exposing all four "CMAKEJS_USING_*" options at once against and
+# allowing illogical combinations of dependencies, we instead setup a new CLI arg
+# from the Javascript side, '--link-level'.
+
+#   'cmake-js configure --link-level=0' equals 'CMAKEJS_USING_NODE_DEV=ON'
+#   'cmake-js configure --link-level=1' equals 'CMAKEJS_USING_NODE_API=ON'
+#   'cmake-js configure --link-level=2' equals 'CMAKEJS_USING_NODE_ADDON_API=ON'
+#   'cmake-js configure --link-level=3' equals 'CMAKEJS_USING_CMAKEJS=ON'
+
+# I already created the '-DCMAKEJS_USING_*' entries in the JS CLI, but currently
+# without any of the logic proposed above.
+
 
 #[=============================================================================[
 Internal helper (borrowed from CMakeRC).
@@ -171,7 +186,7 @@ foreach(_DEP IN LISTS _NODE_DEV_DEPS)
 endforeach()
 unset(_NODE_DEV_DEPS)
 
-# # relocate... (this is crucial to get right for 'install()' to work on user's addons)
+# relocate... (this is crucial to get right for 'install()' to work on user's addons)
 # set(CMAKE_JS_INC "")
 
 # # target include directories (as if 'node-dev' were an isolated CMake project...)
@@ -180,9 +195,9 @@ unset(_NODE_DEV_DEPS)
 #   $<INSTALL_INTERFACE:include/node>
 # )
 
-# set(CMAKE_JS_INC "${CMAKE_JS_INC}" CACHE PATH     "cmake-js include directory." FORCE)
-set(CMAKE_JS_SRC "${CMAKE_JS_SRC}" CACHE FILEPATH "cmake-js source file."       FORCE)
-set(CMAKE_JS_LIB "${CMAKE_JS_LIB}" CACHE FILEPATH "cmake-js lib file."          FORCE)
+# set(CMAKE_JS_INC ${CMAKE_JS_INC} CACHE PATH     "cmake-js include directory." FORCE)
+set(CMAKE_JS_SRC ${CMAKE_JS_SRC} CACHE FILEPATH "cmake-js source file."       FORCE)
+set(CMAKE_JS_LIB ${CMAKE_JS_LIB} CACHE FILEPATH "cmake-js lib file."          FORCE)
 
 set(CMAKE_JS_INC_FILES "") # prevent repetitive globbing on each run
 file(GLOB_RECURSE CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/*.h")
@@ -366,10 +381,10 @@ if(CMAKEJS_USING_NODE_DEV)
   # cmake-js::node-dev
   add_library                 (node-dev INTERFACE)
   add_library                 (cmake-js::node-dev ALIAS node-dev)
-  target_include_directories  (node-dev INTERFACE "${CMAKE_JS_INC}")
-  target_sources              (node-dev INTERFACE "${CMAKE_JS_SRC}")
-  target_sources              (node-dev INTERFACE "${CMAKE_JS_INC_FILES}")
-  target_link_libraries       (node-dev INTERFACE "${CMAKE_JS_LIB}")
+  target_include_directories  (node-dev INTERFACE ${CMAKE_JS_INC})
+  target_sources              (node-dev INTERFACE ${CMAKE_JS_SRC})
+  # target_sources              (node-dev INTERFACE "${CMAKE_JS_INC_FILES}")
+  target_link_libraries       (node-dev INTERFACE ${CMAKE_JS_LIB})
   set_target_properties       (node-dev PROPERTIES VERSION ${NODE_VERSION})
 
   set(NODE_DEV_FILES "")
@@ -485,7 +500,8 @@ if(CMAKEJS_USING_NODE_API)
   add_library                 (cmake-js::node-api ALIAS node-api)
   target_include_directories  (node-api INTERFACE ${NODE_API_HEADERS_DIR})
   target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
-  set_target_properties       (node-api PROPERTIES VERSION 6.1.0)
+  set_target_properties       (node-api PROPERTIES VERSION   6.1.0)
+  set_target_properties       (node-api PROPERTIES SOVERSION 6)
 
   set(NODE_API_FILES "")
   list(APPEND NODE_API_FILES
@@ -533,7 +549,8 @@ if(CMAKEJS_USING_NODE_ADDON_API)
   add_library                 (cmake-js::node-addon-api ALIAS node-addon-api)
   target_include_directories  (node-addon-api INTERFACE ${NODE_ADDON_API_DIR})
   target_link_libraries       (node-addon-api INTERFACE cmake-js::node-api)
-  set_target_properties       (node-addon-api PROPERTIES VERSION 1.1.0)
+  set_target_properties       (node-addon-api PROPERTIES VERSION   1.1.0)
+  set_target_properties       (node-addon-api PROPERTIES SOVERSION 1)
 
   set(NODE_ADDON_API_FILES "")
   list(APPEND NODE_ADDON_API_FILES
@@ -1020,9 +1037,8 @@ file(COPY "${_CMAKEJS_SCRIPT}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/cm
 # To do this, they set '-DCMAKE_INSTALL_PREFIX=./install', configure, then build the
 # 'install' target.
 
-include(GNUInstallDirs)
 unset(CMAKEJS_INC_DIR)
-set(CMAKEJS_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE STRING "Installation directory for include files, a relative path that will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path.")
+set(CMAKEJS_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Installation directory for include files, a relative path that will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path.")
 # copy headers (and definitions?) to build dir for distribution
 if(CMAKEJS_USING_NODE_DEV)
   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node")
