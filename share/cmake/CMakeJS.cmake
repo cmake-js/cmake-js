@@ -389,6 +389,7 @@ if(CMAKEJS_NODE_DEV)
   )
 
   foreach(FILE IN LISTS NODE_DEV_FILES)
+    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}")
     target_sources(node-dev INTERFACE
       FILE_SET node_dev_INTERFACE_HEADERS
       TYPE HEADERS
@@ -399,6 +400,7 @@ if(CMAKEJS_NODE_DEV)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}>
         $<INSTALL_INTERFACE:include/node/${FILE}>
     )
+    endif()
   endforeach()
 
   list(APPEND CMAKEJS_TARGETS  node-dev)
