@@ -158,6 +158,7 @@ console.log(`Napi Version: ${demo.version()}`);
       /.cache
       /.config
       /.local
+      /dist
       /doc
       /docs
       #/bin
