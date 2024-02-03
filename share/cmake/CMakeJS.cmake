@@ -624,7 +624,7 @@ cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_V
           endif()
       endif()
 
-      # Needs more validation...
+      # TODO: This needs more/better validation...
       if(DEFINED ARG_NAPI_VERSION AND (ARG_NAPI_VERSION LESS_EQUAL 0))
           message(SEND_ERROR "NAPI_VERSION for ${name} is not a valid Integer number (${ARG_NAPI_VERSION})")
           return()
@@ -808,9 +808,6 @@ cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<d
       endif()
       _cmakejs_normalize_path(ARG_BASE_DIRS)
       get_filename_component(ARG_BASE_DIRS "${ARG_BASE_DIRS}" ABSOLUTE)
-
-      # Generate the identifier for the resource library's namespace
-      get_target_property(lib_namespace "${name}" ${name}_ADDON_NAMESPACE)
 
       # All remaining unparsed args 'should' be source files for this target, so...
       foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
