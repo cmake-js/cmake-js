@@ -482,7 +482,7 @@ endif()
 if(CMAKEJS_USING_NODE_API)
 
   # Acquire if needed...
-  if(NOT DEFINED NODE_API_HEADERS_DIR)
+  if(NOT DEFINED NODE_API_HEADERS_DIR) # Why the NODE_API_* namespace? Because 'node-api-headers' from vcpkg also provides this exact var, so we can help our users from vcpkg-land avoid picking up headers they already have ; but, we still need to process those headers into our target(s) for them!
     cmakejs_acquire_napi_c_files()
     set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} CACHE PATH "Node API Headers directory." FORCE)
     message(DEBUG "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
@@ -531,7 +531,7 @@ endif()
 if(CMAKEJS_USING_NODE_ADDON_API)
 
   # Acquire if needed...
-  if(NOT DEFINED NODE_ADDON_API_DIR)
+  if(NOT DEFINED NODE_ADDON_API_DIR) # Why the NODE_ADDON_API_* namespace? Because 'node-addon-api' from vcpkg also provides this exact var, so we can help our users from vcpkg-land avoid picking up headers they already have ; but, we still need to process those headers into our target(s) for them!
     cmakejs_acquire_napi_cpp_files()
     set(NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR} CACHE PATH "Node Addon API Headers directory." FORCE)
     message(DEBUG "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
