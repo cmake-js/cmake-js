@@ -41,10 +41,10 @@ VCPKG_FEATURE_FLAGS or by passing for example '-DCMAKE_NODE_API:BOOL=FALSE'
 
 set (CMAKEJS_TARGETS "")
 include(CMakeDependentOption)
-option                (CMAKEJS_NODE_DEV         "Supply cmake-js::node-dev target for linkage" ON)
-cmake_dependent_option(CMAKEJS_NODE_API         "Supply cmake-js::node-api target for linkage"       ON CMAKEJS_NODE_DEV OFF)
-cmake_dependent_option(CMAKEJS_NODE_ADDON_API   "Supply cmake-js::node-addon-api target for linkage" ON CMAKEJS_NODE_API OFF)
-cmake_dependent_option(CMAKEJS_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_NODE_ADDON_API OFF)
+option                (CMAKEJS_USING_NODE_DEV         "Supply cmake-js::node-dev target for linkage" ON)
+cmake_dependent_option(CMAKEJS_USING_NODE_API         "Supply cmake-js::node-api target for linkage"       ON CMAKEJS_USING_NODE_DEV OFF)
+cmake_dependent_option(CMAKEJS_USING_NODE_ADDON_API   "Supply cmake-js::node-addon-api target for linkage" ON CMAKEJS_USING_NODE_API OFF)
+cmake_dependent_option(CMAKEJS_USING_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_USING_NODE_ADDON_API OFF)
 
 #[=============================================================================[
 Internal helper (borrowed from CMakeRC).
@@ -156,7 +156,7 @@ endif ()
 # 'always-on' codeblock; we provide the following blob, no matter the config.
 
 # relocate... (only runs if no node_modules to fallback on.. i.e., on a fresh git clone. Expected behaviour..?)
-file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
+file(GLOB_RECURSE _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
 file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
 unset(_CMAKE_JS_INC_FILES)
 
@@ -164,7 +164,7 @@ set(_NODE_DEV_DEPS "")
 list(APPEND _NODE_DEV_DEPS cppgc openssl uv libplatform)
 foreach(_DEP IN LISTS _NODE_DEV_DEPS)
   if(IS_DIRECTORY "${CMAKE_JS_INC}/${_DEP}")
-    file(GLOB _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/${_DEP}/*.h")
+    file(GLOB_RECURSE _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/${_DEP}/*.h")
     file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node/${_DEP}")
     unset(_CMAKE_JS_INC_FILES)
   endif()
@@ -185,8 +185,8 @@ set(CMAKE_JS_SRC "${CMAKE_JS_SRC}" CACHE FILEPATH "cmake-js source file."       
 set(CMAKE_JS_LIB "${CMAKE_JS_LIB}" CACHE FILEPATH "cmake-js lib file."          FORCE)
 
 set(CMAKE_JS_INC_FILES "") # prevent repetitive globbing on each run
-file(GLOB CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/*.h")
-file(GLOB CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/**/*.h")
+file(GLOB_RECURSE CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/*.h")
+file(GLOB_RECURSE CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/**/*.h")
 set(CMAKE_JS_INC_FILES "${CMAKE_JS_INC_FILES}" CACHE STRING "" FORCE)
 source_group("cmake-js v${_version} Node ${NODE_VERSION}" FILES "${CMAKE_JS_INC_FILES}")
 
@@ -274,7 +274,7 @@ function(cmakejs_acquire_napi_c_files)
 
     # relocate...
     set(_NODE_API_INC_FILES "")
-    file(GLOB _NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+    file(GLOB_RECURSE _NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
     file(COPY ${_NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
     unset(_NODE_API_INC_FILES)
 
@@ -286,7 +286,7 @@ function(cmakejs_acquire_napi_c_files)
     set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} CACHE PATH "Node API Headers directory." FORCE)
 
     set(NODE_API_INC_FILES "")
-    file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+    file(GLOB_RECURSE NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
     set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
     source_group("Node API (C)" FILES "${NODE_API_INC_FILES}")
 
@@ -316,9 +316,8 @@ function(cmakejs_acquire_napi_cpp_files)
 
     # relocate...
     set(_NODE_ADDON_API_INC_FILES "")
-    file(GLOB _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+    file(GLOB_RECURSE _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
     file(COPY ${_NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
-    message(STATUS "_NODE_ADDON_API_INC_FILES = ${_NODE_ADDON_API_INC_FILES}")
     unset(_NODE_ADDON_API_INC_FILES)
 
     # target include directories (as if 'node-addon-api' were an isolated CMake project...)
@@ -329,7 +328,7 @@ function(cmakejs_acquire_napi_cpp_files)
     set(NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR} PARENT_SCOPE)
 
     set(NODE_ADDON_API_INC_FILES "")
-    file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+    file(GLOB_RECURSE NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
     set(NODE_ADDON_API_INC_FILES ${NODE_ADDON_API_INC_FILES} PARENT_SCOPE)
     # set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE STRING "Node Addon API Header files." FORCE)
     source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
@@ -354,7 +353,7 @@ cmake-js::node-addon-api
 cmake-js::cmake-js
 
 ]=============================================================================]#
-if(CMAKEJS_NODE_DEV)
+if(CMAKEJS_USING_NODE_DEV)
 
   # acquire if needed...
   if(NOT DEFINED NODE_EXECUTABLE)
@@ -380,9 +379,15 @@ if(CMAKEJS_NODE_DEV)
     "node_object_wrap.h"
     "node_version.h"
     "node.h"
+    # NodeJS addon
+    "node_api.h"
+    "node_api_types.h"
+    "js_native_api.h"
+    "js_native_api_types.h"
     # uv
     "uv.h"
     # v8
+    "v8config.h"
     "v8-array-buffer.h"
     "v8-callbacks.h"
     "v8-container.h"
@@ -424,10 +429,15 @@ if(CMAKEJS_NODE_DEV)
     "v8-traced-handle.h"
     "v8-typed-array.h"
     "v8-unwinder.h"
+    "v8-util.h"
+    "v8-value-serializer-version.h"
     "v8-value-serializer.h"
     "v8-value.h"
     "v8-version.h"
+    "v8-version-string.h"
     "v8-wasm.h"
+    "v8-wasm-trap-handler-posix.h"
+    "v8-wasm-trap-handler-win.h"
     "v8-weak-callback.h"
     "v8.h"
     "v8-config.h"
@@ -438,7 +448,7 @@ if(CMAKEJS_NODE_DEV)
 
   foreach(FILE IN LISTS NODE_DEV_FILES)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}")
-      message(STATUS "Found NodeJS developer header: ${FILE}")
+      message(DEBUG "Found NodeJS developer header: ${FILE}")
       target_sources(node-dev INTERFACE
       FILE_SET node_dev_INTERFACE_HEADERS
       TYPE HEADERS
@@ -455,7 +465,7 @@ if(CMAKEJS_NODE_DEV)
   list(APPEND CMAKEJS_TARGETS  node-dev)
 endif()
 
-if(CMAKEJS_NODE_API)
+if(CMAKEJS_USING_NODE_API)
 
   # Acquire if needed...
   if(NOT DEFINED NODE_API_HEADERS_DIR)
@@ -463,7 +473,7 @@ if(CMAKEJS_NODE_API)
     set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} CACHE PATH "Node API Headers directory." FORCE)
     message(DEBUG "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
     if(NOT DEFINED NODE_API_INC_FILES)
-      file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+      file(GLOB_RECURSE NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
       source_group("Node Addon API (C)" FILES ${NODE_API_INC_FILES})
     endif()
     set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE STRING "Node API Header files." FORCE)
@@ -486,21 +496,24 @@ if(CMAKEJS_NODE_API)
   )
 
   foreach(FILE IN LISTS NODE_API_FILES)
-    target_sources(node-api INTERFACE
-      FILE_SET node_api_INTERFACE_HEADERS
-      TYPE HEADERS
-      BASE_DIRS
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-      FILES
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api/${FILE}>
-        $<INSTALL_INTERFACE:include/node-addon-api/${FILE}>
-    )
+    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers/${FILE}")
+      message(DEBUG "Found Napi API C header: ${FILE}")
+      target_sources(node-api INTERFACE
+        FILE_SET node_api_INTERFACE_HEADERS
+        TYPE HEADERS
+        BASE_DIRS
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+          $<INSTALL_INTERFACE:include>
+        FILES
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api/${FILE}>
+          $<INSTALL_INTERFACE:include/node-addon-api/${FILE}>
+      )
+    endif()
   endforeach()
   list(APPEND CMAKEJS_TARGETS node-api)
 endif()
 
-if(CMAKEJS_NODE_ADDON_API)
+if(CMAKEJS_USING_NODE_ADDON_API)
 
   # Acquire if needed...
   if(NOT DEFINED NODE_ADDON_API_DIR)
@@ -508,7 +521,7 @@ if(CMAKEJS_NODE_ADDON_API)
     set(NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR} CACHE PATH "Node Addon API Headers directory." FORCE)
     message(DEBUG "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
     if(NOT DEFINED NODE_ADDON_API_INC_FILES)
-      file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+      file(GLOB_RECURSE NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
       source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
     endif()
     set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE STRING "Node Addon API Header files." FORCE)
@@ -530,22 +543,25 @@ if(CMAKEJS_NODE_ADDON_API)
   )
 
   foreach(FILE IN LISTS NODE_ADDON_API_FILES)
-    target_sources(node-addon-api INTERFACE
-      FILE_SET node_addon_api_INTERFACE_HEADERS
-      TYPE HEADERS
-      BASE_DIRS
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-      FILES
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api/${FILE}>
-        $<INSTALL_INTERFACE:include/node-addon-api/${FILE}>
-    )
+    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api/${FILE}")
+      message(DEBUG "Found Napi Addon API C++ header: ${FILE}")
+      target_sources(node-addon-api INTERFACE
+        FILE_SET node_addon_api_INTERFACE_HEADERS
+        TYPE HEADERS
+        BASE_DIRS
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+          $<INSTALL_INTERFACE:include>
+        FILES
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api/${FILE}>
+          $<INSTALL_INTERFACE:include/node-addon-api/${FILE}>
+      )
+    endif()
   endforeach()
 
   list(APPEND CMAKEJS_TARGETS  node-addon-api)
 endif()
 
-if(CMAKEJS_CMAKEJS)
+if(CMAKEJS_USING_CMAKEJS)
   # CMakeJS API - requires Node Addon API (C++), resolves the full Napi Addon dependency chain
   # cmake-js::cmake-js
   add_library                 (cmake-js INTERFACE)
@@ -671,7 +687,7 @@ if(CMAKEJS_CMAKEJS)
       #
       # Because currently, our 'create_napi_addon()' depends on cmake-js::cmake-js,
       # Which is why I had to wrap our nice custom functions inside of
-      # this 'CMAKEJS_CMAKEJS=TRUE' block, for now.
+      # this 'CMAKEJS_USING_CMAKEJS=TRUE' block, for now.
       #
       # cmake-js cli users could then be offered a new flag for setting a
       # preferred dependency level for their project, controlling the
@@ -712,6 +728,7 @@ if(CMAKEJS_CMAKEJS)
         RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin"
 
         # # Conventional C++-style debug settings might be useful to have...
+        # Getting Javascript bindings to grep different paths is tricky, though!
         # LIBRARY_OUTPUT_NAME_DEBUG "d${name}"
         # ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
         # LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
@@ -916,21 +933,25 @@ include (${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
 
 check_required_components (cmake-js)
 
+# Not sure if this is needed...
 set (CMAKE_JS_SRC "@CMAKE_JS_SRC@")
 set (CMAKE_JS_INC "@CMAKE_JS_INC@")
 set (CMAKE_JS_LIB "@CMAKE_JS_LIB@")
 set (CMAKE_JS_VERSION "@CMAKE_JS_VERSION@")
 set (CMAKE_JS_EXECUTABLE "@CMAKE_JS_EXECUTABLE@")
-set (CMAKE_JS_INC_FILES "@CMAKE_JS_INC_FILES@")
+set (CMAKE_JS_INC_FILES "")
+list (APPEND CMAKE_JS_INC_FILES "@CMAKE_JS_INC_FILES@")
 
 if (CMAKEJS_NODE_API)
-    set (NODE_API_HEADERS_DIR "@NODE_API_HEADERS_DIR@")
-    set (NODE_API_INC_FILES "@NODE_API_INC_FILES@")
+   set (NODE_API_HEADERS_DIR "@NODE_API_HEADERS_DIR@")
+   set (NODE_API_INC_FILES "")
+   list (APPEND NODE_API_INC_FILES "@NODE_API_INC_FILES@")
 endif()
 
 if (CMAKE_JS_NODE_ADDON_API)
-    set (NODE_ADDON_API_DIR "@NODE_ADDON_API_DIR@")
-    set (NODE_ADDON_API_INC_FILES "@NODE_ADDON_API_INC_FILES@")
+   set (NODE_ADDON_API_DIR "@NODE_ADDON_API_DIR@")
+   set (NODE_ADDON_API_INC_FILES "")
+   list (APPEND NODE_ADDON_API_INC_FILES "@NODE_ADDON_API_INC_FILES@")
 endif ()
 
 ]==])
@@ -980,7 +1001,7 @@ file(COPY "${_CMAKEJS_SCRIPT}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/cm
 include(GNUInstallDirs)
 
 # copy headers (and definitions?) to build dir for distribution
-if(CMAKEJS_NODE_DEV)
+if(CMAKEJS_USING_NODE_DEV)
   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node")
   install(TARGETS node-dev
     EXPORT CMakeJSTargets
@@ -992,7 +1013,7 @@ if(CMAKEJS_NODE_DEV)
   )
 endif()
 
-if(CMAKEJS_NODE_API)
+if(CMAKEJS_USING_NODE_API)
   install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node-api-headers")
   install(TARGETS node-api
     EXPORT CMakeJSTargets
@@ -1004,7 +1025,7 @@ if(CMAKEJS_NODE_API)
   )
 endif()
 
-if(CMAKEJS_NODE_ADDON_API)
+if(CMAKEJS_USING_NODE_ADDON_API)
   install(FILES ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node-addon-api")
   install(TARGETS node-addon-api
     EXPORT CMakeJSTargets
@@ -1016,7 +1037,7 @@ if(CMAKEJS_NODE_ADDON_API)
   )
 endif()
 
-if(CMAKEJS_CMAKEJS)
+if(CMAKEJS_USING_CMAKEJS)
   install(FILES ${_CMAKEJS_SCRIPT} DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS")
   install(TARGETS cmake-js
     EXPORT CMakeJSTargets
