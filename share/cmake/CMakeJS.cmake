@@ -171,16 +171,16 @@ foreach(_DEP IN LISTS _NODE_DEV_DEPS)
 endforeach()
 unset(_NODE_DEV_DEPS)
 
-# relocate... (this is crucial for 'install()' to work on user's addons)
-set(CMAKE_JS_INC "")
+# # relocate... (this is crucial to get for 'install()' to work on user's addons)
+# set(CMAKE_JS_INC "")
 
-# target include directories (as if 'node-dev' were an isolated CMake project...)
-set(CMAKE_JS_INC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
-  $<INSTALL_INTERFACE:include/node>
-)
+# # target include directories (as if 'node-dev' were an isolated CMake project...)
+# set(CMAKE_JS_INC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
+#   $<INSTALL_INTERFACE:include/node>
+# )
 
-set(CMAKE_JS_INC "${CMAKE_JS_INC}" CACHE PATH     "cmake-js include directory." FORCE)
+# set(CMAKE_JS_INC "${CMAKE_JS_INC}" CACHE PATH     "cmake-js include directory." FORCE)
 set(CMAKE_JS_SRC "${CMAKE_JS_SRC}" CACHE FILEPATH "cmake-js source file."       FORCE)
 set(CMAKE_JS_LIB "${CMAKE_JS_LIB}" CACHE FILEPATH "cmake-js lib file."          FORCE)
 
@@ -955,26 +955,26 @@ include (${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
 
 check_required_components (cmake-js)
 
-# Not sure if this is needed...
-set (CMAKE_JS_SRC "@CMAKE_JS_SRC@")
-set (CMAKE_JS_INC @CMAKE_JS_INC@)
-set (CMAKE_JS_LIB "@CMAKE_JS_LIB@")
-set (CMAKE_JS_VERSION "@CMAKE_JS_VERSION@")
-set (CMAKE_JS_EXECUTABLE "@CMAKE_JS_EXECUTABLE@")
-set (CMAKE_JS_INC_FILES "")
-list (APPEND CMAKE_JS_INC_FILES "@CMAKE_JS_INC_FILES@")
+# # Not sure if this is needed...
+# set (CMAKE_JS_SRC "@CMAKE_JS_SRC@")
+# set (CMAKE_JS_INC @CMAKE_JS_INC@)
+# set (CMAKE_JS_LIB "@CMAKE_JS_LIB@")
+# set (CMAKE_JS_VERSION "@CMAKE_JS_VERSION@")
+# set (CMAKE_JS_EXECUTABLE "@CMAKE_JS_EXECUTABLE@")
+# set (CMAKE_JS_INC_FILES "")
+# list (APPEND CMAKE_JS_INC_FILES "@CMAKE_JS_INC_FILES@")
 
-if (CMAKEJS_NODE_API)
-   set (NODE_API_HEADERS_DIR @NODE_API_HEADERS_DIR@)
-   set (NODE_API_INC_FILES "")
-   list (APPEND NODE_API_INC_FILES "@NODE_API_INC_FILES@")
-endif()
+# if (CMAKEJS_NODE_API)
+#    set (NODE_API_HEADERS_DIR @NODE_API_HEADERS_DIR@)
+#    set (NODE_API_INC_FILES "")
+#    list (APPEND NODE_API_INC_FILES "@NODE_API_INC_FILES@")
+# endif()
 
-if (CMAKE_JS_NODE_ADDON_API)
-   set (NODE_ADDON_API_DIR "@NODE_ADDON_API_DIR@")
-   set (NODE_ADDON_API_INC_FILES "")
-   list (APPEND NODE_ADDON_API_INC_FILES "@NODE_ADDON_API_INC_FILES@")
-endif ()
+# if (CMAKE_JS_NODE_ADDON_API)
+#    set (NODE_ADDON_API_DIR "@NODE_ADDON_API_DIR@")
+#    set (NODE_ADDON_API_INC_FILES "")
+#    list (APPEND NODE_ADDON_API_INC_FILES "@NODE_ADDON_API_INC_FILES@")
+# endif ()
 
 ]==])
 
@@ -1021,7 +1021,8 @@ file(COPY "${_CMAKEJS_SCRIPT}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/cm
 # 'install' target.
 
 include(GNUInstallDirs)
-
+unset(CMAKEJS_INC_DIR)
+set(CMAKEJS_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE STRING "Installation directory for include files, a relative path that will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path.")
 # copy headers (and definitions?) to build dir for distribution
 if(CMAKEJS_USING_NODE_DEV)
   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node")
