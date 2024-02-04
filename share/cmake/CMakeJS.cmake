@@ -48,7 +48,7 @@ cmake_dependent_option(CMAKEJS_USING_NODE_ADDON_API   "Supply cmake-js::node-add
 cmake_dependent_option(CMAKEJS_USING_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_USING_NODE_ADDON_API OFF)
 
 # TODO: re; the above.
-# I propose instead of exposing all four "CMAKEJS_USING_*" options at once against and
+# I propose instead of exposing all four "CMAKEJS_USING_*" options at once and
 # allowing illogical combinations of dependencies, we instead setup a new CLI arg
 # from the Javascript side, '--link-level'.
 
@@ -210,6 +210,7 @@ file(GLOB_RECURSE CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/*.h")
 file(GLOB_RECURSE CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/node/**/*.h")
 set(CMAKE_JS_INC_FILES "${CMAKE_JS_INC_FILES}" CACHE STRING "" FORCE)
 source_group("cmake-js v${_version} Node ${NODE_VERSION}" FILES "${CMAKE_JS_INC_FILES}")
+# 'source_group' is the IDE support. Not related to 'target_sources' - two different things!
 
 # Log the vars to the console for sanity...
 if(VERBOSE)
@@ -289,7 +290,7 @@ function(cmakejs_acquire_napi_c_files)
       COMMAND "${NODE_EXECUTABLE}" -p "require('node-api-headers').include_dir"
       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
       OUTPUT_VARIABLE NODE_API_HEADERS_DIR
-      # COMMAND_ERROR_IS_FATAL ANY - crashes on ARM64 builds?
+      # COMMAND_ERROR_IS_FATAL ANY - crashes on ARM64 builds? unfortunate!
     )
     string(REGEX REPLACE "[\r\n\"]" "" NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}")
 
@@ -313,6 +314,11 @@ function(cmakejs_acquire_napi_c_files)
     file(GLOB_RECURSE NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
     set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" PARENT_SCOPE)
     source_group("Node API (C)" FILES "${NODE_API_INC_FILES}")
+    # end IDE support codeblock
+    # it's not a 'source_group' for targets!
+    # VS users will see the above globbed headers as a filegroup named "Node API (C)"
+    # and that is literally all that this 'source_group' function does.
+    # it is not the same as 'target_sources' - so, globbing was ok here!
 
     if(VERBOSE)
         message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
@@ -343,6 +349,8 @@ function(cmakejs_acquire_napi_cpp_files)
     # file(GLOB_RECURSE _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
     # file(COPY ${_NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
     # unset(_NODE_ADDON_API_INC_FILES)
+
+    # much easier this way than the above...
     file(COPY "${NODE_ADDON_API_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include")
 
     unset(NODE_ADDON_API_DIR CACHE)
@@ -392,7 +400,6 @@ if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or hig
   # cmake-js::node-dev
   add_library                 (node-dev INTERFACE)
   add_library                 (cmake-js::node-dev ALIAS node-dev)
-  # target_include_directories  (node-dev INTERFACE ${CMAKE_JS_INC})
   target_sources              (node-dev INTERFACE ${CMAKE_JS_SRC}) # tip: don't enclose this in strings! (or it won't be null if the file is nonexistent)
   target_link_libraries       (node-dev INTERFACE ${CMAKE_JS_LIB}) # tip: don't enclose this in strings! (or it won't be null if the file is nonexistent)
   set_target_properties       (node-dev PROPERTIES VERSION ${NODE_VERSION})
@@ -544,9 +551,9 @@ if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or hig
       get_filename_component(file_name      "${input}" NAME)
       file(RELATIVE_PATH file_rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${file_abs_path}/${file_name}")
 
-      message(STATUS "Found NodeJS development header: ${file_name}")
-      message(STATUS "file_abs_path: ${file_abs_path}")
-      message(STATUS "file_rel_path: ${file_rel_path}")
+      message(DEBUG "Found NodeJS development header: ${file_name}")
+      message(DEBUG "file_abs_path: ${file_abs_path}")
+      message(DEBUG "file_rel_path: ${file_rel_path}")
       target_sources(node-dev INTERFACE
         FILE_SET node_dev_INTERFACE_HEADERS
         TYPE HEADERS
@@ -1347,28 +1354,3 @@ unset(_version)
 # unset (CMAKE_JS_LIB)
 # unset (CMAKE_JS_VERSION)
 # unset (CMAKE_JS_EXECUTABLE)
-
-# function(source_maker)
-
-#     foreach(input IN CMAKE_JS_INC)
-
-#         _cmakejs_normalize_path(input)
-#         get_filename_component(file_abs_path  "${input}" ABSOLUTE)
-#         get_filename_component(file_name "${input}" NAME)
-#         file(RELATIVE_PATH file_rel_path "${CMAKE_CURRENT_BINARY_DIR}/include" "${file_abs_path}")
-
-#         message(DEBUG "Found NodeJS development header: ${input}")
-#         target_sources(node-dev INTERFACE
-#           FILE_SET node_dev_INTERFACE_HEADERS
-#           TYPE HEADERS
-#           BASE_DIRS
-#             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-#             $<INSTALL_INTERFACE:include>
-#           FILES
-#             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${file_name}>
-#             $<INSTALL_INTERFACE:include/${file_name}>
-#         )
-
-#     endforeach()
-
-# endfunction()
