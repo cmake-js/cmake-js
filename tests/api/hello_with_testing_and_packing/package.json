@@ -8,14 +8,14 @@
     "start":       "node ./index.js",
     "install":     "cmake-js install",
     "postinstall": "cmake-js compile",
-    "configure":   "cmake-js configure -CD BUILD_TESTS=ON -CD CMAKE_INSTALL_PREFIX=./install -G Ninja",
+    "configure":   "cmake-js configure --CDBUILD_TESTS:BOOL=TRUE --CDCMAKE_INSTALL_PREFIX:PATH=./install",
     "reconfigure": "cmake-js reconfigure",
     "build":       "cmake-js build",
     "rebuild":     "cmake-js rebuild",
     "clean":       "cmake-js clean",
     "wipe":        "cmake-js clean && rm -rvf ./node_modules",
 
-    "ctest":        "ctest --test-dir ./build",
+    "ctest":        "ctest --test-dir ./build --rerun-failed --output-on-failure --verbose",
     "cpack":        "cpack --config   ./build/CPackSourceConfig.cmake -B ./install",
     "cdist":        "cpack --config   ./build/CPackConfig.cmake       -B ./install"
   },

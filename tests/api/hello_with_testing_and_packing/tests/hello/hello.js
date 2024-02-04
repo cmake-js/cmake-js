@@ -4,9 +4,9 @@ function test_hello() {
 
   try {
 
-    const demo = require("../../lib/demo.node");
+    const addon = require("../../lib/addon.node");
 
-    console.log(demo.hello());
+    console.log(addon.hello());
 
     status = true;
 

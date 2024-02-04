@@ -93,7 +93,7 @@ install(FILES
 if(BUILD_TESTS)
     # include(CTest) # If you want to see all the test dashboard targets, uncomment this
     enable_testing()
-    include("${CMAKE_CURRENT_LIST_DIR}/tests/addon/tests.cmake")
+    include("${CMAKE_CURRENT_LIST_DIR}/tests/hello/tests.cmake")
 endif()
 
 # set(CPACK_PACKAGE_CHECKSUM "${PROJECT_VERSION_TWEAK}") # git rev-parse is a good idea for this...

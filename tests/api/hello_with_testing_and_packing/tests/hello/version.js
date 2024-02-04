@@ -4,9 +4,9 @@ function test_version() {
 
   try {
 
-    const demo = require("../../lib/demo.node");
+    const addon = require("../../lib/addon.node");
 
-    console.log(`Napi Version: ${demo.version()}`);
+    console.log(`Napi Version: ${addon.version()}`);
 
     status = true;
 

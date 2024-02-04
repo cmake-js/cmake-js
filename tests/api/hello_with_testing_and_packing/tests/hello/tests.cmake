@@ -8,7 +8,7 @@ list(APPEND TESTS
 function(do_test arg)
     add_test(
       NAME test_${arg}
-      COMMAND "${NODE_EXECUTABLE}" "./tests/demo/${arg}.js"
+      COMMAND "${NODE_EXECUTABLE}" "./tests/hello/${arg}.js"
       WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
     )
     set_tests_properties(test_${arg}
