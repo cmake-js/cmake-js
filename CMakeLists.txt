@@ -256,9 +256,8 @@ check_required_components (cmake-js)
   # offer a basic/messy CPack
   # TODO: I don't think this is fully working because there is no built
   # addon inside the binary tar outputs.
-  # It's distracting from the simplicity of the demo, and only here for
-  # more proof of concept. Remove it if you wish, it isn't part of the
-  # proposed API itself at all (same with CTest above).
+  # If it's distracting from the simplicity of the demo, remove it if you wish;
+  # it isn't part of the proposed API-to-be-shipped itself at all.
 
   # set(CPACK_PACKAGE_CHECKSUM "${PROJECT_VERSION_TWEAK}") # git rev-parse is a good idea for this...
   set(CPACK_PACKAGE_VENDOR "cmake-js")
