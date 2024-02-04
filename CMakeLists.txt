@@ -236,12 +236,13 @@ check_required_components (cmake-js)
   # The beautiful part in the whole process is combining
   # the npm-like workflow with the power of a whole C/C++
   # compiler/linker toolchain. Developers from JS and
-  # developers from C++ should bot feel equally at home,
+  # developers from C++ should both feel equally at home,
   # whether they want to run CMake native commands or use
   # the efficient CLI (and the obvious answer is...! :) )
   #
   # The entire thing "just works", as long as they have
-  # cmake-js on their package.json.
+  # cmake-js on their package.json and configure their builds
+  # with it.
   #
   # Thanks for reading!
   # Nathan
