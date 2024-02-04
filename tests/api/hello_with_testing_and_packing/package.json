@@ -1,0 +1,31 @@
+{
+  "name": "@vendor/hello_with_types",
+  "version": "1.0.0",
+  "description": "A test addon with CTest, CPack, and Typescript support made using CMakeJS.cmake",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start":       "node ./index.js",
+    "install":     "cmake-js install",
+    "postinstall": "cmake-js compile",
+    "configure":   "cmake-js configure -CD BUILD_TESTS=ON -CD CMAKE_INSTALL_PREFIX=./install -G Ninja",
+    "reconfigure": "cmake-js reconfigure",
+    "build":       "cmake-js build",
+    "rebuild":     "cmake-js rebuild",
+    "clean":       "cmake-js clean",
+    "wipe":        "cmake-js clean && rm -rvf ./node_modules",
+
+    "ctest":        "ctest --test-dir ./build",
+    "cpack":        "cpack --config   ./build/CPackSourceConfig.cmake -B ./install",
+    "cdist":        "cpack --config   ./build/CPackConfig.cmake       -B ./install"
+  },
+  "dependencies": {
+    "cmake-js": "../../../",
+    "node-addon-api": "^7.1.0",
+    "node-api-headers": "^1.1.0"
+  },
+  "devDependencies": {
+		"@types/node": "^20.11.14",
+		"typescript": "^5.3.3"
+	}
+}
