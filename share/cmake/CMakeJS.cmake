@@ -200,7 +200,7 @@ set(CMAKE_JS_INC "")
 # )
 
 # set(CMAKE_JS_INC ${CMAKE_JS_INC} CACHE PATH     "cmake-js include directory." FORCE)
-set(CMAKE_JS_INC "${CMAKE_CURRENT_BINARY_DIR}/include/node")
+set(CMAKE_JS_INC "${CMAKE_CURRENT_BINARY_DIR}/include/node") # dont CACHE FORCE this yet, it will change again soon...
 set(CMAKE_JS_SRC ${CMAKE_JS_SRC} CACHE FILEPATH "cmake-js source file."       FORCE)
 set(CMAKE_JS_LIB ${CMAKE_JS_LIB} CACHE FILEPATH "cmake-js lib file."          FORCE)
 
@@ -307,7 +307,7 @@ function(cmakejs_acquire_napi_c_files)
       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers>
       $<INSTALL_INTERFACE:include/node-api-headers>
     )
-    set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} PARENT_SCOPE)
+    set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} PARENT_SCOPE) # dont wrap this one in quotes; it breaks!
 
     # this is just for IDE support only. Never pass globbed headers to 'target_sources()'!
     set(NODE_API_INC_FILES "")
@@ -585,7 +585,7 @@ if(CMAKEJS_USING_NODE_API) # user did 'cmake-js configure --link-level=1' or hig
     set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE STRING "Node API Header files." FORCE)
   endif()
 
-  # Node API (C) - requires NodeJS system installation headers
+  # Node API (C) - requires NodeJS developer headers target, cmake-js::node-dev
   # cmake-js::node-api
   add_library                 (node-api INTERFACE)
   add_library                 (cmake-js::node-api ALIAS node-api)
@@ -629,12 +629,12 @@ if(CMAKEJS_USING_NODE_ADDON_API) # user did 'cmake-js configure --link-level=2' 
     message(DEBUG "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
     if(NOT DEFINED NODE_ADDON_API_INC_FILES)
       file(GLOB_RECURSE NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-      source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
+      source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}") # just for IDE support; another misleading function name!
     endif()
     set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE STRING "Node Addon API Header files." FORCE)
   endif()
 
-  # Node Addon API (C++) - requires Node API (C)
+  # Node Addon API (C++) - requires Node API (C) target, cmake-js::node-api
   # cmake-js::node-addon-api
   add_library                 (node-addon-api INTERFACE)
   add_library                 (cmake-js::node-addon-api ALIAS node-addon-api)
@@ -671,7 +671,7 @@ endif()
 
 if(CMAKEJS_USING_CMAKEJS) # user did 'cmake-js configure --link-level=3', or did not specify a link level (fallback case)
 
-  # CMakeJS API - requires Node Addon API (C++), resolves the full Napi Addon dependency chain
+  # CMakeJS API - requires Node Addon API (C++) target, cmake-js::node-api; resolves the full Napi Addon dependency chain
   # cmake-js::cmake-js
   add_library                 (cmake-js INTERFACE)
   add_library                 (cmake-js::cmake-js ALIAS cmake-js)
@@ -680,7 +680,7 @@ if(CMAKEJS_USING_CMAKEJS) # user did 'cmake-js configure --link-level=3', or did
   target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
   set_target_properties       (cmake-js PROPERTIES VERSION   7.3.3)
   set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
-  set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMakeJS_MAJOR_VERSION)
+  set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMakeJS_MAJOR_VERSION) # This is a hook for dependency version management, not fully implemented here, just a start...
   # Generate definitions
   if(MSVC)
       set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
@@ -688,6 +688,23 @@ if(CMAKEJS_USING_CMAKEJS) # user did 'cmake-js configure --link-level=3', or did
           execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
       endif()
   endif()
+
+  # TODO: DELAY_HOOK thing - here? idea of this target is, 'automatically give me everything, all set up'.
+  # I propose that the remainder of the details of Node Addon CMake config which I've not explored yet
+  # should be well-considered as to which target we supply a pre-config for. Wherever you define this stuff,
+  # it will probably propogate down to this target level anyway, due to this one carrying a link line
+  # to all the other targets via it's logical dependency chain. I just think that if you're not using our
+  # nice 'create()' function, you're an intermediate/advanced CMake dev who would rather spec that
+  # stuff themselves. An additional cosideration is making sure we only apply stuff to our targets,
+  # and never just define things globally. Meaning, always use 'target_add_definitions()' and never ever
+  # use regular 'add_definitions()' when taking care of this. Why? Because that global function
+  # will propogate globally, downstream, and who knows where else (see also: : never do 'using namespace <vendor>'
+  # in the global namespace scope in a public C++ header file... you don't know where it will propogate,
+  # what it might break, or even where the issue stems from when it does arise).
+  # Keep in mind that PUBLIC defs on are propogated to any other targets that link with it.
+  # PRIVATE does not propogate. Sometimes, INTERFACE libs insist you use INTERFACE specifiers.
+  # so whatever is decided, it must be very well considered i.e., not arbitrary, and if CMake
+  # insists something, don't fight it. CMake doggedly refuses to be beaten at it's own games :)
 
   list(APPEND CMAKEJS_TARGETS cmake-js)
 
