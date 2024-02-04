@@ -4,14 +4,34 @@
   MIT License
   "CMake.js - a Node.js native addon build tool"
   https://github.com/cmake-js/cmake-js/blob/cmakejs_cmake_api/README.md
+
+
+  # THIS FILE IS INTENDED FOR CMAKEJS DEVELOPERS AND CONTRIBUTORS.
+  #
+  # IF YOU ARE NOT EITHER OF THE ABOVE, THEN YOU MAY SAFELY CONSIDER
+  # THIS FILE TO BE NON-EXISTENT.
+  #
+  # IF YOU ARE LOOKING TO BUILD YOUR OWN ADDON WITH OUR CMAKE API, PLEASE
+  # INSTEAD START A NEW NODEJS/CMAKE PROJECT AND ADD OUR JAVASCRIPT PACKAGE
+  # TO YOUR DEPENDENCIES. THEN, CONFIGURE YOUR PROJECT USING OUR CLI.
+  # YOU WILL BE READY TO INCLUDE NODE/NAPI HEADERS YOU REQUIRE
+  # AND BEGIN DEVELOPING!
+  #
+  # THE BELOW IS OUR INTERNAL PROJECT WE USE FOR TESTING OUR API ONLY
+  #
+  # THIS IS NOT INTENDED TO BE AN EXAMPLE OF HOW OUR API WORKS.
+  #
+  # PLEASE DO NOT ATTEMPT TO CREATE A NEW ADDON INSIDE THIS REPO :)
+  #
+  # PLEASE DO NOT ATTEMPT TO REPLICATE THIS CODE IN YOUR OWN ADDON :)
+  #
+  # IF YOU WOULD LIKE TO SEE AN EXAMPLE OF OUR API IN ACTION,
+  # PLEASE GO TO '/tests/api/hello' AND '/tests/api/hello_consumer'
+  # AND RUN THE COMMANDS YOU FIND IN THEIR package.json FILES.
 ]=============================================================================]#
 
 cmake_minimum_required (VERSION 3.15)
 cmake_policy (VERSION 3.15)
-
-if (NOT DEFINED CMAKE_BUILD_TYPE)
-  set (CMAKE_BUILD_TYPE "Debug")
-endif ()
 
 project (CMakeJS
   VERSION 7.3.3
@@ -19,6 +39,49 @@ project (CMakeJS
   HOMEPAGE_URL "https://github.com/cmake-js/cmake-js"
   LANGUAGES C CXX
 )
+
+# PROOF OF CONCEPT:
+#
+# @Julusian
+#
+# CMakeJS's own targets are abstract 'INTERFACE' targets which only exist
+# within CMake's build cache - so, there is nothing to compile, here.
+#
+# We instead offer a simple test/demonstration of our API, and reserve the
+# CMakeJS vendor namespace in C++/CMake land.
+#
+# Everything below this point is *purely* for demonstration (and some testing)
+# purposes. It makes sense that we should have a root-level CMakeLists.txt so
+# so that we can make our own 'project()', but we didn't want to do this inside
+# the API file because then our users would inheritently always be building
+# *sub-projects* below us, which is immediately breaking expected behaviour
+# before they can even begin. So...
+#
+# We establish a root-level CMakeLists with our own 'project()', and consume our
+# own API.
+#
+# BUT, this file *only exists when you are sitting at this project directory*.
+# Our API consumers are not *ever* being directed to this file; our package.json
+# dependees are never calling these commands nor interfacing with this file.
+#
+# So, everything contained within this file is purely intended for running
+# internal checks on our API before we ship updates to our users. This helps
+# simply helps us to confirm that all is working as expected. I.e., it is
+# *purely for demonstrative purposes!*
+#
+# THIS PROJECT IS INTENDED FOR CMAKEJS DEVELOPERS AND CONTRIBUTORS.
+#
+# YOU ARE WELCOME TO RUN THE SCRIPTS AND SEE HOW EVERYTHING WORKS.
+
+# PLEASE DO NOT ATTEMPT TO CREATE A NEW ADDON LIKE WE DID HERE :)
+# SEE OUR DOCS AND OUR SAMPLE PROJECTS INSTEAD:
+#
+# - https://github.com/cmake-js/cmake-js/blob/cmakejs_cmake_api/README.md
+#
+# - '/tests/api/hello'
+# - '/tests/api/hello_consumer'
+#
+# (RUN THE COMMANDS YOU FIND IN THEIR package.json FILES.
 
 # (no building into our source tree is allowed)
 set (CMakeJS_IS_MASTER_PROJECT FALSE)
@@ -28,13 +91,6 @@ endif()
 
 include ("${CMAKE_CURRENT_LIST_DIR}/share/cmake/CMakeJS.cmake")
 
-# CMakeJS's own targets are abstract 'INTERFACE' targets which only exist
-# within CMake's build cache - so, there is nothing to compile, here.
-
-# We instead offer a simple test/demonstration of our API, and reserve the
-# CMakeJS vendor namespace in C++/CMake land.
-
-# PROOF OF CONCEPT:
 
 # If this is not a subproject...
 if (CMakeJS_IS_TOP_LEVEL
@@ -188,14 +244,16 @@ check_required_components (cmake-js)
   # Still seems like a lot of code for builders, so why
   # did cmake-js make the effort of defining export()
   # and install() at API level?
+  #
   # Because if I want to actually achieve any of those
   # remote scenarios highlighted above, I'd have to do
-  # all this, for my addon, AND for all the cmake-js
+  # all this, for my addon(s!), AND for all the cmake-js
   # targets. Since the kind cmake-js devs already
   # did their job fully at API level, whoever builds
   # an addon with it will find that... their entire
   # addon project's dependancies are already fully
   # relocatable.
+  #
   # Considering those can be quite a lot of files
   # (libnode-dev...), not to mention they can be
   # tricky to locate - and to point your IDE at correctly,
