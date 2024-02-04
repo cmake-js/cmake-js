@@ -171,35 +171,10 @@ endif ()
 # 'always-on' codeblock; we provide the following blob, no matter the config.
 
 # relocate... (only runs if no node_modules to fallback on.. i.e., on a fresh git clone. Expected behaviour..?)
-
-# This is too specific... see comments around the node-dev target fileset
-# file(GLOB_RECURSE _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
-# file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node")
-# unset(_CMAKE_JS_INC_FILES)
-
-# set(_NODE_DEV_DEPS "")
-# list(APPEND _NODE_DEV_DEPS cppgc openssl uv libplatform)
-# foreach(_DEP IN LISTS _NODE_DEV_DEPS)
-#   if(IS_DIRECTORY "${CMAKE_JS_INC}/${_DEP}")
-#     file(GLOB_RECURSE _CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/${_DEP}/**/*.h")
-#     file(COPY ${_CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node/${_DEP}")
-#     unset(_CMAKE_JS_INC_FILES)
-#   endif()
-# endforeach()
-# unset(_NODE_DEV_DEPS)
-
 file(COPY ${CMAKE_JS_INC} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 # # relocate... (this is crucial to get right for 'install()' to work on user's addons)
 set(CMAKE_JS_INC "")
-
-# # target include directories (as if 'node-dev' were an isolated CMake project...)
-# set(CMAKE_JS_INC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
-#   $<INSTALL_INTERFACE:include/node>
-# )
-
-# set(CMAKE_JS_INC ${CMAKE_JS_INC} CACHE PATH     "cmake-js include directory." FORCE)
 set(CMAKE_JS_INC "${CMAKE_CURRENT_BINARY_DIR}/include/node") # dont CACHE FORCE this yet, it will change again soon...
 set(CMAKE_JS_SRC ${CMAKE_JS_SRC} CACHE FILEPATH "cmake-js source file."       FORCE)
 set(CMAKE_JS_LIB ${CMAKE_JS_LIB} CACHE FILEPATH "cmake-js lib file."          FORCE)
