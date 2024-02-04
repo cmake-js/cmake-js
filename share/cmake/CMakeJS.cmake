@@ -188,7 +188,7 @@ endif ()
 # endforeach()
 # unset(_NODE_DEV_DEPS)
 
-file(COPY "${CMAKE_JS_INC}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include")
+file(COPY ${CMAKE_JS_INC} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 # # relocate... (this is crucial to get right for 'install()' to work on user's addons)
 set(CMAKE_JS_INC "")
@@ -295,11 +295,10 @@ function(cmakejs_acquire_napi_c_files)
     string(REGEX REPLACE "[\r\n\"]" "" NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}")
 
     # relocate...
-    # set(_NODE_API_INC_FILES "")
-    # file(GLOB_RECURSE _NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-    # file(COPY ${_NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
-    # unset(_NODE_API_INC_FILES)
-    file(COPY "${NODE_API_HEADERS_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
+    set(_NODE_API_INC_FILES "")
+    file(GLOB_RECURSE _NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+    file(COPY ${_NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
+    unset(_NODE_API_INC_FILES)
 
     unset(NODE_API_HEADERS_DIR CACHE)
     # target include directories (as if 'node-api-headers' were an isolated CMake project...)
@@ -345,13 +344,10 @@ function(cmakejs_acquire_napi_cpp_files)
     string(REGEX REPLACE "[\r\n\"]" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
 
     # relocate...
-    # set(_NODE_ADDON_API_INC_FILES "")
-    # file(GLOB_RECURSE _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-    # file(COPY ${_NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
-    # unset(_NODE_ADDON_API_INC_FILES)
-
-    # much easier this way than the above...
-    file(COPY "${NODE_ADDON_API_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include")
+    set(_NODE_ADDON_API_INC_FILES "")
+    file(GLOB_RECURSE _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+    file(COPY ${_NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
+    unset(_NODE_ADDON_API_INC_FILES)
 
     unset(NODE_ADDON_API_DIR CACHE)
     # target include directories (as if 'node-addon-api' were an isolated CMake project...)
@@ -541,7 +537,6 @@ if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or hig
   #   endif()
   # endforeach()
   set(_CMAKE_JS_INC_FILES "")
-  # file(GLOB_RECURSE _CMAKE_JS_INC_FILES CONFIGURE_DEPENDS "${CMAKE_JS_INC}" "*.h")
 
   # Not quite working, but not breaking anything...
   foreach(input IN ITEMS "${CMAKE_JS_INC}")
@@ -549,7 +544,7 @@ if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or hig
       _cmakejs_normalize_path(input)
       get_filename_component(file_abs_path  "${input}" ABSOLUTE)
       get_filename_component(file_name      "${input}" NAME)
-      file(RELATIVE_PATH file_rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${file_abs_path}/${file_name}")
+      file(RELATIVE_PATH file_rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${file_abs_path}") # /${file_name}
 
       message(DEBUG "Found NodeJS development header: ${file_name}")
       message(DEBUG "file_abs_path: ${file_abs_path}")
@@ -558,11 +553,11 @@ if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or hig
         FILE_SET node_dev_INTERFACE_HEADERS
         TYPE HEADERS
         BASE_DIRS
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
-          $<INSTALL_INTERFACE:include/node>
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include> # /node
+          $<INSTALL_INTERFACE:include> # /node
         FILES
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${file_rel_path}/${file_name}>
-          $<INSTALL_INTERFACE:${file_rel_path}/${file_name}>
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${file_rel_path}> # /${file_name}
+          $<INSTALL_INTERFACE:${file_rel_path}>
       )
 
   endforeach()
@@ -589,7 +584,7 @@ if(CMAKEJS_USING_NODE_API) # user did 'cmake-js configure --link-level=1' or hig
   # cmake-js::node-api
   add_library                 (node-api INTERFACE)
   add_library                 (cmake-js::node-api ALIAS node-api)
-  target_include_directories  (node-api INTERFACE ${NODE_API_HEADERS_DIR})
+  target_include_directories  (node-api INTERFACE ${NODE_API_HEADERS_DIR}) # no string enclosure here!
   target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
   set_target_properties       (node-api PROPERTIES VERSION   6.1.0)
   set_target_properties       (node-api PROPERTIES SOVERSION 6)
@@ -1155,7 +1150,7 @@ set(CMAKEJS_INC_DIR
 )
 # copy headers (and definitions?) to build dir for distribution
 if(CMAKEJS_USING_NODE_DEV)
-  install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node")
+  install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node")
   install(TARGETS node-dev
     EXPORT CMakeJSTargets
     LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
@@ -1167,25 +1162,27 @@ if(CMAKEJS_USING_NODE_DEV)
 endif()
 
 if(CMAKEJS_USING_NODE_API)
-  install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node-api-headers")
+  install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers")
   install(TARGETS node-api
     EXPORT CMakeJSTargets
     LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers" # Having trouble setting this correctly
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers" # this issue stems from their package.json, not our code... but guess who needs to fix it now :)
     FILE_SET node_api_INTERFACE_HEADERS
   )
 endif()
 
 if(CMAKEJS_USING_NODE_ADDON_API)
-  install(FILES ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node-addon-api")
+  install(FILES ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api")
   install(TARGETS node-addon-api
     EXPORT CMakeJSTargets
     LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api"
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api"
     FILE_SET node_addon_api_INTERFACE_HEADERS
   )
 endif()
