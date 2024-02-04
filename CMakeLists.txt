@@ -254,8 +254,6 @@ check_required_components (cmake-js)
   endif()
 
   # offer a basic/messy CPack
-  # TODO: I don't think this is fully working because there is no built
-  # addon inside the binary tar outputs.
   # If it's distracting from the simplicity of the demo, remove it if you wish;
   # it isn't part of the proposed API-to-be-shipped itself at all.
 
