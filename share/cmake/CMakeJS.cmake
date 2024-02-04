@@ -294,10 +294,11 @@ function(cmakejs_acquire_napi_c_files)
     string(REGEX REPLACE "[\r\n\"]" "" NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}")
 
     # relocate...
-    set(_NODE_API_INC_FILES "")
-    file(GLOB_RECURSE _NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-    file(COPY ${_NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
-    unset(_NODE_API_INC_FILES)
+    # set(_NODE_API_INC_FILES "")
+    # file(GLOB_RECURSE _NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+    # file(COPY ${_NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
+    # unset(_NODE_API_INC_FILES)
+    file(COPY "${NODE_API_HEADERS_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
 
     unset(NODE_API_HEADERS_DIR CACHE)
     # target include directories (as if 'node-api-headers' were an isolated CMake project...)
@@ -338,10 +339,11 @@ function(cmakejs_acquire_napi_cpp_files)
     string(REGEX REPLACE "[\r\n\"]" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
 
     # relocate...
-    set(_NODE_ADDON_API_INC_FILES "")
-    file(GLOB_RECURSE _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-    file(COPY ${_NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
-    unset(_NODE_ADDON_API_INC_FILES)
+    # set(_NODE_ADDON_API_INC_FILES "")
+    # file(GLOB_RECURSE _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+    # file(COPY ${_NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
+    # unset(_NODE_ADDON_API_INC_FILES)
+    file(COPY "${NODE_ADDON_API_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include")
 
     unset(NODE_ADDON_API_DIR CACHE)
     # target include directories (as if 'node-addon-api' were an isolated CMake project...)
@@ -390,10 +392,14 @@ if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or hig
   # cmake-js::node-dev
   add_library                 (node-dev INTERFACE)
   add_library                 (cmake-js::node-dev ALIAS node-dev)
-  target_include_directories  (node-dev INTERFACE ${CMAKE_JS_INC})
+  # target_include_directories  (node-dev INTERFACE ${CMAKE_JS_INC})
   target_sources              (node-dev INTERFACE ${CMAKE_JS_SRC}) # tip: don't enclose this in strings! (or it won't be null if the file is nonexistent)
   target_link_libraries       (node-dev INTERFACE ${CMAKE_JS_LIB}) # tip: don't enclose this in strings! (or it won't be null if the file is nonexistent)
   set_target_properties       (node-dev PROPERTIES VERSION ${NODE_VERSION})
+  target_include_directories  (node-dev INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
+    $<INSTALL_INTERFACE:include/node>
+  )
 
   # TODO: this list would be un-manageable for all iterations of NodeJS dev files
   # across versions; even minor versions seem to have lots of different files!
@@ -527,6 +533,33 @@ if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or hig
   #   )
   #   endif()
   # endforeach()
+  set(_CMAKE_JS_INC_FILES "")
+  # file(GLOB_RECURSE _CMAKE_JS_INC_FILES CONFIGURE_DEPENDS "${CMAKE_JS_INC}" "*.h")
+
+  # Not quite working, but not breaking anything...
+  foreach(input IN ITEMS "${CMAKE_JS_INC}")
+
+      _cmakejs_normalize_path(input)
+      get_filename_component(file_abs_path  "${input}" ABSOLUTE)
+      get_filename_component(file_name      "${input}" NAME)
+      file(RELATIVE_PATH file_rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${file_abs_path}/${file_name}")
+
+      message(STATUS "Found NodeJS development header: ${file_name}")
+      message(STATUS "file_abs_path: ${file_abs_path}")
+      message(STATUS "file_rel_path: ${file_rel_path}")
+      target_sources(node-dev INTERFACE
+        FILE_SET node_dev_INTERFACE_HEADERS
+        TYPE HEADERS
+        BASE_DIRS
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
+          $<INSTALL_INTERFACE:include/node>
+        FILES
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${file_rel_path}/${file_name}>
+          $<INSTALL_INTERFACE:${file_rel_path}/${file_name}>
+      )
+
+  endforeach()
+  unset(_CMAKE_JS_INC_FILES)
 
   list(APPEND CMAKEJS_TARGETS  node-dev)
 endif()
@@ -1090,7 +1123,12 @@ file(COPY "${_CMAKEJS_SCRIPT}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/cm
 # 'install' target.
 
 unset(CMAKEJS_INC_DIR)
-set(CMAKEJS_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Installation directory for include files, a relative path that will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path.")
+set(CMAKEJS_INC_DIR
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  CACHE PATH "Installation directory for include files, a relative path that will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path."
+  FORCE
+)
 # copy headers (and definitions?) to build dir for distribution
 if(CMAKEJS_USING_NODE_DEV)
   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDE_DIR}/node")
@@ -1309,3 +1347,28 @@ unset(_version)
 # unset (CMAKE_JS_LIB)
 # unset (CMAKE_JS_VERSION)
 # unset (CMAKE_JS_EXECUTABLE)
+
+# function(source_maker)
+
+#     foreach(input IN CMAKE_JS_INC)
+
+#         _cmakejs_normalize_path(input)
+#         get_filename_component(file_abs_path  "${input}" ABSOLUTE)
+#         get_filename_component(file_name "${input}" NAME)
+#         file(RELATIVE_PATH file_rel_path "${CMAKE_CURRENT_BINARY_DIR}/include" "${file_abs_path}")
+
+#         message(DEBUG "Found NodeJS development header: ${input}")
+#         target_sources(node-dev INTERFACE
+#           FILE_SET node_dev_INTERFACE_HEADERS
+#           TYPE HEADERS
+#           BASE_DIRS
+#             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+#             $<INSTALL_INTERFACE:include>
+#           FILES
+#             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${file_name}>
+#             $<INSTALL_INTERFACE:include/${file_name}>
+#         )
+
+#     endforeach()
+
+# endfunction()
