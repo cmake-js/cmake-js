@@ -21,7 +21,7 @@
 
 #include <node_api.h>
 
-napi_value addon_hello(napi_env env, napi_callback_info args)
+napi_value vendor_addon_hello(napi_env env, napi_callback_info args)
 {
   napi_value greeting;
   napi_status status;
@@ -31,13 +31,14 @@ napi_value addon_hello(napi_env env, napi_callback_info args)
   return greeting;
 }
 
-napi_value addon_init(napi_env env, napi_value exports)
+napi_value vendor_addon_init(napi_env env, napi_value exports)
 {
   napi_status status;
   napi_value fn;
 
   // Export a chosen C function under a given Javascript key
-  status = napi_create_function(env, nullptr, 0, addon_hello, nullptr, &fn); // Name of function on Javascript side...
+
+  status = napi_create_function(env, nullptr, 0, vendor_addon_hello, nullptr, &fn); // Name of function on Javascript side...
   if (status != napi_ok) return nullptr;
 
   status = napi_set_named_property(env, exports, "hello", fn);         // Name of function on C side...
@@ -48,7 +49,7 @@ napi_value addon_init(napi_env env, napi_value exports)
 }
 
 // Register a new addon with the intializer function defined above
-NAPI_MODULE(addon, addon_init) // (<name> to use, initializer to use)
+NAPI_MODULE(addon, vendor_addon_init) // (<name> to use, initializer to use)
 
 #else // !__has_include(<node_api.h>)
  #warning "Warning: Cannot find '<node_api.h>' - try running 'npm -g install cmake-js'..."
