@@ -950,6 +950,9 @@ cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_V
         "${_NAPI_GLOBAL_EXCEPTIONS_POLICY}"
       )
 
+      # (experimental) :)
+      cmakejs_create_addon_bindings(${name})
+
       # Global exceptions policy
       unset(_NAPI_GLOBAL_EXCEPTIONS_POLICY)
 
