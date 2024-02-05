@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(vendor)
+project(vendor VERSION 1.0.0.0)
 
 # (must be top-level project to run tests and packing, like any other CMake project!)
 set (vendor_IS_MASTER_PROJECT FALSE)
