@@ -19,11 +19,13 @@
 
 namespace Napi
 {
+#ifdef    NAPI_CPP_CUSTOM_NAMESPACE
 namespace NAPI_CPP_CUSTOM_NAMESPACE
 {
+#endif
 
 Napi::Value Hello(const Napi::CallbackInfo& info) {
-  return Napi::String::New(info.Env(), STRINGIFY(CMAKEJS_ADDON_NAME)".node is online!");
+  return Napi::String::New(info.Env(), STRINGIFY(CMAKEJS_ADDON_NAME)".node v." STRINGIFY(@PROJECT_VERSION@)" is online!");
 }
 
 Napi::Value NapiVersion(const Napi::CallbackInfo& info) {
@@ -65,6 +67,8 @@ Napi::Value Get(const Napi::CallbackInfo& args) {
 
     // Try to get the data from the url
     status = hello_addon_get(url.data(), follow);
+
+    NAPI_THROW_IF_FAILED_VOID(env, status) // This behaviour changes depending on EXCEPTIONS policy (can be YES, NO, or MAYBE)
 
   } catch (const std::exception &x) {
 
@@ -126,6 +130,8 @@ Napi::Value Post(const Napi::CallbackInfo& args) {
 
     // Try to post the data to the url
     status = hello_addon_post(url.data(), data.data());
+
+    NAPI_THROW_IF_FAILED_VOID(env, status) // This behaviour changes depending on EXCEPTIONS policy (can be YES, NO, or MAYBE)
 
   } catch (const std::exception &x) {
 
@@ -192,7 +198,9 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 // Register a new addon with the intializer function defined above
 NODE_API_MODULE(CMAKEJS_ADDON_NAME, Init) // (name to use, initializer to use)
 
-} // namespace NAPI_CPP_CUSTOM_NAMESPACE
+#ifdef NAPI_CPP_CUSTOM_NAMESPACE
+}  // namespace NAPI_CPP_CUSTOM_NAMESPACE
+#endif
 } // namespace Napi
 
 // Export your custom namespace to outside of the Napi namespace, providing an

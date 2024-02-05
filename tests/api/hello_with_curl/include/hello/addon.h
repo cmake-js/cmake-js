@@ -9,22 +9,14 @@
 
 #include <curl/curl.h>
 
-/**
- * @brief Adapted from https://curl.se/libcurl/c/simple.html
- *
- * @param url The HTTP URL to send the POST request to.
- * @param follow Whether to follow redirected URL requests.
- * @return int
- */
+#define HELLO_ADDON_VERSION @PROJECT_VERSION@ // CMake will evaluate this when 'configure_file()' runs!
+
+/** Adapted from https://curl.se/libcurl/c/simple.html */
 int hello_addon_get(const char* url, const bool& follow);
 
-/**
- * @brief Adapted from https://curl.se/libcurl/c/http-post.html
- *
- * @param url The HTTP URL to send the POST request to.
- * @param data The data body to send in the POST request.
- * @return int
- */
-int hello_addon_post(const char *url, const char *data);
+/** Adapted from https://curl.se/libcurl/c/http-post.html */
+int hello_addon_post(const char* url, const char* data);
 
+
+#define EX @NAPI_CPP_EXCEPTIONS@
 #endif // HELLO_ADDON_H_INCLUDED

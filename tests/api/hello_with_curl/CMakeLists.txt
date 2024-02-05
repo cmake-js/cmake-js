@@ -125,11 +125,11 @@ check_required_components (cmake-js)
   set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY ON)
   set(CPACK_SOURCE_GENERATOR "TGZ;ZIP") # Check out CPack's 'NSIS' installer for Win32, and the others!
   set(CPACK_SOURCE_IGNORE_FILES
-      _CPack_Packages
-      /*.zip
-      /*.tar
-      /*.tar.*
-      /.env*
+    _CPack_Packages
+    /*.zip
+    /*.tar
+    /*.tar.*
+    /.env*
     /.git/*
     /.cmake
     /.github
