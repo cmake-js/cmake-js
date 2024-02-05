@@ -17,4 +17,6 @@ Our proposed ```--link-level``` CLI switch can control how far down the list the
 
 cmake-js::cmake-js is unique in that it doesn't carry any headers of it's own, but since it *does* carry all the other targets by being last in the consumer chain, users linking to this target will recieve the full set of developer headers, *and* will be able to use our very nice ```cmakejs_create_napi_addon()``` function in their CMakeLists.txt, which vastly reduces the amount of intermediate/advanced CMake config they might otherwise be faced with.
 
+Everything is powered by a tidy combination of cmake-js' Javascript CLI and it's CMake API.
+
 As a cherry on the cake, users will be able to call CPack on their addons, and find that their CMake source and binary dirs are bundled up along with the header sets that they requested via ```--link-level``` (and nothing more).
