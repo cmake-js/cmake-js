@@ -40,10 +40,6 @@ configure_file(
   "include/hello/addon.h" # from SOURCE_DIR...
   "include/hello/addon.h" # ..to BINARY_DIR
 )
-configure_file(
-  "include/hello/urlc.h"
-  "include/hello/urlc.h"
-)
 target_include_directories(addon PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/hello>
   $<INSTALL_INTERFACE:include/hello>
