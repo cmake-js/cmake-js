@@ -1236,7 +1236,7 @@ target_link_libraries(my_addon PRIVATE cmake-js::node-api)
 set_target_properties(my_addon PROPERTIES PREFIX "" SUFFIX ".node")
 
 --
--- You can include '<node_api.h>' in 'my_addon.c' and start building
+-- You can include '<node_api.h>' in 'my_addon.cc' and start building
 -- with the Node Addon API in C.
 --
 ]==])
