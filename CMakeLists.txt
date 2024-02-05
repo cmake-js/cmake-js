@@ -230,13 +230,13 @@ check_required_components (cmake-js)
     "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.ts"
     "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.d.ts"
     DESTINATION
-    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+    "${PROJECT_BINARY_DIR}/lib"
   )
 
   install(FILES
-    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/demo.node.js"
-    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/demo.node.ts"
-    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/demo.node.d.ts"
+    "${PROJECT_BINARY_DIR}/lib/demo.node.js"
+    "${PROJECT_BINARY_DIR}/lib/demo.node.ts"
+    "${PROJECT_BINARY_DIR}/lib/demo.node.d.ts"
     DESTINATION
     "${CMAKE_INSTALL_LIBDIR}"
   )

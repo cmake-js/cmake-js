@@ -79,13 +79,13 @@ if (vendor_IS_TOP_LEVEL
     "${CMAKE_CURRENT_LIST_DIR}/lib/addon.node.ts"
     "${CMAKE_CURRENT_LIST_DIR}/lib/addon.node.d.ts"
     DESTINATION
-    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+    "${PROJECT_BINARY_DIR}/lib"
   )
 
   install(FILES
-    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/addon.node.js"
-    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/addon.node.ts"
-    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/addon.node.d.ts"
+    "${PROJECT_BINARY_DIR}/lib/addon.node.js"
+    "${PROJECT_BINARY_DIR}/lib/addon.node.ts"
+    "${PROJECT_BINARY_DIR}/lib/addon.node.d.ts"
     DESTINATION
     "${CMAKE_INSTALL_LIBDIR}"
   )

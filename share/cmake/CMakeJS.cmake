@@ -935,9 +935,9 @@ cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_V
         PREFIX ""
         SUFFIX ".node"
 
-        # ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Actually we dont need to enforce an opinion here!
-        # LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Instead, we call 'cmakejs_create_addon_bindings()'
-        # RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin" # on this target, and the user can just 'require()' that file!
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Actually we might not need to enforce an opinion here!
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Instead, we call 'cmakejs_create_addon_bindings()'
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin" # on this target, and the user can just 'require()' that file!
 
         # # Conventional C++-style debug settings might be useful to have...
         # Getting Javascript bindings to grep different paths is tricky, though!
