@@ -283,9 +283,21 @@ function(cmakejs_acquire_napi_cpp_files)
 endfunction()
 
 #[=============================================================================[
+Generate a Javascript bindings file to your built addon, at the root of your
+build directory, providing a more predictable file to acquire your built addon
+from instead of having to work out where your built addon went from the Javascript
+side.
+
 (experimental)
 ]=============================================================================]#
 function(cmakejs_create_addon_bindings addon_target)
+
+  # Check that this is a Node Addon target
+  get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
+  if(NOT TARGET ${name} OR NOT is_addon_lib)
+    message(SEND_ERROR "'cmakejs_create_addon_bindings()' called on '${name}' which is not an existing napi addon library")
+    return()
+  endif()
 
   # Figure out the path from the build dir to wherever the built addon went
   file(RELATIVE_PATH _bindings_rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
@@ -301,7 +313,7 @@ module.exports = @addon_target@;
 
   # write the configured string to a file in the binary dir, providing a
   # consistent binding point for every addon built! :)
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${addon_target}.js" "${_bindings}")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${addon_target}.node.js" "${_bindings}")
 
   # Now, built addons can be found easier in Javascript:
   # const my_addon = require('./build/<addon_name>')
@@ -310,6 +322,7 @@ module.exports = @addon_target@;
   # changed; but, we should *never* write CMake-configured bindings file
   # into anybody's source tree, as we might corrupt their work! ALWAYS
   # put this kind of stuff into the binary dir!
+  message(STATUS "-- Created Javascript bindings: ${addon_target}.node.js")
 endfunction()
 
 #[=======================================================================[
@@ -922,9 +935,9 @@ cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_V
         PREFIX ""
         SUFFIX ".node"
 
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin"
+        # ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Actually we dont need to enforce an opinion here!
+        # LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Instead, we call 'cmakejs_create_addon_bindings()'
+        # RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin" # on this target, and the user can just 'require()' that file!
 
         # # Conventional C++-style debug settings might be useful to have...
         # Getting Javascript bindings to grep different paths is tricky, though!

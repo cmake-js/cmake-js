@@ -107,9 +107,6 @@ if (CMakeJS_IS_TOP_LEVEL
     NAMESPACE CMakeJS
   )
 
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib") # usually set fur users by cmake-js cli... this is just for test
-  cmakejs_create_addon_bindings(demo)
-
   # ...we're building the CMakeJS demo project
   message (STATUS "cmake-js::demo \n")
 
@@ -233,13 +230,13 @@ check_required_components (cmake-js)
     "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.ts"
     "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.d.ts"
     DESTINATION
-    "${PROJECT_BINARY_DIR}/lib"
+    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
   )
 
   install(FILES
-    "${PROJECT_BINARY_DIR}/lib/demo.node.js"
-    "${PROJECT_BINARY_DIR}/lib/demo.node.ts"
-    "${PROJECT_BINARY_DIR}/lib/demo.node.d.ts"
+    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/demo.node.js"
+    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/demo.node.ts"
+    "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/demo.node.d.ts"
     DESTINATION
     "${CMAKE_INSTALL_LIBDIR}"
   )
