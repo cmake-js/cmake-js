@@ -10,6 +10,7 @@ endif()
 find_package(CURL REQUIRED)
 
 if(hello_IS_INSTALLABLE)
+  include(GNUInstallDirs)
   # cURL relocate...
   if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/curl")
     # Set up cURL for transport
@@ -48,7 +49,6 @@ target_include_directories(addon PUBLIC
 target_link_libraries(addon PRIVATE CURL::libcurl)
 target_include_directories(addon PRIVATE ${CURL_INCLUDE_DIR})
 
-
 # TESTING
 if(NOT DEFINED BUILD_TESTS AND hello_IS_TOP_LEVEL)
   set(BUILD_TESTS ON)
@@ -61,7 +61,6 @@ endif()
 
 # PACKING
 if(hello_IS_INSTALLABLE AND hello_IS_TOP_LEVEL)
-  include(GNUInstallDirs)
   # CPack prep stuff...
   include (CMakePackageConfigHelpers)
 
