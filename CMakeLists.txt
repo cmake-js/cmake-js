@@ -1,642 +1,374 @@
 #[=============================================================================[
-  CMakeJS.cmake - A proposed CMake API for cmake-js v8
-  Copyright (C) 2024 Nathan J. Hood
+  cmake-js v7.3.3
+  Copyright (C) 2024
   MIT License
-  See: https://github.com/nathanjhood/NapiAddon
+  "CMake.js - a Node.js native addon build tool"
+  https://github.com/cmake-js/cmake-js/blob/cmakejs_cmake_api/README.md
+
+
+  # THIS FILE IS INTENDED FOR CMAKEJS DEVELOPERS AND CONTRIBUTORS.
+  #
+  # IF YOU ARE NOT EITHER OF THE ABOVE, THEN YOU MAY SAFELY CONSIDER
+  # THIS FILE TO BE NON-EXISTENT.
+  #
+  # IF YOU ARE LOOKING TO BUILD YOUR OWN ADDON WITH OUR CMAKE API, PLEASE
+  # INSTEAD START A NEW NODEJS/CMAKE PROJECT AND ADD OUR JAVASCRIPT PACKAGE
+  # TO YOUR DEPENDENCIES. THEN, CONFIGURE YOUR PROJECT USING OUR CLI.
+  # YOU WILL BE READY TO INCLUDE NODE/NAPI HEADERS YOU REQUIRE
+  # AND BEGIN DEVELOPING!
+  #
+  # THE BELOW IS OUR INTERNAL PROJECT WE USE FOR TESTING OUR API ONLY
+  #
+  # THIS IS NOT INTENDED TO BE AN EXAMPLE OF HOW OUR API WORKS.
+  #
+  # PLEASE DO NOT ATTEMPT TO CREATE A NEW ADDON INSIDE THIS REPO :)
+  #
+  # PLEASE DO NOT ATTEMPT TO REPLICATE THIS CODE IN YOUR OWN ADDON :)
+  #
+  # IF YOU WOULD LIKE TO SEE AN EXAMPLE OF OUR API IN ACTION,
+  # PLEASE GO TO '/tests/api/hello' AND '/tests/api/hello_consumer'
+  # AND RUN THE COMMANDS YOU FIND IN THEIR package.json FILES.
 ]=============================================================================]#
 
-#[=============================================================================[
-Check whether we have already been included (borrowed from CMakeRC)
-]=============================================================================]#
-# Hypothetical CMakeJS version number...
-set(_version 8.0.0)
+cmake_minimum_required (VERSION 3.15)
+cmake_policy (VERSION 3.15)
 
-cmake_minimum_required(VERSION 3.15)
-cmake_policy(VERSION 3.15)
-include(CMakeParseArguments)
+project (CMakeJS
+  VERSION 7.3.3
+  DESCRIPTION "CMake.js - a Node.js native addon build tool"
+  HOMEPAGE_URL "https://github.com/cmake-js/cmake-js"
+  LANGUAGES C CXX
+)
 
-project (cmakejs)
+# PROOF OF CONCEPT:
+#
+# @Julusian
+#
+# CMakeJS's own targets are abstract 'INTERFACE' targets which only exist
+# within CMake's build cache - so, there is nothing to compile, here.
+#
+# We instead offer a simple test/demonstration of our API, and reserve the
+# CMakeJS vendor namespace in C++/CMake land.
+#
+# Everything below this point is *purely* for demonstration (and some testing)
+# purposes. It makes sense that we should have a root-level CMakeLists.txt so
+# so that we can make our own 'project()', but we didn't want to do this inside
+# the API file because then our users would inheritently always be building
+# *sub-projects* below us, which is immediately breaking expected behaviour
+# before they can even begin. So...
+#
+# We establish a root-level CMakeLists with our own 'project()', and consume our
+# own API.
+#
+# BUT, this file *only exists when you are sitting at this project directory*.
+# Our API consumers are not *ever* being directed to this file; our package.json
+# dependees are never calling these commands nor interfacing with this file.
+#
+# So, everything contained within this file is purely intended for running
+# internal checks on our API before we ship updates to our users. This helps
+# simply helps us to confirm that all is working as expected. I.e., it is
+# *purely for demonstrative purposes!*
+#
+# THIS PROJECT IS INTENDED FOR CMAKEJS DEVELOPERS AND CONTRIBUTORS.
+#
+# YOU ARE WELCOME TO RUN THE SCRIPTS AND SEE HOW EVERYTHING WORKS.
 
-if(COMMAND cmakejs_napi_addon_add_sources)
-    if(NOT DEFINED _CMAKEJS_VERSION OR NOT (_version STREQUAL _CMAKEJS_VERSION))
-        message(WARNING "More than one CMakeJS version has been included in this project.")
-    endif()
-    # CMakeJS has already been included! Don't do anything
-    return()
+# PLEASE DO NOT ATTEMPT TO CREATE A NEW ADDON LIKE WE DID HERE :)
+# SEE OUR DOCS AND OUR SAMPLE PROJECTS INSTEAD:
+#
+# - https://github.com/cmake-js/cmake-js/blob/cmakejs_cmake_api/README.md
+#
+# - '/tests/api/hello'
+# - '/tests/api/hello_consumer'
+#
+# (RUN THE COMMANDS YOU FIND IN THEIR package.json FILES.
+
+# (no building into our source tree is allowed)
+set (CMakeJS_IS_MASTER_PROJECT FALSE)
+if(NOT (PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR))
+  set (CMakeJS_IS_MASTER_PROJECT TRUE)
 endif()
 
-set(_CMAKEJS_VERSION "${_version}" CACHE INTERNAL "CMakeJS version. Used for checking for conflicts")
+include ("${CMAKE_CURRENT_LIST_DIR}/share/cmake/CMakeJS.cmake")
 
-set(_CMAKEJS_SCRIPT "${CMAKE_CURRENT_LIST_FILE}" CACHE INTERNAL "Path to 'CMakeJS.cmake' script")
 
-# Default build output directory, if not specified with '-DCMAKEJS_BINARY_DIR:PATH=/some/dir'
-if(NOT DEFINED CMAKEJS_BINARY_DIR)
-    set(CMAKEJS_BINARY_DIR "${CMAKE_BINARY_DIR}")
-endif()
+# If this is not a subproject...
+if (CMakeJS_IS_TOP_LEVEL
+    # (and we're not building into the source tree)
+    AND CMakeJS_IS_MASTER_PROJECT
+  )
 
-#[=============================================================================[
-Internal helper (borrowed from CMakeRC).
-]=============================================================================]#
-function(_cmakejs_normalize_path var)
-    set(path "${${var}}")
-    file(TO_CMAKE_PATH "${path}" path)
-    while(path MATCHES "//")
-        string(REPLACE "//" "/" path "${path}")
-    endwhile()
-    string(REGEX REPLACE "/+$" "" path "${path}")
-    set("${var}" "${path}" PARENT_SCOPE)
-endfunction()
+  cmakejs_create_napi_addon (
+    # CMAKEJS_ADDON_NAME
+    demo
+    # SOURCES
+    src/demo/addon.cpp
+    # NAPI_CPP_CUSTOM_NAMESPACE
+    NAMESPACE CMakeJS
+  )
 
-#[=======================================================================[
-FindCMakeJs.cmake
---------
+  # ...we're building the CMakeJS demo project
+  message (STATUS "cmake-js::demo \n")
 
-Find the native CMakeJs includes, source, and library
+  # Tell the user what to do
+  message (STATUS [==[
+--
+-- You may build and test our demo addon target ('demo.node').
+--
+-- You must use the regular CMake interface to build this demo project (not the cmake-js CLI)!
+--
+-- See our 'package.json' for some command aliases that can be used to build the demo.
+--
+-- The demo target was constructed using our custom CMake API:
+--
 
-(This codeblock typically belongs in a file named 'FindCMakeJS.cmake' for
-distribution...)
+cmakejs_create_napi_addon (
+  # CMAKEJS_ADDON_NAME
+  demo
+  # SOURCES
+  src/demo/addon.cpp
+  # NAPI_CPP_CUSTOM_NAMESPACE
+  NAMESPACE CMakeJS
+)
 
-This module defines
+-- You will be able to load the demo addon in JavaScript code:
+--
 
-::
+const demo = require("./build/lib/demo.node");
 
-  CMAKE_JS_INC, where to find node.h, etc.
-  CMAKE_JS_LIB, the libraries required to use CMakeJs.
-  CMAKE_JS_SRC, where to find required *.cpp files, if any,
-  CMAKE_JS_EXECUTABLE, the cmake-js binary (global)
-  CMAKE_JS_NPM_PACKAGE, the cmake-js binary (local)
+console.log(`Napi Status:  ${demo.hello()}`);
+console.log(`Napi Version: ${demo.version()}`);
 
-]=======================================================================]#
 
-# CMAKE_JS_VERSION is defined on all platforms when calling from cmake-js.
-# By checking whether this var is pre-defined, we can determine if we are
-# running from an npm script (via cmake-js), or from CMake directly...
 
-if (NOT DEFINED CMAKE_JS_VERSION) # TODO: Unfortunately, this var is a little too close to 'CMAKE_VERSION' for comfort... Kitware may need it. Should be moved into 'CMAKEJS_VERSION'!
+-- Read more about our 'CMakeJS.cmake' API here:
+-- https://github.com/cmake-js/cmake-js/blob/cmakejs_cmake_api/README.md
+--
+-- Our demo target uses Napi Addon API (C++)
+-- https://nodejs.org/api/addons.html
+--
+-- See more node addon examples here:
+-- https://github.com/nodejs/node-addon-examples
+--
+--
+-- CMake.js - a Node.js native addon build tool. Copyright 2024 MIT.
+-- https://github.com/cmake-js/cmake-js
+--
+-- ]==])
 
-    # ...and if we're calling from CMake directly, we need to set up some vars
-    # that our build step depends on (these are predefined when calling via npm/cmake-js).
-    if(VERBOSE)
-        message(STATUS "CMake Calling...")
-    endif()
 
-    # Check for cmake-js installations
-    find_program(CMAKE_JS_EXECUTABLE
-      NAMES "cmake-js" "cmake-js.exe"
-      PATHS "$ENV{PATH}" "$ENV{ProgramFiles}/cmake-js"
-      DOC "cmake-js system executable binary"
-      REQUIRED
-    )
-    if (NOT CMAKE_JS_EXECUTABLE)
-        message(FATAL_ERROR "cmake-js system installation not found! Please run 'npm -g install cmake-js@latest' and try again.")
-        return()
-    endif()
+  # offer a basic installer for our demo.
 
-    _cmakejs_normalize_path(CMAKE_JS_EXECUTABLE)
-    string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_EXECUTABLE "${CMAKE_JS_EXECUTABLE}")
+  # NOTE: this is part of the DEMO, I am NOT suggesting
+  # cmake-js should pack and ship any addons of it's own!
+  # this entire CMakeLists.txt is just purely about proof
+  # of concept.
 
-    find_program(CMAKE_JS_NPM_PACKAGE
-      NAMES "cmake-js" "cmake-js.exe"
-      PATHS "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/bin"
-      DOC "cmake-js project-local npm package binary"
-      REQUIRED
-    )
-    if (NOT CMAKE_JS_NPM_PACKAGE)
-        message(FATAL_ERROR "cmake-js project-local npm package not found! Please run 'npm install' and try again.")
-        return()
-    endif()
+  # the following demonstrates how users can
+  # easily ship either their source that automatically
+  # carry all dependencies (required headers),
+  # which is useful for e.g., offline machines,
+  # they can build-at-home or in a VM or wokflow run
+  # targeting a specific OS/platform/arch which
+  # they don't have access to, and can retrieve
+  # the built binaries in a tar file, then
+  # send their pre-built, pre-packaged addon(s)
+  # down to their remote servers, which don't
+  # have C++ compilers or CMake on them.
 
-    # Execute the CLI commands, and write their outputs into the cached vars
-    # where the remaining build processes expect them to be...
-    execute_process(
-      COMMAND "${CMAKE_JS_EXECUTABLE}" "print-cmakejs-include" "--log-level error" "--generator ${CMAKE_GENERATOR}"
-      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      OUTPUT_VARIABLE CMAKE_JS_INC
-    )
+  include(GNUInstallDirs) # dont be alarmed by this - it wont install to your system!
 
-    execute_process(
-      COMMAND "${CMAKE_JS_EXECUTABLE}" "print-cmakejs-src" "--log-level error" "--generator ${CMAKE_GENERATOR}"
-      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      OUTPUT_VARIABLE CMAKE_JS_SRC
-    )
+  export (
+    TARGETS demo
+    FILE share/cmake/DemoTargets.cmake
+    NAMESPACE CMakeJS::
+  )
 
-    execute_process(
-      COMMAND "${CMAKE_JS_EXECUTABLE}" "print-cmakejs-lib" "--log-level error" "--generator ${CMAKE_GENERATOR}"
-      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      OUTPUT_VARIABLE CMAKE_JS_LIB
-    )
+  # install 'CMakeJSTargets' export file
+  install(
+    EXPORT DemoTargets
+    FILE DemoTargets.cmake
+    NAMESPACE CMakeJS::
+    DESTINATION lib/cmake/CMakeJS
+  )
 
-    # Strip the vars of any unusual chars that might break the paths...
-    _cmakejs_normalize_path(CMAKE_JS_INC)
-    _cmakejs_normalize_path(CMAKE_JS_SRC)
-    _cmakejs_normalize_path(CMAKE_JS_LIB)
+  install(TARGETS demo
+    EXPORT DemoTargets
+    LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  )
 
-    string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_INC "${CMAKE_JS_INC}")
-    string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_SRC "${CMAKE_JS_SRC}")
-    string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_LIB "${CMAKE_JS_LIB}")
 
-    set(CMAKE_JS_INC "${CMAKE_JS_INC}" CACHE STRING "cmake-js include directory." FORCE)
-    set(CMAKE_JS_SRC "${CMAKE_JS_SRC}" CACHE STRING "cmake-js source file." FORCE)
-    set(CMAKE_JS_LIB "${CMAKE_JS_LIB}" CACHE STRING "cmake-js lib file." FORCE)
+  file (WRITE "${CMAKE_CURRENT_BINARY_DIR}/DemoConfig.cmake.in" [==[
+@PACKAGE_INIT@
 
-    # TODO: At this point, some warnings may occur re: the below (still investigating);
-    # Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS.
-    #set (NAPI_CPP_EXCEPTIONS TRUE CACHE STRING "Define either NAPI_CPP_EXCEPTIONS or NAPI_DISABLE_CPP_EXCEPTIONS")
-    add_definitions(-DNAPI_CPP_EXCEPTIONS) # Also needs /EHsc
-    # add_definitions(-DNAPI_DISABLE_CPP_EXCEPTIONS)
+include (${CMAKE_CURRENT_LIST_DIR}/DemoTargets.cmake)
 
-else ()
+check_required_components (cmake-js)
 
-    # ... we already are calling via npm/cmake-js, so we should already have all the vars we need!
-    if(VERBOSE)
-        message(DEBUG "CMakeJS Calling...")
-    endif()
+]==])
+
+  # create cmake config file
+  configure_package_config_file (
+      "${CMAKE_CURRENT_BINARY_DIR}/DemoConfig.cmake.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/DemoConfig.cmake"
+    INSTALL_DESTINATION
+      "${CMAKE_INSTALL_LIBDIR}/cmake/Demo"
+  )
+  # generate the version file for the cmake config file
+  write_basic_package_version_file (
+    "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/DemoConfigVersion.cmake"
+    VERSION 7.3.3
+    COMPATIBILITY AnyNewerVersion
+  )
+
+  # copy the demo types
+  file(COPY
+    "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.js"
+    "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/lib/demo.node.d.ts"
+    DESTINATION
+    "${PROJECT_BINARY_DIR}/lib"
+  )
+
+  install(FILES
+    "${PROJECT_BINARY_DIR}/lib/demo.node.js"
+    "${PROJECT_BINARY_DIR}/lib/demo.node.ts"
+    "${PROJECT_BINARY_DIR}/lib/demo.node.d.ts"
+    DESTINATION
+    "${CMAKE_INSTALL_LIBDIR}"
+  )
+
+  # Still seems like a lot of code for builders, so why
+  # did cmake-js make the effort of defining export()
+  # and install() at API level?
+  #
+  # Because if I want to actually achieve any of those
+  # remote scenarios highlighted above, I'd have to do
+  # all this, for my addon(s!), AND for all the cmake-js
+  # targets. Since the kind cmake-js devs already
+  # did their job fully at API level, whoever builds
+  # an addon with it will find that... their entire
+  # addon project's dependancies are already fully
+  # relocatable.
+  #
+  # Considering those can be quite a lot of files
+  # (libnode-dev...), not to mention they can be
+  # tricky to locate - and to point your IDE at correctly,
+  # cmake-js users looking to implement CMake's export()
+  # and install() stuff on their addons - for whatever
+  # reasons they have (I mentioned a few) - will
+  # likely be delighted that so much heavy work has
+  # been done for them, by a slick combination of
+  # it's two API's:
+  #
+  # - cmake-js CLI controls their project with
+  # it's super handy alias-like commands
+  #
+  # - whatever they do and wherever they point
+  # their CMake outputs and inputs at, CMake itself
+  # will simply go "cmake-js::node-api? I got that
+  # right here." and just "sort it all out" for the user
+  #
+  # - one means of sorting it out" is, cmake-js CLI
+  # will kick in during config, determine if we need
+  # headers (and which, according to --link-level)
+  # and baiscally be a Node Addon API package manager
+  # for us, resolving our deps and handing them over
+  # to CMake to manage them
+  #
+  # - the CMake API will make building an addon a
+  # very straightforward affair, should they choose
+  # to either use our addon creation functions, or
+  # just link to a cmake-js:: target to get everything
+  # "sorted out" (the previous steps automate this)
+  #
+  # - if they want to pack and ship their addon as
+  # source, as a prebuilt binary, or some custom
+  # combo, our API is flexible enough to not burden
+  # them with manually resolving all those previous
+  # steps before they can take care of their own targets
+  #
+  # The beautiful part in the whole process is combining
+  # the npm-like workflow with the power of a whole C/C++
+  # compiler/linker toolchain. Developers from JS and
+  # developers from C++ should both feel equally at home,
+  # whether they want to run CMake native commands or use
+  # the efficient CLI (and the obvious answer is...! :) )
+  #
+  # The entire thing "just works", as long as they have
+  # cmake-js on their package.json and configure their builds
+  # with it.
+  #
+  # Thanks for reading!
+  # Nathan
+
+
+  if(BUILD_TESTS)
+      # include(CTest) # If you want to see all the test dashboard targets, uncomment this
+      enable_testing()
+      include("${CMAKE_CURRENT_LIST_DIR}/tests/demo/tests.cmake")
+  endif()
+
+  # offer a basic/messy CPack
+  # If it's distracting from the simplicity of the demo, remove it if you wish;
+  # it isn't part of the proposed API-to-be-shipped itself at all.
+
+  # set(CPACK_PACKAGE_CHECKSUM "${PROJECT_VERSION_TWEAK}") # git rev-parse is a good idea for this...
+  set(CPACK_PACKAGE_VENDOR "cmake-js")
+  set(CPACK_PACKAGE_NAME              "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-node_${NODE_VERSION}")
+  set(CPACK_PACKAGE_FILE_NAME         "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-node_${NODE_VERSION}") # Multi-platform CMake API distribution
+  set(CPACK_SOURCE_PACKAGE_FILE_NAME  "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-Source") # No system spec as this is un-compiled source file distribution (i.e., the Javascript API)
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_DESCRIPTION})
+  set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+  set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_VERSION_MINOR})
+  set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_VERSION_PATCH})
+  set(CPACK_PACKAGE_VERSION_TWEAK ${PROJECT_VERSION_VERSION_TWEAK})
+  set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/LICENSE)
+  set(CPACK_RESOURCE_FILE_README  ${PROJECT_SOURCE_DIR}/README.md)
+  set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY ON)
+  set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY ON)
+  set(CPACK_SOURCE_GENERATOR "TGZ;ZIP") # Check out CPack's 'NSIS' installer for Win32, and the others!
+  set(CPACK_SOURCE_IGNORE_FILES
+      _CPack_Packages
+      /*.zip
+      /*.tar
+      /*.tar.*
+      /.env*
+      /.git/*
+      /.cmake
+      /.github
+      /.vs
+      /.vscode
+      /.cache
+      /.config
+      /.local
+      /dist
+      /doc
+      /docs
+      #/bin
+      #/lib
+      /usr
+      /out
+      #/build
+      /Release
+      /Debug
+      /MinSizeRel
+      /RelWithDebInfo
+      /downloads
+      /installed
+      /install
+      /node_modules
+      /vcpkg
+      /.*build.*
+      /package-lock.json
+      /yarn.lock
+      /\\\\.DS_Store
+  )
+  include(CPack)
 
 endif ()
 
-unset(CMAKE_JS_INC_FILES) # prevent repetitive globbing on each run
-file(GLOB CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/*.h")
-file(GLOB CMAKE_JS_INC_FILES "${CMAKE_JS_INC}/**/*.h")
-source_group("cmake-js v${_version} Node ${NODE_VERSION}" FILES "${CMAKE_JS_INC_FILES}")
-
-# Log the vars to the console for sanity...
-if(VERBOSE)
-    message(DEBUG "CMAKE_JS_INC = ${CMAKE_JS_INC}")
-    message(DEBUG "CMAKE_JS_SRC = ${CMAKE_JS_SRC}")
-    message(DEBUG "CMAKE_JS_LIB = ${CMAKE_JS_LIB}")
-endif()
-
-#[=============================================================================[
-Get the in-use NodeJS binary for executing NodeJS commands in CMake scripts.
-
-Provides
-
-::
-
-  NODE_EXECUTABLE, the NodeJS runtime binary being used
-  NODE_VERSION, the version of the NodeJS runtime binary being used
-
-]=============================================================================]#
-function(cmakejs_acquire_node_executable)
-    find_program(NODE_EXECUTABLE
-      NAMES "node" "node.exe"
-      PATHS "$ENV{PATH}" "$ENV{ProgramFiles}/nodejs"
-      DOC "NodeJs executable binary"
-      REQUIRED
-    )
-    if (NOT NODE_EXECUTABLE)
-        message(FATAL_ERROR "NodeJS installation not found! Please check your paths and try again.")
-        return()
-    endif()
-
-    execute_process(
-      COMMAND "${NODE_EXECUTABLE}" "--version"
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      OUTPUT_VARIABLE NODE_VERSION
-    )
-    string(REGEX REPLACE "[\r\n\"]" "" NODE_VERSION "${NODE_VERSION}")
-    set(NODE_VERSION "${NODE_VERSION}" CACHE STRING "" FORCE)
-
-    if(VERBOSE)
-        message(STATUS "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
-        message(STATUS "NODE_VERSION: ${NODE_VERSION}")
-    endif()
-endfunction()
-
-if(NOT DEFINED NODE_EXECUTABLE)
-    cmakejs_acquire_node_executable()
-    message(STATUS "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
-    message(STATUS "NODE_VERSION: ${NODE_VERSION}")
-endif()
-
-# Resolve NodeJS development headers
-# TODO: This code block is quite problematic, since:
-# 1 - it might trigger a build run, depending on how the builder has set up their package.json scripts...
-# 2 - it also currently assumes a preference for yarn over npm (and the others)...
-# 3 - finally, because of how cmake-js works, it might create Ninja-build artefacts,
-# even when the CMake user specifies a different generator to CMake manually...
-# We could use 'add_custom_target()' with a user-side ARG for which package manager to use...
-if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
-    execute_process(
-      COMMAND yarn install
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      OUTPUT_VARIABLE NODE_MODULES_DIR
-    )
-    if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
-        message(FATAL_ERROR "Something went wrong - NodeJS modules installation failed!")
-        return()
-    endif()
-endif()
-
-#[=============================================================================[
-Get NodeJS C Addon development files.
-
-Provides
-::
-
-  NODE_API_HEADERS_DIR, where to find node_api.h, etc.
-  NODE_API_INC_FILES, the headers required to use Node Addon API.
-
-]=============================================================================]#
-function(cmakejs_acquire_napi_c_files)
-    execute_process(
-      COMMAND "${NODE_EXECUTABLE}" -p "require('node-api-headers').include_dir"
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-      OUTPUT_VARIABLE NODE_API_HEADERS_DIR
-      # COMMAND_ERROR_IS_FATAL ANY
-    )
-    string(REGEX REPLACE "[\r\n\"]" "" NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}")
-    set(NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}" CACHE PATH "Node API Headers directory." FORCE)
-
-    unset(NODE_API_INC_FILES)
-    file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-    set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
-    source_group("Node Addon API (C)" FILES "${NODE_API_INC_FILES}")
-
-    if(VERBOSE)
-        message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
-    endif()
-endfunction()
-
-# Acquire if needed...
-if(NOT DEFINED NODE_API_HEADERS_DIR)
-    cmakejs_acquire_napi_c_files()
-    message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
-endif()
-if(NOT DEFINED NODE_API_INC_FILES)
-    file(GLOB NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-    set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE FILEPATH "Node API Header files." FORCE)
-    source_group("Node Addon API (C)" FILES "${NODE_API_INC_FILES}")
-endif()
-
-#[=============================================================================[
-Get NodeJS C++ Addon development files.
-
-Provides
-::
-
-  NODE_ADDON_API_DIR, where to find napi.h, etc.
-  NODE_ADDON_API_INC_FILES, the headers required to use Node Addon API.
-
-]=============================================================================]#
-function(cmakejs_acquire_napi_cpp_files)
-    execute_process(
-      COMMAND "${NODE_EXECUTABLE}" -p "require('node-addon-api').include"
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-      OUTPUT_VARIABLE NODE_ADDON_API_DIR
-      # COMMAND_ERROR_IS_FATAL ANY
-    )
-    string(REGEX REPLACE "[\r\n\"]" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
-    set(NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}" CACHE PATH "Node Addon API Headers directory." FORCE)
-
-    unset(NODE_ADDON_API_INC_FILES)
-    file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-    set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE FILEPATH "Node Addon API Header files." FORCE)
-    source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
-
-    if(VERBOSE)
-        message(STATUS "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
-    endif()
-endfunction()
-
-# Acquire if needed...
-if(NOT DEFINED NODE_ADDON_API_DIR)
-    cmakejs_acquire_napi_cpp_files()
-    message(STATUS "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
-endif()
-if(NOT DEFINED NODE_ADDON_API_INC_FILES)
-    file(GLOB NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-    set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE FILEPATH "Node Addon API Header files." FORCE)
-    source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
-endif()
-
-#[=============================================================================[
-Silently create an interface library (no output) with all Addon API dependencies
-resolved, for Addon targets to link with.
-
-(This should contain most of cmake-js globally-required configuration)
-
-Targets:
-
-cmake-js::node-dev
-cmake-js::node-api
-cmake-js::node-addon-api
-cmake-js::cmake-js
-
-]=============================================================================]#
-
-# NodeJS system installation headers
-# cmake-js::node-dev
-add_library                 (node-dev INTERFACE)
-add_library                 (cmake-js::node-dev ALIAS node-dev)
-target_include_directories  (node-dev INTERFACE "${CMAKE_JS_INC}")
-target_sources              (node-dev INTERFACE "${CMAKE_JS_SRC}")
-target_sources              (node-dev INTERFACE "${CMAKE_JS_INC_FILES}")
-target_link_libraries       (node-dev INTERFACE "${CMAKE_JS_LIB}")
-
-# Node API (C) - requires NodeJS system installation headers
-# cmake-js::node-api
-add_library                 (node-api INTERFACE)
-add_library                 (cmake-js::node-api ALIAS node-api)
-target_include_directories  (node-api INTERFACE "${NODE_API_HEADERS_DIR}")
-target_sources              (node-api INTERFACE "${NODE_API_INC_FILES}")
-target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
-
-# Node Addon API (C++) - requires Node API (C)
-# cmake-js::node-addon-api
-add_library                 (node-addon-api INTERFACE)
-add_library                 (cmake-js::node-addon-api ALIAS node-addon-api)
-target_include_directories  (node-addon-api INTERFACE "${NODE_ADDON_API_DIR}")
-target_sources              (node-addon-api INTERFACE "${NODE_ADDON_API_INC_FILES}")
-target_link_libraries       (node-addon-api INTERFACE cmake-js::node-api)
-
-# CMakeJS API - requires Node Addon API (C++), resolves the full Napi Addon dependency chain
-# cmake-js::cmake-js
-add_library                 (cmake-js INTERFACE)
-add_library                 (cmake-js::cmake-js ALIAS cmake-js)
-target_link_libraries       (cmake-js INTERFACE cmake-js::node-addon-api)
-target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
-target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
-
-# Generate definitions
-if(MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
-    if(CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
-        execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
-    endif()
-endif()
-
-#[=============================================================================[
-Exposes a user-side helper function for creating a dynamic '*.node' library,
-linked to the Addon API interface.
-
-cmakejs_create_napi_addon(<name> [<sources>])
-cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>] [<sources>])
-
-(This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
-]=============================================================================]#
-function(cmakejs_create_napi_addon name)
-
-    # Avoid duplicate target names
-    if(TARGET ${name})
-        message(SEND_ERROR "'cmakejs_create_napi_addon()' given target '${name}' which is already exists. Please choose a unique name for this Addon target.")
-        return()
-    endif()
-
-    set(options)
-    set(args ALIAS NAMESPACE NAPI_VERSION)
-    set(list_args)
-    cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
-
-    # Generate the identifier for the resource library's namespace
-    set(ns_re "[a-zA-Z_][a-zA-Z0-9_]*")
-
-    if(NOT DEFINED ARG_NAMESPACE)
-        # Check that the library name is also a valid namespace
-        if(NOT name MATCHES "${ns_re}")
-            message(SEND_ERROR "Library name is not a valid namespace. Specify the NAMESPACE argument")
-            return()
-        endif()
-        set(ARG_NAMESPACE "${name}")
-    else()
-        if(NOT ARG_NAMESPACE MATCHES "${ns_re}")
-            message(SEND_ERROR "NAMESPACE for ${name} is not a valid C++ namespace identifier (${ARG_NAMESPACE})")
-            return()
-        endif()
-    endif()
-
-    # Needs more validation...
-    if(DEFINED ARG_NAPI_VERSION AND (ARG_NAPI_VERSION LESS_EQUAL 0))
-        message(SEND_ERROR "NAPI_VERSION for ${name} is not a valid Integer number (${ARG_NAPI_VERSION})")
-        return()
-    endif()
-
-    if(NOT DEFINED ARG_NAPI_VERSION)
-        if(NOT DEFINED NAPI_VERSION)
-            # default NAPI version to use if none specified
-            set(NAPI_VERSION 8)
-        endif()
-        set(ARG_NAPI_VERSION ${NAPI_VERSION})
-    endif()
-
-    if(ARG_ALIAS)
-        set(name_alt "${ARG_ALIAS}")
-    else()
-        set(name_alt "${ARG_NAMESPACE}")
-    endif()
-
-    if(VERBOSE)
-        message(STATUS "Configuring Napi Addon: ${name}")
-    endif()
-
-    # Begin a new Napi Addon target
-
-    add_library(${name} SHARED)
-    add_library(${name_alt}::${name} ALIAS ${name})
-
-    target_link_libraries(${name} PRIVATE cmake-js::cmake-js)
-
-    set_property(
-      TARGET ${name}
-      PROPERTY "${name}_IS_NAPI_ADDON_LIBRARY" TRUE
-    )
-
-    set_target_properties(${name}
-      PROPERTIES
-
-      LIBRARY_OUTPUT_NAME "${name}"
-      PREFIX ""
-      SUFFIX ".node"
-
-      ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib"
-      LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib"
-      RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin"
-
-      # # Conventional C++-style debug settings might be useful to have...
-      # LIBRARY_OUTPUT_NAME_DEBUG "d${name}"
-      # ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
-      # LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
-      # RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/bin/Debug"
-    )
-
-    cmakejs_napi_addon_add_sources(${name} ${ARG_UNPARSED_ARGUMENTS})
-
-    cmakejs_napi_addon_add_definitions(${name}
-      PRIVATE # These definitions only belong to this unique target
-      "CMAKEJS_ADDON_NAME=${name}"
-      "CMAKEJS_ADDON_ALIAS=${name_alt}"
-      "NAPI_CPP_CUSTOM_NAMESPACE=${ARG_NAMESPACE}"
-    )
-
-    cmakejs_napi_addon_add_definitions(${name}
-      PUBLIC # These definitions are shared with anything that links to this addon
-      "NAPI_VERSION=${ARG_NAPI_VERSION}"
-      "BUILDING_NODE_EXTENSION"
-    )
-
-endfunction()
-
-#[=============================================================================[
-Add source files to an existing Napi Addon target.
-
-cmakejs_napi_addon_add_sources(<name> [items1...])
-cmakejs_napi_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
-cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...]])
-cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<dirs>...]] [items1...]...)
-]=============================================================================]#
-function(cmakejs_napi_addon_add_sources name)
-
-    # Check that this is a Node Addon target
-    get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
-    if(NOT TARGET ${name} OR NOT is_addon_lib)
-        message(SEND_ERROR "'cmakejs_napi_addon_add_sources()' called on '${name}' which is not an existing napi addon library")
-        return()
-    endif()
-
-    set(options)
-    set(args BASE_DIRS)
-    set(list_args INTERFACE PRIVATE PUBLIC)
-    cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
-
-    if(NOT ARG_BASE_DIRS)
-        # Default base directory of the passed-in source file(s)
-        set(ARG_BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
-    endif()
-    _cmakejs_normalize_path(ARG_BASE_DIRS)
-    get_filename_component(ARG_BASE_DIRS "${ARG_BASE_DIRS}" ABSOLUTE)
-
-    # Generate the identifier for the resource library's namespace
-    get_target_property(lib_namespace "${name}" ${name}_ADDON_NAMESPACE)
-
-    # All remaining unparsed args 'should' be source files for this target, so...
-    foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
-
-        _cmakejs_normalize_path(input)
-        get_filename_component(abs_in "${input}" ABSOLUTE)
-        file(RELATIVE_PATH relpath "${ARG_BASE_DIRS}" "${abs_in}")
-        if(relpath MATCHES "^\\.\\.")
-            # For now we just error on files that exist outside of the source dir.
-            message(SEND_ERROR "Cannot add file '${input}': File must be in a subdirectory of ${ARG_BASE_DIRS}")
-            return()
-        endif()
-
-        set(rel_file "${ARG_BASE_DIRS}/${relpath}")
-        _cmakejs_normalize_path(rel_file)
-        get_filename_component(source_file "${input}" ABSOLUTE)
-        # If we are here, source file is valid. Add IDE support
-        source_group("${name}" FILES "${source_file}")
-
-        if(DEFINED ARG_INTERFACE)
-            foreach(item IN LISTS ARG_INTERFACE)
-                target_sources(${name} INTERFACE "${source_file}")
-            endforeach()
-        endif()
-
-        if(DEFINED ARG_PRIVATE)
-            foreach(item IN LISTS ARG_PRIVATE)
-                target_sources(${name} PRIVATE "${source_file}")
-            endforeach()
-        endif()
-
-        if(DEFINED ARG_PUBLIC)
-            foreach(item IN LISTS ARG_PUBLIC)
-                target_sources(${name} PUBLIC "${source_file}")
-            endforeach()
-        endif()
-
-        foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
-            target_sources(${name} PRIVATE "${source_file}")
-        endforeach()
-
-    endforeach()
-
-endfunction()
-
-#[=============================================================================[
-Add pre-processor definitions to an existing Napi Addon target.
-
-cmakejs_napi_addon_add_definitions(<name> [items1...])
-cmakejs_napi_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
-]=============================================================================]#
-function(cmakejs_napi_addon_add_definitions name)
-
-    # Check that this is a Node Addon target
-    get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
-    if(NOT TARGET ${name} OR NOT is_addon_lib)
-        message(SEND_ERROR "'cmakejs_napi_addon_add_definitions()' called on '${name}' which is not an existing napi addon library")
-        return()
-    endif()
-
-    set(options)
-    set(args)
-    set(list_args INTERFACE PRIVATE PUBLIC)
-    cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
-
-    if(DEFINED ARG_INTERFACE)
-        foreach(item IN LISTS ARG_INTERFACE)
-            target_compile_definitions(${name} INTERFACE "${item}")
-        endforeach()
-    endif()
-
-    if(DEFINED ARG_PRIVATE)
-        foreach(item IN LISTS ARG_PRIVATE)
-            target_compile_definitions(${name} PRIVATE "${item}")
-        endforeach()
-    endif()
-
-    if(DEFINED ARG_PUBLIC)
-        foreach(item IN LISTS ARG_PUBLIC)
-            target_compile_definitions(${name} PUBLIC "${item}")
-        endforeach()
-    endif()
-
-    foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
-        target_compile_definitions(${name} "${item}")
-    endforeach()
-
-endfunction()
-
-set (CMAKEJS_TARGETS)
-list (APPEND CMAKEJS_TARGETS
-  node-dev
-  node-api
-  node-addon-api
-  cmake-js
-)
-export (
-  TARGETS ${CMAKEJS_TARGETS}
-  FILE share/cmake/CMakeJSTargets.cmake
-  NAMESPACE cmake-js::
-)
-
-
-include (CMakePackageConfigHelpers)
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in" [==[
-@PACKAGE_INIT@
-
-include(${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
-
-check_required_components(cmake-js)
-]==])
-
-# create cmake config file
-configure_package_config_file (
-    "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfig.cmake"
-  INSTALL_DESTINATION
-    "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS"
-)
-# generate the version file for the cmake config file
-write_basic_package_version_file (
-	share/cmake/CMakeJSConfigVersion.cmake
-	VERSION ${_version}
-	COMPATIBILITY AnyNewerVersion
-)
-
-unset(_version)
-# # TODO: These vars are not very namespace friendly!
-# unset (CMAKE_JS_SRC)
-# unset (CMAKE_JS_INC)
-# unset (CMAKE_JS_LIB)
-# unset (CMAKE_JS_VERSION)
-# unset (CMAKE_JS_EXECUTABLE)
+# Happy building!
