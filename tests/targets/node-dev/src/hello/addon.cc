@@ -19,7 +19,7 @@ void Hello(const v8::FunctionCallbackInfo<v8::Value>& args)
 // void Version(const v8::FunctionCallbackInfo<v8::Value>& args)
 // {
 //   v8::Isolate* isolate = args.GetIsolate();
-//   args.GetReturnValue().Set(NODE_VERSION);
+//   args.GetReturnValue().Set(NODE_VERSION); // should be a v8::Number...
 // }
 
 // Expose the C++ function 'Hello' as a javascript function named 'hello', etc...
