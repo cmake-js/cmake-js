@@ -7,9 +7,9 @@
   "scripts": {
     "start":       "node ./index.js",
     "install":     "cmake-js install",
-    "postinstall": "cmake-js compile   --CDBUILD_TESTS:BOOL=TRUE --CDCMAKE_INSTALL_PREFIX:PATH=./dist",
-    "configure":   "cmake-js configure --CDBUILD_TESTS:BOOL=TRUE --CDCMAKE_INSTALL_PREFIX:PATH=./dist",
-    "reconfigure": "cmake-js reconfigure",
+    "postinstall": "cmake-js compile     --CDBUILD_TESTS:BOOL=TRUE --CDCMAKE_INSTALL_PREFIX:PATH=./dist",
+    "configure":   "cmake-js configure   --CDBUILD_TESTS:BOOL=TRUE --CDCMAKE_INSTALL_PREFIX:PATH=./dist",
+    "reconfigure": "cmake-js reconfigure --CDBUILD_TESTS:BOOL=TRUE --CDCMAKE_INSTALL_PREFIX:PATH=./dist",
     "build":       "cmake-js build",
     "rebuild":     "cmake-js rebuild",
     "clean":       "cmake-js clean",

@@ -6,7 +6,7 @@ set(CMAKEJS_USING_NODE_ADDON_API FALSE) # this should have been done with '--lin
 
 include(CMakeJS)
 
-add_library(addon SHARED "src/hello/addon.c")
+add_library(addon SHARED "src/hello/addon.cc")
 target_link_libraries(addon PRIVATE cmake-js::node-api) # relocatable deps resolved!
 set_target_properties(addon PROPERTIES PREFIX "" SUFFIX ".node")
 set_target_properties(addon PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")

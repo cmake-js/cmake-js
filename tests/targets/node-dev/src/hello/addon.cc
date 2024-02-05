@@ -42,6 +42,6 @@ NODE_MODULE(addon, Initialize) // (name to use, initializer to use)
 
 } // namespace vendor
 
-#else // !__has_include(<napi.h>) || !BUILDING_NODE_EXTENSION
+#else // !__has_include(<node.h>)
  #warning "Warning: Cannot find '<node.h>' - try running 'npm -g install cmake-js'..."
 #endif

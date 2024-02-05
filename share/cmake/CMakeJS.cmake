@@ -1231,7 +1231,7 @@ target_link_libraries(my_library PRIVATE cmake-js::node-dev)
 include(CMakeJS)
 
 add_library(my_addon SHARED)
-target_sources(my_addon PRIVATE src/<vendor>/my_addon.c)
+target_sources(my_addon PRIVATE src/<vendor>/my_addon.cc)
 target_link_libraries(my_addon PRIVATE cmake-js::node-api)
 set_target_properties(my_addon PROPERTIES PREFIX "" SUFFIX ".node")
 
