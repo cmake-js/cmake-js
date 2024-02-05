@@ -1091,6 +1091,7 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/share/cmake")
 
+# Tell the user what to do
 message(STATUS "-- Appended cmake-js CMake API to your module path.")
 message(STATUS "-- You may 'include(CMakeJS)' in your CMake project to use our API and/or relocatable targets.")
 message(STATUS "-- Read more about our 'CMakeJS.cmake' API here:")
