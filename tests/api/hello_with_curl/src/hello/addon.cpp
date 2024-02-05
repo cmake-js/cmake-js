@@ -34,31 +34,83 @@ Napi::Value CurlVersion(const Napi::CallbackInfo& info) {
   return Napi::Number::New(info.Env(), CURLVERSION_NOW);
 }
 
-Napi::Value Post(const Napi::CallbackInfo& args) {
+Napi::Value Get(const Napi::CallbackInfo& args) {
 
   const Napi::Env env = args.Env();
 
   // Arguments required: at least one, and no more than two
-  if (args.Length() != 2)
-  {
+  if (args.Length() != 2) {
     // NAPI_CPP_EXCEPTIONS = YES
     Napi::TypeError::New(env, "Wrong number of arguments! Please supply a url string, and the string data to POST, in that order").ThrowAsJavaScriptException();
     return env.Null();
   }
 
   // Param 1 must be a url string
-  if (!args[0].IsString())
-  {
+  // Param 2 must be a redirect boolean
+  if (!args[0].IsString() || !args[1].IsBoolean()) {
+    // NAPI_CPP_EXCEPTIONS = YES
+    Napi::TypeError::New(env, "Wrong type of arguments! Please supply a url string, and a boolean whether to follow redirected url's, in that order").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  /* First set the URL that is about to receive our POST. This URL can just as well be an https:// URL if that is what should receive the data. */
+  std::string url = args[0].ToString().Utf8Value();
+
+  /* Now specify the redirect follow mode */
+  bool follow = args[1].ToBoolean().Value();
+
+  int status;
+
+  try {
+
+    // Try to get the data from the url
+    status = hello_addon_get(url.data(), follow);
+
+  } catch (const std::exception &x) {
+
+    // If there was an error...
+    std::string message(x.what());
+    message += '\n';
+    message += STRINGIFY(CMAKEJS_ADDON_NAME)".node: could not get the following request:\n";
+    message += "url: ";
+    message += args[0].As<Napi::String>();
+    message += '\n';
+    message += "follow redirects: ";
+    message += args[1].As<Napi::String>();
+    message += '\n';
+    // Throw a javascript-side exception
+    Napi::TypeError::New(env, message).ThrowAsJavaScriptException();
+
+    // Clear the old string
+    url.clear();
+
+    message.clear();
+
+    // Return null
+    return env.Null();
+  }
+
+  // If the request did not cause an exception,
+  // return the status and exit.
+  return Napi::Number::New(env, status);
+}
+
+Napi::Value Post(const Napi::CallbackInfo& args) {
+
+  const Napi::Env env = args.Env();
+
+  // Arguments required: at least one, and no more than two
+  if (args.Length() != 2) {
     // NAPI_CPP_EXCEPTIONS = YES
     Napi::TypeError::New(env, "Wrong number of arguments! Please supply a url string, and the string data to POST, in that order").ThrowAsJavaScriptException();
     return env.Null();
   }
 
-    // Param 2 must be a data string
-  if (!args[1].IsString())
-  {
+  // Param 1 must be a url string
+  // Param 2 must be a data string
+  if (!args[0].IsString() || !args[1].IsString()) {
     // NAPI_CPP_EXCEPTIONS = YES
-    Napi::TypeError::New(env, "Wrong number of arguments! Please supply a url string, and the string data to POST, in that order").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "Wrong type of arguments! Please supply a url string, and the string data to POST, in that order").ThrowAsJavaScriptException();
     return env.Null();
   }
 
@@ -120,6 +172,11 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(
     Napi::String::New(env, "curl_version"),
     Napi::Function::New(env, CurlVersion)
+  );
+
+  exports.Set(
+    Napi::String::New(env, "get"),
+    Napi::Function::New(env, Get)
   );
 
   exports.Set(

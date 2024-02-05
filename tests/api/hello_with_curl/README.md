@@ -4,4 +4,6 @@ You can build me, export me as a Javscript module, and share your comments with 
 
 Please see my package.json to understand how to make HTTP POST requests with me.
 
+More cURL API examples can be found at [https://curl.se/libcurl/c/example.html](https://curl.se/libcurl/c/example.html).
+
 Powered by cmake-js CLI

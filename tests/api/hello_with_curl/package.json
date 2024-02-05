@@ -15,7 +15,8 @@
     "clean":       "cmake-js clean",
     "wipe":        "cmake-js clean && rm -rvf ./node_modules",
 
-    "curl:post":   "node -p \"const addon = require('./index'); addon.post('https://httpbin.org/anything' ,'name=nathanjhood&project=cmake-js');;\""
+    "curl:get":    "node -p \"const addon = require('./index'); addon.get( 'https://httpbin.org/anything', /** follow redirects? */ true);\"",
+    "curl:post":   "node -p \"const addon = require('./index'); addon.post('https://httpbin.org/anything', 'name=nathanjhood&project=cmake-js');\""
   },
   "dependencies": {
     "cmake-js": "https://github.com/nathanjhood/cmake-js#cmakejs_cmake_api",

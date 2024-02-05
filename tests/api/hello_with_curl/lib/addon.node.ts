@@ -24,6 +24,14 @@ interface addon {
    * Returns a number, confirming the POST request status.
    * @returns number
    */
+  get(url: string, follow: boolean): string;
+  /**
+   * Sends an HTTP POST request using the CURL API.
+   * The request is sent to 'url'. Both the url and the
+   * data to be posted must be Javascript strings (for now).
+   * Returns a number, confirming the POST request status.
+   * @returns number
+   */
   post(url: string, data: string): string;
 }
 const addon: addon = require('../build/lib/addon.node');
