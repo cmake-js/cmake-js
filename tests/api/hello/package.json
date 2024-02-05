@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start":       "node ./index.js",
+    "start":       "node -p \"const addon = require('./build/lib/addon.node'); console.log(addon.hello());\"",
     "install":     "cmake-js install",
     "postinstall": "cmake-js compile",
     "configure":   "cmake-js configure",
