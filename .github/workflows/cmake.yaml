@@ -1,0 +1,97 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Run tests for ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.libc }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # windows
+          - os: windows-2019
+            arch: x64
+          - os: windows-2022
+            arch: x64
+          - os: windows-2019
+            arch: x86
+          # macos
+          - os: macos-12
+            arch: x64
+          # - os: macos-11
+          #   arch: arm64
+          - os: macos-11
+            arch: x64
+          # linux
+          - os: ubuntu-22.04
+            arch: x64
+          - os: ubuntu-20.04
+            arch: x64
+          # linux-libc
+          - os: ubuntu-latest
+            arch: arm64
+            docker-arch: linux/arm64
+            docker-image: node:14-bullseye
+          - os: ubuntu-latest
+            arch: arm
+            docker-arch: linux/arm/v7
+            docker-image: node:14-bullseye
+          # linux-musl
+          - os: ubuntu-latest
+            arch: x64
+            docker-arch: linux/amd64
+            docker-image: node:14-alpine
+            libc: musl
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 14.x
+        if: ${{ !matrix.docker-arch }}
+        uses: actions/setup-node@v3
+        with:
+          architecture: ${{ matrix.arch }}
+          node-version: 14.x
+
+      - name: run tests
+        if: ${{ !matrix.docker-arch }}
+        shell: bash
+        run: |
+          npm install
+          npm test
+        env:
+          CI: true
+          npm_config_build_from_source: true
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        if: matrix.docker-arch
+      - name: run tests (in docker)
+        uses: addnab/docker-run-action@v3
+        if: matrix.docker-arch
+        with:
+          image: ${{ matrix.docker-image }}
+          # shell: bash
+          options: --platform=${{ matrix.docker-arch }} -v ${{ github.workspace }}:/work -e CI=1
+          run: |
+            if command -v apt-get &> /dev/null
+            then
+              apt-get update
+              apt-get install -y cmake
+            elif command -v apk &> /dev/null
+            then
+              apk update
+              apk add cmake make g++ gcc
+            fi
+
+            cd /work
+
+            cd /tests/api/hello_consumer
+
+            npm install
+            npm run start
