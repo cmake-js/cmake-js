@@ -45,7 +45,7 @@ int hello_addon_post(const char* url, const char* data)
     curl_easy_cleanup(curl);
   }
   curl_global_cleanup();
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 #else // !__has_include(<curl/curl.h>)

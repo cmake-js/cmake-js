@@ -68,7 +68,7 @@ Napi::Value Get(const Napi::CallbackInfo& args) {
     // Try to get the data from the url
     status = hello_addon_get(url.data(), follow);
 
-    NAPI_THROW_IF_FAILED_VOID(env, status) // This behaviour changes depending on EXCEPTIONS policy (can be YES, NO, or MAYBE)
+    NAPI_THROW_IF_FAILED(env, status) // This behaviour changes depending on EXCEPTIONS policy (can be YES, NO, or MAYBE)
 
   } catch (const std::exception &x) {
 
@@ -82,6 +82,8 @@ Napi::Value Get(const Napi::CallbackInfo& args) {
     message += "follow redirects: ";
     message += args[1].As<Napi::String>();
     message += '\n';
+
+    std::cerr << message << std::endl;
     // Throw a javascript-side exception
     Napi::TypeError::New(env, message).ThrowAsJavaScriptException();
 
@@ -131,7 +133,7 @@ Napi::Value Post(const Napi::CallbackInfo& args) {
     // Try to post the data to the url
     status = hello_addon_post(url.data(), data.data());
 
-    NAPI_THROW_IF_FAILED_VOID(env, status) // This behaviour changes depending on EXCEPTIONS policy (can be YES, NO, or MAYBE)
+    NAPI_THROW_IF_FAILED(env, status) // This behaviour changes depending on EXCEPTIONS policy (can be YES, NO, or MAYBE)
 
   } catch (const std::exception &x) {
 

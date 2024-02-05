@@ -47,7 +47,7 @@ int hello_addon_get(const char* url, const bool& follow)
     /* always cleanup */
     curl_easy_cleanup(curl);
   }
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 #else // !__has_include(<curl/curl.h>)
