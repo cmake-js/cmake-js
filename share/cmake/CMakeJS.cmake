@@ -162,7 +162,7 @@ function(cmakejs_acquire_napi_c_files)
     )
     string(REGEX REPLACE "[\r\n\"]" "" NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}")
 
-    # relocate...
+    # copy the headers to mitigate `Target "node-api-headers" INTERFACE_INCLUDE_DIRECTORIES property contains path which is prefixed in the source directory.`
     file(GLOB _NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
     file(COPY ${_NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
     unset(_NODE_API_INC_FILES)
@@ -195,7 +195,7 @@ function(cmakejs_acquire_napi_cpp_files)
     )
     string(REGEX REPLACE "[\r\n\"]" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
 
-    # relocate...
+    # copy the headers to mitigate `Target "node-addon-api" INTERFACE_INCLUDE_DIRECTORIES property contains path which is prefixed in the source directory.`
     file(GLOB _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
     file(COPY ${_NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
     unset(_NODE_ADDON_API_INC_FILES)
@@ -283,7 +283,6 @@ if(CMAKEJS_NODE_API)
 endif()
 
 if(CMAKEJS_NODE_ADDON_API)
-
   # Acquire if needed...
   if(NOT DEFINED NODE_ADDON_API_DIR)
     cmakejs_acquire_napi_cpp_files()
