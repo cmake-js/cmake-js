@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start":       "node -p \"const addon = require('./build/lib/addon.node'); console.log(addon.hello());\"",
+    "start":       "node -p \"const addon = require('./index'); console.log(addon.hello());\"",
     "install":     "cmake-js install",
     "postinstall": "cmake-js compile",
     "configure":   "cmake-js configure",
@@ -16,6 +16,6 @@
     "wipe":        "cmake-js clean && rm -rvf ./node_modules"
   },
   "dependencies": {
-    "cmake-js": "../../../"
+    "cmake-js": "https://github.com/nathanjhood/cmake-js#cmakejs_cmake_api"
   }
 }

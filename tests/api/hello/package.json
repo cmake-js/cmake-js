@@ -16,7 +16,7 @@
     "wipe":        "cmake-js clean && rm -rvf ./node_modules"
   },
   "dependencies": {
-    "cmake-js": "../../../",
+    "cmake-js": "https://github.com/nathanjhood/cmake-js#cmakejs_cmake_api",
     "node-addon-api": "^7.1.0",
     "node-api-headers": "^1.1.0"
   }

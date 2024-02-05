@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.15)
 
 project(hello)
 
+# For CMake IDE tools support (do yarn/install first and keep your node_modules folder around)
+if(NOT DEFINED CMAKE_JS_VERSION)
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/share/cmake")
+endif()
+
 include(CMakeJS)
 
 add_library(addon SHARED "src/hello/addon.cpp")
