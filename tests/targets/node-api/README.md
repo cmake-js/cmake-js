@@ -1,6 +1,6 @@
 # DISCLAIMER
 
-I don't actually know how to build one of these, so for now,
+It is not so clear how to code one of these, so for now,
 I'm just trying to compile a var or two to test the linked-in
 target against. Once someone figures out how to build a real addon,
 in C against node_api.h, please replace addon.c and remove this disclaimer!
