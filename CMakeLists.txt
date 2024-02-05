@@ -107,6 +107,9 @@ if (CMakeJS_IS_TOP_LEVEL
     NAMESPACE CMakeJS
   )
 
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib") # usually set fur users by cmake-js cli... this is just for test
+  cmakejs_create_addon_bindings(demo)
+
   # ...we're building the CMakeJS demo project
   message (STATUS "cmake-js::demo \n")
 

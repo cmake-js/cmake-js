@@ -282,6 +282,35 @@ function(cmakejs_acquire_napi_cpp_files)
   endif()
 endfunction()
 
+#[=============================================================================[
+(experimental)
+]=============================================================================]#
+function(cmakejs_create_addon_bindings addon_target)
+
+  # Figure out the path from the build dir to wherever the built addon went
+  file(RELATIVE_PATH _bindings_rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+
+  # Use the addon name and relative path to create a 'configured' string (vars surrounded with @'s get evaluated)
+  string(CONFIGURE [[
+const @addon_target@ = require(`./@_bindings_rel_path@/@addon_target@.node`);
+module.exports = @addon_target@;
+]]
+    _bindings
+    @ONLY
+  )
+
+  # write the configured string to a file in the binary dir, providing a
+  # consistent binding point for every addon built! :)
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${addon_target}.js" "${_bindings}")
+
+  # Now, built addons can be found easier in Javascript:
+  # const my_addon = require('./build/<addon_name>')
+
+  # If your CMake is not going into './build' then obvuously it should be
+  # changed; but, we should *never* write CMake-configured bindings file
+  # into anybody's source tree, as we might corrupt their work! ALWAYS
+  # put this kind of stuff into the binary dir!
+endfunction()
 
 #[=======================================================================[
 FindCMakeJs.cmake
