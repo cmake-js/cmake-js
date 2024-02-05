@@ -1051,27 +1051,50 @@ include (${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
 
 check_required_components (cmake-js)
 
-# # Not sure if this is needed...
-# set (CMAKE_JS_SRC "@CMAKE_JS_SRC@")
-# set (CMAKE_JS_INC @CMAKE_JS_INC@)
-# set (CMAKE_JS_LIB "@CMAKE_JS_LIB@")
-# set (CMAKE_JS_VERSION "@CMAKE_JS_VERSION@")
-# set (CMAKE_JS_EXECUTABLE "@CMAKE_JS_EXECUTABLE@")
-# set (CMAKE_JS_INC_FILES "")
-# list (APPEND CMAKE_JS_INC_FILES "@CMAKE_JS_INC_FILES@")
+# This codeblock make CMakeJS.cmake transportable, by
+# also ensuring that anybody who picks up our CMake package
+# will also have the CLI (which is a requirement of our CMake API)
 
-# if (CMAKEJS_NODE_API)
-#    set (NODE_API_HEADERS_DIR @NODE_API_HEADERS_DIR@)
-#    set (NODE_API_INC_FILES "")
-#    list (APPEND NODE_API_INC_FILES "@NODE_API_INC_FILES@")
-# endif()
+# Resolve NodeJS development headers
+# TODO: This code block is quite problematic, since:
+# 1 - it might trigger a build run, depending on how the builder has set up their package.json scripts...
+# 2 - it also currently assumes a preference for yarn over npm (and the others)...
+# 3 - finally, because of how cmake-js works, it might create Ninja-build artefacts,
+# even when the CMake user specifies a different generator to CMake manually...
+# We could use 'add_custom_target()' with a user-side ARG for which package manager to use...
+if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
+    # re: package manager to use, we could check IF_EXISTS for a 'yarn.lock'
+    # in the CMAKE_CURRENT_SOURCE_DIR, else use npm?
+    execute_process(
+      COMMAND yarn install
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      OUTPUT_VARIABLE NODE_MODULES_DIR
+    )
+    if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
+        message(FATAL_ERROR "Something went wrong - NodeJS modules installation failed!")
+        return()
+    endif()
+endif()
 
-# if (CMAKE_JS_NODE_ADDON_API)
-#    set (NODE_ADDON_API_DIR "@NODE_ADDON_API_DIR@")
-#    set (NODE_ADDON_API_INC_FILES "")
-#    list (APPEND NODE_ADDON_API_INC_FILES "@NODE_ADDON_API_INC_FILES@")
-# endif ()
+# this would be just 'yarn/npm add cmake-js' if this API were on our 'master' branch
+if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js")
+  execute_process(
+    COMMAND yarn "add https://github.com/nathanjhood/cmake-js#cmakejs_cmake_api"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE CMAKE_JS_EXECUTABLE
+  )
+  if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js")
+      message(FATAL_ERROR "Something went wrong - cmake-js installation failed!")
+      return()
+  endif()
+endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/share/cmake")
+
+message(STATUS "-- Appended cmake-js CMake API to your module path.")
+message(STATUS "-- You may 'include(CMakeJS)' in your CMake project to use our API and/or relocatable targets.")
+message(STATUS "-- Read more about our 'CMakeJS.cmake' API here:")
+message(STATUS "-- https://github.com/cmake-js/cmake-js/blob/cmakejs_cmake_api/README.md")
 ]==])
 
 # create cmake config file
