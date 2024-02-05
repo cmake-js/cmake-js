@@ -55,16 +55,28 @@
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
+		"@types/node": "^20.11.14",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"mocha": "*",
 		"nan": "^2.18.0",
 		"node-addon-api": "^6.1.0",
-		"prettier": "^3.2.2"
+		"prettier": "^3.2.2",
+		"typescript": "^5.3.3"
 	},
 	"scripts": {
 		"test": "mocha tests",
-		"lint": "eslint lib bin/cmake-js tests"
+		"lint": "eslint lib bin/cmake-js tests",
+
+    "demo:configure": "cmake --fresh -S . -B ./build -DBUILD_TESTS:BOOL=TRUE -DCMAKE_INSTALL_PREFIX:PATH=./install -G Ninja",
+    "demo:build":     "cmake --build    ./build",
+    "demo:install":   "cmake --install  ./build",
+    "demo:ctest":     "ctest --test-dir ./build",
+    "demo:cpack":     "cpack --config   ./build/CPackSourceConfig.cmake -B ./install",
+    "demo:cdist":     "cpack --config   ./build/CPackConfig.cmake       -B ./install",
+
+    "api:pack-js":    "cpack --config   ./build/CPackSourceConfig.cmake -B ./dist",
+    "api:pack-cmake": "cpack --config   ./build/CPackConfig.cmake       -B ./dist"
 	},
 	"files": [
 		"lib",

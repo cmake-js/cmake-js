@@ -1,0 +1,27 @@
+{
+  "name": "@vendor/hello_with_types",
+  "version": "1.0.0",
+  "description": "A test addon with Typescript support made using CMakeJS.cmake",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start":       "node ./index.js",
+    "install":     "cmake-js install",
+    "postinstall": "cmake-js compile",
+    "configure":   "cmake-js configure",
+    "reconfigure": "cmake-js reconfigure",
+    "build":       "cmake-js build",
+    "rebuild":     "cmake-js rebuild",
+    "clean":       "cmake-js clean",
+    "wipe":        "cmake-js clean && rm -rvf ./node_modules"
+  },
+  "dependencies": {
+    "cmake-js": "https://github.com/nathanjhood/cmake-js#cmakejs_cmake_api",
+    "node-addon-api": "^7.1.0",
+    "node-api-headers": "^1.1.0"
+  },
+  "devDependencies": {
+		"@types/node": "^20.11.14",
+		"typescript": "^5.3.3"
+	}
+}
