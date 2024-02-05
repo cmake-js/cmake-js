@@ -668,10 +668,10 @@ if(CMAKEJS_USING_CMAKEJS) # user did 'cmake-js configure --link-level=3', or did
   # stuff themselves. An additional cosideration is making sure we only apply stuff to our targets,
   # and never just define things globally. Meaning, always use 'target_add_definitions()' and never ever
   # use regular 'add_definitions()' when taking care of this. Why? Because that global function
-  # will propogate globally, downstream, and who knows where else (see also: : never do 'using namespace <vendor>'
+  # will propogate globally, downstream, and who knows where else (see also: never do 'using namespace <vendor>'
   # in the global namespace scope in a public C++ header file... you don't know where it will propogate,
   # what it might break, or even where the issue stems from when it does arise).
-  # Keep in mind that PUBLIC defs on are propogated to any other targets that link with it.
+  # Keep in mind that PUBLIC defs on a target are propogated to any other targets that link with it.
   # PRIVATE does not propogate. Sometimes, INTERFACE libs insist you use INTERFACE specifiers.
   # so whatever is decided, it must be very well considered i.e., not arbitrary, and if CMake
   # insists something, don't fight it. CMake doggedly refuses to be beaten at it's own games :)
