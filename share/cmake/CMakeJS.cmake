@@ -311,6 +311,8 @@ This module defines
 
 ]=======================================================================]#
 
+# -- BEGIN 'always-on' codeblob; we provide the following blob, no matter the config.
+
 # CMAKE_JS_VERSION is defined on all platforms when calling from cmake-js.
 # By checking whether this var is pre-defined, we can determine if we are
 # running from an npm script (via cmake-js), or from CMake directly...
@@ -346,8 +348,6 @@ else ()
     endif()
 
 endif ()
-
-# 'always-on' codeblock; we provide the following blob, no matter the config.
 
 # relocate... (only runs if no node_modules to fallback on.. i.e., on a fresh git clone. Expected behaviour..?)
 file(COPY ${CMAKE_JS_INC} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include")
@@ -391,6 +391,8 @@ if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
         return()
     endif()
 endif()
+
+# -- END 'always-on' codeblob.
 
 #[=============================================================================[
 Silently create an interface library (no output) with all Addon API dependencies
