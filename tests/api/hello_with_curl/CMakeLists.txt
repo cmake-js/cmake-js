@@ -24,10 +24,10 @@ if(hello_IS_INSTALLABLE)
   install(FILES ${CURL_INCLUDE_DIR} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 endif()
 
-# Get cmake-js::cmake-js via 'cmakejs_create_napi_addon()'
+# Get cmake-js::cmake-js via 'cmakejs_create_node_api_addon()'
 include(CMakeJS)
 
-cmakejs_create_napi_addon(
+cmakejs_create_node_api_addon(
   addon
   "src/hello/addon.cpp"
   "src/hello/get.cpp"

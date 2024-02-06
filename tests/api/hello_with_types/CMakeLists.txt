@@ -4,7 +4,7 @@ project(hello)
 
 include(CMakeJS)
 
-cmakejs_create_napi_addon(
+cmakejs_create_node_api_addon(
   addon
   src/hello/addon.cpp
   NAMESPACE vendor

@@ -168,7 +168,7 @@ Provides
   NODE_API_INC_FILES, the headers required to use Node API.
 
 ]=============================================================================]#
-function(cmakejs_acquire_napi_c_files)
+function(cmakejs_acquire_node_api_c_headers)
  # Acquire if needed...
   if(NOT DEFINED NODE_API_HEADERS_DIR) # Why the NODE_API_* namespace? Because 'node-api-headers' from vcpkg also provides this exact var, so we can help our users from vcpkg-land avoid picking up headers they already have ; but, we still need to process those headers into our target(s) for them!
   message("run ${NODE_EXECUTABLE} -p require('node-api-headers').include_dir)")
@@ -235,7 +235,7 @@ Provides
   NODE_ADDON_API_INC_FILES, the headers required to use Node Addon API.
 
 ]=============================================================================]#
-function(cmakejs_acquire_napi_cpp_files)
+function(cmakejs_acquire_node_api_cpp_headers)
   if(NOT DEFINED NODE_ADDON_API_DIR) # This matches the 'node-addon-api' package from vcpkg, so will avoid duplicates for those users
     execute_process(
       COMMAND "${NODE_EXECUTABLE}" -p "require('node-addon-api').include"
@@ -523,8 +523,8 @@ endif()
 #   list(APPEND CMAKEJS_TARGETS  node-dev)
 # endif()
 
-function(cmakejs_setup_node_api_addons)
-  cmakejs_acquire_napi_c_files()
+function(cmakejs_setup_node_api_c_library)
+  cmakejs_acquire_node_api_c_headers()
 
   # Check that this hasnt already been called
   if(TARGET cmake-js::node-api)
@@ -600,10 +600,10 @@ function(cmakejs_setup_node_api_addons)
 endfunction()
 
 
-function(cmakejs_setup_node_addon_api_addons) # TODO: name this
-  cmakejs_acquire_napi_cpp_files()
+function(cmakejs_setup_node_api_cpp_library)
+  cmakejs_acquire_node_api_cpp_headers()
 
-  cmakejs_setup_node_api_addons() # needs c addons support
+  cmakejs_setup_node_api_c_library() # needs c addons support
 
   # Check that this hasnt already been called
   if(TARGET cmake-js::node-addon-api)
@@ -679,17 +679,17 @@ list(APPEND CMAKEJS_TARGETS cmake-js)
 Exposes a user-side helper function for creating a dynamic '*.node' library,
 linked to the Addon API interface.
 
-cmakejs_create_napi_addon(<name> [<sources>])
-cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>] [<sources>])
+cmakejs_create_node_api_addon(<name> [<sources>])
+cmakejs_create_node_api_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>] [<sources>])
 
 (This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
 ]=============================================================================]#
-function(cmakejs_create_napi_addon name)
-  cmakejs_setup_node_api_addons() # needs c addons support # TODO: keep this?
+function(cmakejs_create_node_api_addon name)
+  cmakejs_setup_node_api_c_library() # needs c addons support # TODO: keep this?
 
     # Avoid duplicate target names
     if(TARGET ${name})
-        message(SEND_ERROR "'cmakejs_create_napi_addon()' given target '${name}' which is already exists. Please choose a unique name for this Addon target.")
+        message(SEND_ERROR "'cmakejs_create_node_api_addon()' given target '${name}' which is already exists. Please choose a unique name for this Addon target.")
         return()
     endif()
 
@@ -783,48 +783,13 @@ function(cmakejs_create_napi_addon name)
     add_library(${name} SHARED)
     add_library(${name_alt}::${name} ALIAS ${name})
 
-    # TODO: If we instead set up a var like 'CMAKEJS_LINK_LEVEL',
-    # it can carry an integer number corresponding to which
-    # dependency level the builder wants. The value of this
-    # integer can be determined somehow from the result of the
-    # 'CMakeDependentOption's at the top of this file.
-    #
-    # i.e. (psudeo code);
-    #
-    #   if options = 0; set (CMAKEJS_LINK_LEVEL "cmake-js::node-dev")
-    #   if options = 1; set (CMAKEJS_LINK_LEVEL "cmake-js::node-api")
-    #   if options = 2; set (CMAKEJS_LINK_LEVEL "cmake-js::node-addon-api")
-    #   if options = 3; set (CMAKEJS_LINK_LEVEL "cmake-js::cmake-js")
-    #
-    # target_link_libraries(${name} PRIVATE ${CMAKEJS_LINK_LEVEL})
-    #
-    # Why?
-    #
-    # Because currently, our 'create_napi_addon()' depends on cmake-js::cmake-js,
-    # Which is why I had to wrap our nice custom functions inside of
-    # this 'CMAKEJS_USING_CMAKEJS=TRUE' block, for now.
-    #
-    # cmake-js cli users could then be offered a new flag for setting a
-    # preferred dependency level for their project, controlling the
-    # values on the JS side before being passed to the command line
-    # (default to 3 if not set):
-    #
-    # $ cmake-js configure --link-level=2
-    #
-    # The above would provide dependency resolution up to cmake-js::node-adon-api level.
-    #
-    # If do we make our functions available at all times this way,
-    # we must also validate that all the possible configurations work
-    # (or fail safely, and with a prompt.)
-    #
-    # Testing (and supporting) the above could be exponentially complex.
-    # I think most people won't use the target toggles anyway,
-    # and those that do, won't have access to any broken/untested
-    # variations of our functions.
-    #
-    # Just my suggestion; do as you will :)
 
+    # Always link the basic needed libraries
     target_link_libraries(${name} PRIVATE cmake-js::cmake-js cmake-js::node-api)
+    if(TARGET cmake-js::node-addon-api)
+      # link the c++ library if it has been defined
+      target_link_libraries(${name} PRIVATE cmake-js::node-addon-api)
+    endif()
 
     set_property(
       TARGET ${name}
@@ -1155,16 +1120,14 @@ set(CMAKEJS_INC_DIR
 #   )
 # endif()
 
-if(CMAKEJS_USING_CMAKEJS)
-  install(FILES ${_CMAKEJS_SCRIPT} DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS")
-  install(TARGETS cmake-js
-    EXPORT CMakeJSTargets
-    LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-    RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-  )
-endif()
+install(FILES ${_CMAKEJS_SCRIPT} DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS")
+install(TARGETS cmake-js
+  EXPORT CMakeJSTargets
+  LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+  ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+  RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
+  INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
 
 # install config files
 install(FILES
@@ -1270,7 +1233,7 @@ add_target_definitions(my_addon PRIVATE BUILDING_NODE_EXTENSION)
 
 include(CMakeJS)
 
-cmakejs_create_napi_addon (
+cmakejs_create_node_api_addon (
     # CMAKEJS_ADDON_NAME
     my_addon
     # SOURCES

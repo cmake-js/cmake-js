@@ -98,7 +98,7 @@ if (CMakeJS_IS_TOP_LEVEL
     AND CMakeJS_IS_MASTER_PROJECT
   )
 
-  cmakejs_create_napi_addon (
+  cmakejs_create_node_api_addon (
     # CMAKEJS_ADDON_NAME
     demo
     # SOURCES
@@ -122,7 +122,7 @@ if (CMakeJS_IS_TOP_LEVEL
 -- The demo target was constructed using our custom CMake API:
 --
 
-cmakejs_create_napi_addon (
+cmakejs_create_node_api_addon (
   # CMAKEJS_ADDON_NAME
   demo
   # SOURCES

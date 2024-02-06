@@ -10,7 +10,7 @@ endif()
 
 include(CMakeJS)
 
-cmakejs_create_napi_addon (
+cmakejs_create_node_api_addon (
   # CMAKEJS_ADDON_NAME
   addon
   # SOURCES
