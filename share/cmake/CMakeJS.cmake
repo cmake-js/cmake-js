@@ -59,7 +59,7 @@ if (NOT DEFINED _version OR "${_version}" STREQUAL "")
 endif()
 
 # check multiple versions havent been loaded
-if(COMMAND cmakejs_napi_addon_add_sources)
+if(COMMAND cmakejs_nodejs_addon_add_sources)
     if(NOT DEFINED _CMAKEJS_VERSION OR NOT (_version STREQUAL _CMAKEJS_VERSION))
         message(WARNING "More than one 'CMakeJS.cmake' version has been included in this project.")
     endif()
@@ -296,7 +296,7 @@ side.
 function(cmakejs_create_addon_bindings addon_target) # TODO - is this useful? it feels kinda useful, but not if distributing with prebuilds (unless the prebuild system understands this)
 
   # Check that this is a Node Addon target
-  get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
+  get_target_property(is_addon_lib ${name} ${name}_IS_NODE_API_ADDON_LIBRARY)
   if(NOT TARGET ${name} OR NOT is_addon_lib)
     message(SEND_ERROR "'cmakejs_create_addon_bindings()' called on '${name}' which is not an existing napi addon library")
     return()
@@ -520,7 +520,7 @@ endif()
 #   endforeach()
 #   unset(_CMAKE_JS_INC_FILES)
 
-#   list(APPEND CMAKEJS_TARGETS  node-dev)
+#   _cmakejs_export_target(node-dev)
 # endif()
 
 function(cmakejs_setup_node_api_c_library)
@@ -584,7 +584,8 @@ function(cmakejs_setup_node_api_c_library)
       )
     endif()
   endforeach()
-  list(APPEND CMAKEJS_TARGETS node-api)
+
+  _cmakejs_export_target(node-api)
 
   # setup the install target
   install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers")
@@ -599,10 +600,8 @@ function(cmakejs_setup_node_api_c_library)
   )
 endfunction()
 
-
 function(cmakejs_setup_node_api_cpp_library)
-  cmakejs_acquire_node_api_cpp_headers()
-
+  cmakejs_acquire_node_api_cpp_headers() # needs the c++ headers
   cmakejs_setup_node_api_c_library() # needs c addons support
 
   # Check that this hasnt already been called
@@ -643,7 +642,7 @@ function(cmakejs_setup_node_api_cpp_library)
     endif()
   endforeach()
 
-  list(APPEND CMAKEJS_TARGETS  node-addon-api)
+  _cmakejs_export_target(node-addon-api)
 
   # setup the install target
   install(FILES ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api")
@@ -662,17 +661,33 @@ endfunction()
 # cmake-js::cmake-js
 add_library                 (cmake-js INTERFACE)
 add_library                 (cmake-js::cmake-js ALIAS cmake-js)
-# if(CMAKEJS_NODE_ADDON_API) # TODO: should this have the dependency, or should that be done manually? Perhaps auto vs manual should be an option
-#   target_link_libraries       (cmake-js INTERFACE cmake-js::node-addon-api)
-# endif()
-# target_link_libraries       (cmake-js INTERFACE cmake-js::node-api)
 target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
 target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
 set_target_properties       (cmake-js PROPERTIES VERSION   ${_CMAKEJS_VERSION})
 set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
 set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMakeJS_MAJOR_VERSION)
 
-list(APPEND CMAKEJS_TARGETS cmake-js)
+function(_cmakejs_export_target name)
+  export (
+    TARGETS ${name}
+    APPEND FILE share/cmake/CMakeJSTargets.cmake
+    NAMESPACE cmake-js::
+  )
+
+  # This should enable each target to behave well with intellisense
+  # (in case they weren't already)
+  target_include_directories(${name}
+    INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+  )
+endfunction()
+export (
+  TARGETS 
+  FILE share/cmake/CMakeJSTargets.cmake
+  NAMESPACE cmake-js::
+)
+_cmakejs_export_target(cmake-js)
 
 
 #[=============================================================================[
@@ -685,7 +700,7 @@ cmakejs_create_node_api_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NA
 (This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
 ]=============================================================================]#
 function(cmakejs_create_node_api_addon name)
-  cmakejs_setup_node_api_c_library() # needs c addons support # TODO: keep this?
+  cmakejs_setup_node_api_c_library() # needs c addons support
 
     # Avoid duplicate target names
     if(TARGET ${name})
@@ -783,7 +798,6 @@ function(cmakejs_create_node_api_addon name)
     add_library(${name} SHARED)
     add_library(${name_alt}::${name} ALIAS ${name})
 
-
     # Always link the basic needed libraries
     target_link_libraries(${name} PRIVATE cmake-js::cmake-js cmake-js::node-api)
     if(TARGET cmake-js::node-addon-api)
@@ -793,7 +807,7 @@ function(cmakejs_create_node_api_addon name)
 
     set_property(
       TARGET ${name}
-      PROPERTY "${name}_IS_NAPI_ADDON_LIBRARY" TRUE # Custom property
+      PROPERTY "${name}_IS_NODE_API_ADDON_LIBRARY" TRUE # Custom property
     )
 
     set_target_properties(${name}
@@ -815,16 +829,16 @@ function(cmakejs_create_node_api_addon name)
       # RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/bin/Debug"
     )
 
-    cmakejs_napi_addon_add_sources(${name} ${ARG_UNPARSED_ARGUMENTS})
+    cmakejs_nodejs_addon_add_sources(${name} ${ARG_UNPARSED_ARGUMENTS})
 
-    cmakejs_napi_addon_add_definitions(${name}
+    cmakejs_nodejs_addon_add_definitions(${name}
       PRIVATE # These definitions only belong to this unique target
       "CMAKEJS_ADDON_NAME=${name}"
       "CMAKEJS_ADDON_ALIAS=${name_alt}"
       "NAPI_CPP_CUSTOM_NAMESPACE=${ARG_NAMESPACE}"
     )
 
-    cmakejs_napi_addon_add_definitions(${name}
+    cmakejs_nodejs_addon_add_definitions(${name}
       PUBLIC # These definitions are shared with anything that links to this addon
       "NAPI_VERSION=${ARG_NAPI_VERSION}"
       "BUILDING_NODE_EXTENSION"
@@ -842,17 +856,17 @@ endfunction()
 #[=============================================================================[
 Add source files to an existing Napi Addon target.
 
-cmakejs_napi_addon_add_sources(<name> [items1...])
-cmakejs_napi_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
-cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...]])
-cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<dirs>...]] [items1...]...)
+cmakejs_nodejs_addon_add_sources(<name> [items1...])
+cmakejs_nodejs_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
+cmakejs_nodejs_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...]])
+cmakejs_nodejs_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<dirs>...]] [items1...]...)
 ]=============================================================================]#
-function(cmakejs_napi_addon_add_sources name)
+function(cmakejs_nodejs_addon_add_sources name)
 
     # Check that this is a Node Addon target
-    get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
+    get_target_property(is_addon_lib ${name} ${name}_IS_NODE_API_ADDON_LIBRARY)
     if(NOT TARGET ${name} OR NOT is_addon_lib)
-        message(SEND_ERROR "'cmakejs_napi_addon_add_sources()' called on '${name}' which is not an existing napi addon library")
+        message(SEND_ERROR "'cmakejs_nodejs_addon_add_sources()' called on '${name}' which is not an existing napi addon library")
         return()
     endif()
 
@@ -915,15 +929,15 @@ endfunction()
 #[=============================================================================[
 Add pre-processor definitions to an existing Napi Addon target.
 
-cmakejs_napi_addon_add_definitions(<name> [items1...])
-cmakejs_napi_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
+cmakejs_nodejs_addon_add_definitions(<name> [items1...])
+cmakejs_nodejs_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
 ]=============================================================================]#
-function(cmakejs_napi_addon_add_definitions name)
+function(cmakejs_nodejs_addon_add_definitions name)
 
     # Check that this is a Node Addon target
-    get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
+    get_target_property(is_addon_lib ${name} ${name}_IS_NODE_API_ADDON_LIBRARY)
     if(NOT TARGET ${name} OR NOT is_addon_lib)
-        message(SEND_ERROR "'cmakejs_napi_addon_add_definitions()' called on '${name}' which is not an existing napi addon library")
+        message(SEND_ERROR "'cmakejs_nodejs_addon_add_definitions()' called on '${name}' which is not an existing napi addon library")
         return()
     endif()
 
@@ -956,16 +970,6 @@ function(cmakejs_napi_addon_add_definitions name)
 
 endfunction()
 
-# This should enable each target to behave well with intellisense
-# (in case they weren't already)
-foreach(TARGET IN LISTS CMAKEJS_TARGETS)
-  target_include_directories(${TARGET}
-    INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-  )
-endforeach()
-
 #[=============================================================================[
 Collect targets and allow CMake to provide them
 
@@ -997,11 +1001,6 @@ to be.
 It's not quite over yet, but the idea should be becoming clear now...
 ]=============================================================================]#
 
-export (
-  TARGETS ${CMAKEJS_TARGETS}
-  FILE share/cmake/CMakeJSTargets.cmake
-  NAMESPACE cmake-js::
-)
 
 include (CMakePackageConfigHelpers)
 file (WRITE "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in" [==[
@@ -1144,12 +1143,12 @@ install(
   DESTINATION lib/cmake/CMakeJS
 )
 
-# Tell the user what to do
-message(STATUS "\ncmake-js v${_CMAKEJS_VERSION} has made the following targets available for linkage:\n")
-foreach(TARGET IN LISTS CMAKEJS_TARGETS)
-    get_target_property(_v ${TARGET} VERSION)
-    message(STATUS "cmake-js::${TARGET} ${_v}")
-endforeach()
+# # Tell the user what to do
+# message(STATUS "\ncmake-js v${_CMAKEJS_VERSION} has made the following targets available for linkage:\n")
+# foreach(TARGET IN LISTS CMAKEJS_TARGETS)
+#     get_target_property(_v ${TARGET} VERSION)
+#     message(STATUS "cmake-js::${TARGET} ${_v}")
+# endforeach()
 
 if(NOT CMakeJS_IS_TOP_LEVEL)
 

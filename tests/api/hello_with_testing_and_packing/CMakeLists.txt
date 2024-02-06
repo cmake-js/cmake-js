@@ -8,7 +8,10 @@ if(NOT (PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR))
   set (vendor_IS_MASTER_PROJECT TRUE)
 endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/share/cmake")
 include(CMakeJS)
+
+cmakejs_setup_node_api_cpp_library()
 
 cmakejs_create_node_api_addon (
   # CMAKEJS_ADDON_NAME

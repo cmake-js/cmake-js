@@ -55,13 +55,13 @@ cmakejs_create_node_api_addon (
   ALIAS addon::v7
 )
 
-cmakejs_napi_addon_add_sources (addon_v7
+cmakejs_nodejs_addon_add_sources (addon_v7
   # Specify an exact directory for this addon's SOURCES
   BASE_DIRS "${PROJECT_SOURCE_DIR}/src"
   src/demo/addon.cpp
 )
 
-cmakejs_napi_addon_add_definitions (addon_v7
+cmakejs_nodejs_addon_add_definitions (addon_v7
   # 'PRIVATE', 'PUBLIC', and 'INTERFACE' definitions are all supported.
   PRIVATE
   # The Napi Addon API has several other useful pre-processor definitions.
