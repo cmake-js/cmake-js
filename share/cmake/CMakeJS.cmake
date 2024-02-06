@@ -91,83 +91,33 @@ if(MSVC)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
 endif()
 
-#[=============================================================================[
-Provides CMAKE_JS_EXECUTABLE
-]=============================================================================]#
-function(cmakejs_find_cmakejs_executable)
-  # Check for cmake-js installations
-  find_program(CMAKE_JS_EXECUTABLE
-    NAMES "cmake-js" "cmake-js.exe"
-    PATHS "$ENV{PATH}" "$ENV{ProgramFiles}/cmake-js"
-    DOC "cmake-js system executable binary"
-    REQUIRED
-  )
-  if(NOT CMAKE_JS_EXECUTABLE)
-    find_program(CMAKE_JS_EXECUTABLE
-      NAMES "cmake-js" "cmake-js.exe"
-      PATHS "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/bin"
-      DOC "cmake-js project-local npm package binary"
-      REQUIRED
-    )
-    if (NOT CMAKE_JS_EXECUTABLE)
-        message(FATAL_ERROR "cmake-js not found! Please run 'npm install' and try again.")
-        return()
-    endif()
-  endif()
-  _cmakejs_normalize_path(CMAKE_JS_EXECUTABLE)
-  string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_EXECUTABLE "${CMAKE_JS_EXECUTABLE}")
-  set(CMAKE_JS_EXECUTABLE ${CMAKE_JS_EXECUTABLE} PARENT_SCOPE) # vars defined in functions only apply to their own scope, so this is needed!
-endfunction()
-
-#[=============================================================================[
-Provides CMAKE_JS_INC
-Requires CMAKE_JS_EXECUTABLE
-(might accept a '--log-level' arg in future for more verbose output)
-]=============================================================================]#
-function(cmakejs_print_cmakejs_include)
-  execute_process(
-    COMMAND "${CMAKE_JS_EXECUTABLE}" "print-cmakejs-include" "--log-level error" "--generator ${CMAKE_GENERATOR}"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    OUTPUT_VARIABLE CMAKE_JS_INC
-  )
-  # Strip the var of any unusual chars that might break the paths...
-  _cmakejs_normalize_path(CMAKE_JS_INC)
-  string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_INC "${CMAKE_JS_INC}")
-  set(CMAKE_JS_INC "${CMAKE_JS_INC}" PARENT_SCOPE)
-endfunction()
-
-#[=============================================================================[
-Provides CMAKE_JS_SRC
-Requires CMAKE_JS_EXECUTABLE
-(might accept a '--log-level' arg in future for more verbose output)
-]=============================================================================]#
-function(cmakejs_print_cmakejs_src)
-  execute_process(
-    COMMAND "${CMAKE_JS_EXECUTABLE}" "print-cmakejs-src" "--log-level error" "--generator ${CMAKE_GENERATOR}"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    OUTPUT_VARIABLE CMAKE_JS_SRC
-  )
-  # Strip the var of any unusual chars that might break the paths...
-  _cmakejs_normalize_path(CMAKE_JS_SRC)
-  string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_SRC "${CMAKE_JS_SRC}")
-  set(CMAKE_JS_SRC "${CMAKE_JS_SRC}" PARENT_SCOPE)
-endfunction()
-
-#[=============================================================================[
-Provides CMAKE_JS_LIB
-Requires CMAKE_JS_EXECUTABLE
-(might accept a '--log-level' arg in future for more verbose output)
-]=============================================================================]#
-function(cmakejs_print_cmakejs_lib)
-  execute_process(
-      COMMAND "${CMAKE_JS_EXECUTABLE}" "print-cmakejs-lib" "--log-level error" "--generator ${CMAKE_GENERATOR}"
-      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      OUTPUT_VARIABLE CMAKE_JS_LIB
-    )
-    _cmakejs_normalize_path(CMAKE_JS_LIB)
-    string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_LIB "${CMAKE_JS_LIB}")
-    set(CMAKE_JS_LIB "${CMAKE_JS_LIB}" PARENT_SCOPE)
-endfunction()
+# #[=============================================================================[
+# Provides CMAKE_JS_EXECUTABLE
+# ]=============================================================================]#
+# function(cmakejs_find_cmakejs_executable)
+#   # Check for cmake-js installations
+#   find_program(CMAKE_JS_EXECUTABLE
+#     NAMES "cmake-js" "cmake-js.exe"
+#     PATHS "$ENV{PATH}" "$ENV{ProgramFiles}/cmake-js"
+#     DOC "cmake-js system executable binary"
+#     REQUIRED
+#   )
+#   if(NOT CMAKE_JS_EXECUTABLE)
+#     find_program(CMAKE_JS_EXECUTABLE
+#       NAMES "cmake-js" "cmake-js.exe"
+#       PATHS "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/bin"
+#       DOC "cmake-js project-local npm package binary"
+#       REQUIRED
+#     )
+#     if (NOT CMAKE_JS_EXECUTABLE)
+#         message(FATAL_ERROR "cmake-js not found! Please run 'npm install' and try again.")
+#         return()
+#     endif()
+#   endif()
+#   _cmakejs_normalize_path(CMAKE_JS_EXECUTABLE)
+#   string(REGEX REPLACE "[\r\n\"]" "" CMAKE_JS_EXECUTABLE "${CMAKE_JS_EXECUTABLE}")
+#   set(CMAKE_JS_EXECUTABLE ${CMAKE_JS_EXECUTABLE} PARENT_SCOPE) # vars defined in functions only apply to their own scope, so this is needed!
+# endfunction()
 
 #[=============================================================================[
 Get the in-use NodeJS binary for executing NodeJS commands in CMake scripts.
@@ -181,28 +131,30 @@ Provides
 
 ]=============================================================================]#
 function(cmakejs_acquire_node_executable)
-  find_program(NODE_EXECUTABLE
-    NAMES "node" "node.exe"
-    PATHS "$ENV{PATH}" "$ENV{ProgramFiles}/nodejs"
-    DOC "NodeJs executable binary"
-    REQUIRED
-  )
-  if (NOT NODE_EXECUTABLE)
-      message(FATAL_ERROR "NodeJS installation not found! Please check your paths and try again.")
-      return()
-  endif()
+  if(NOT DEFINED NODE_EXECUTABLE)
+    find_program(NODE_EXECUTABLE
+      NAMES "node" "node.exe"
+      PATHS "$ENV{PATH}" "$ENV{ProgramFiles}/nodejs"
+      DOC "NodeJs executable binary"
+      REQUIRED
+    )
+    if (NOT NODE_EXECUTABLE)
+        message(FATAL_ERROR "NodeJS installation not found! Please check your paths and try again.")
+        return()
+    endif()
 
-  execute_process(
-    COMMAND "${NODE_EXECUTABLE}" "--version"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE NODE_VERSION
-  )
-  string(REGEX REPLACE "[\r\n\"]" "" NODE_VERSION "${NODE_VERSION}")
-  set(NODE_VERSION "${NODE_VERSION}" CACHE STRING "" FORCE)
+    execute_process(
+      COMMAND "${NODE_EXECUTABLE}" "--version"
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      OUTPUT_VARIABLE NODE_VERSION
+    )
+    string(REGEX REPLACE "[\r\n\"]" "" NODE_VERSION "${NODE_VERSION}")
+    set(NODE_VERSION "${NODE_VERSION}" CACHE STRING "" FORCE)
 
-  if(VERBOSE)
-      message(STATUS "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
-      message(STATUS "NODE_VERSION: ${NODE_VERSION}")
+    if(VERBOSE)
+        message(STATUS "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
+        message(STATUS "NODE_VERSION: ${NODE_VERSION}")
+    endif()
   endif()
 endfunction()
 
@@ -217,42 +169,60 @@ Provides
 
 ]=============================================================================]#
 function(cmakejs_acquire_napi_c_files)
-  execute_process(
-    COMMAND "${NODE_EXECUTABLE}" -p "require('node-api-headers').include_dir"
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    OUTPUT_VARIABLE NODE_API_HEADERS_DIR
-    # COMMAND_ERROR_IS_FATAL ANY - crashes on ARM64 builds? unfortunate!
-  )
-  string(REGEX REPLACE "[\r\n\"]" "" NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}")
+ # Acquire if needed...
+  if(NOT DEFINED NODE_API_HEADERS_DIR) # Why the NODE_API_* namespace? Because 'node-api-headers' from vcpkg also provides this exact var, so we can help our users from vcpkg-land avoid picking up headers they already have ; but, we still need to process those headers into our target(s) for them!
+  message("run ${NODE_EXECUTABLE} -p require('node-api-headers').include_dir)")
+    execute_process(
+      COMMAND "${NODE_EXECUTABLE}" -p "require('node-api-headers').include_dir"
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      OUTPUT_VARIABLE NODE_API_HEADERS_DIR
+      # COMMAND_ERROR_IS_FATAL ANY - crashes on ARM64 builds? unfortunate!
+    )
+    string(REGEX REPLACE "[\r\n\"]" "" NODE_API_HEADERS_DIR "${NODE_API_HEADERS_DIR}")
 
-  # relocate...
-  set(_NODE_API_INC_FILES "")
-  file(GLOB_RECURSE _NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-  file(COPY ${_NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
-  unset(_NODE_API_INC_FILES)
+    if (NOT NODE_API_HEADERS_DIR)
+      message(FATAL_ERROR "Failed to resolve `node-api-headers`")
+      return()
+    endif()
 
-  unset(NODE_API_HEADERS_DIR CACHE)
-  # target include directories (as if 'node-api-headers' were an isolated CMake project...)
-  set(NODE_API_HEADERS_DIR
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers>
-    $<INSTALL_INTERFACE:include/node-api-headers>
-  )
-  set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} PARENT_SCOPE) # dont wrap this one in quotes; it breaks!
+    # relocate...
+    set(_NODE_API_INC_FILES "")
+    file(GLOB_RECURSE _NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+    file(COPY ${_NODE_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers")
+    unset(_NODE_API_INC_FILES)
 
-  # this is just for IDE support only. Never pass globbed headers to 'target_sources()'!
-  set(NODE_API_INC_FILES "")
-  file(GLOB_RECURSE NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-  set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" PARENT_SCOPE)
-  source_group("Node API (C)" FILES "${NODE_API_INC_FILES}")
-  # end IDE support codeblock
-  # it's not a 'source_group' for targets!
-  # VS users will see the above globbed headers as a filegroup named "Node API (C)"
-  # and that is literally all that this 'source_group' function does.
-  # it is not the same as 'target_sources' - so, globbing was ok here!
+    unset(NODE_API_HEADERS_DIR CACHE)
+    # target include directories (as if 'node-api-headers' were an isolated CMake project...)
+    set(NODE_API_HEADERS_DIR
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers>
+      $<INSTALL_INTERFACE:include/node-api-headers>
+    )
+    set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} PARENT_SCOPE) # dont wrap this one in quotes; it breaks!
 
-  if(VERBOSE)
-      message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
+    # this is just for IDE support only. Never pass globbed headers to 'target_sources()'!
+    set(NODE_API_INC_FILES "")
+    file(GLOB_RECURSE NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+    set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" PARENT_SCOPE)
+    source_group("Node API (C)" FILES "${NODE_API_INC_FILES}")
+    # end IDE support codeblock
+    # it's not a 'source_group' for targets!
+    # VS users will see the above globbed headers as a filegroup named "Node API (C)"
+    # and that is literally all that this 'source_group' function does.
+    # it is not the same as 'target_sources' - so, globbing was ok here!
+
+    if(VERBOSE)
+        message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
+    endif()
+
+    set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} CACHE PATH "Node API Headers directory." FORCE)
+    message(DEBUG "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
+    unset(NODE_API_INC_FILES)
   endif()
+  if(NOT DEFINED NODE_API_INC_FILES)
+    file(GLOB_RECURSE NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
+    source_group("Node Addon API (C)" FILES ${NODE_API_INC_FILES}) # IDE only, don't pass this to target_sources()!
+  endif()
+  set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE STRING "Node API Header files." FORCE)
 endfunction()
 
 #[=============================================================================[
@@ -266,37 +236,53 @@ Provides
 
 ]=============================================================================]#
 function(cmakejs_acquire_napi_cpp_files)
-  execute_process(
-    COMMAND "${NODE_EXECUTABLE}" -p "require('node-addon-api').include"
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    OUTPUT_VARIABLE NODE_ADDON_API_DIR
-    # COMMAND_ERROR_IS_FATAL ANY -these vars seem to error on ARM64 builds ...?
-  )
-  string(REGEX REPLACE "[\r\n\"]" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
+  if(NOT DEFINED NODE_ADDON_API_DIR) # This matches the 'node-addon-api' package from vcpkg, so will avoid duplicates for those users
+    execute_process(
+      COMMAND "${NODE_EXECUTABLE}" -p "require('node-addon-api').include"
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      OUTPUT_VARIABLE NODE_ADDON_API_DIR
+      # COMMAND_ERROR_IS_FATAL ANY -these vars seem to error on ARM64 builds ...?
+    )
+    string(REGEX REPLACE "[\r\n\"]" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
+  
+    if (NOT NODE_ADDON_API_DIR)
+      message(FATAL_ERROR "Failed to resolve `node-addon-api`")
+      return()
+    endif()
+    
+    # relocate...
+    set(_NODE_ADDON_API_INC_FILES "")
+    file(GLOB_RECURSE _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+    file(COPY ${_NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
+    unset(_NODE_ADDON_API_INC_FILES)
 
-  # relocate...
-  set(_NODE_ADDON_API_INC_FILES "")
-  file(GLOB_RECURSE _NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-  file(COPY ${_NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api")
-  unset(_NODE_ADDON_API_INC_FILES)
+    unset(NODE_ADDON_API_DIR CACHE)
+    # target include directories (as if 'node-addon-api' were an isolated CMake project...)
+    set(NODE_ADDON_API_DIR
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api>
+      $<INSTALL_INTERFACE:include/node-addon-api>
+    )
+    set(NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR} PARENT_SCOPE)
 
-  unset(NODE_ADDON_API_DIR CACHE)
-  # target include directories (as if 'node-addon-api' were an isolated CMake project...)
-  set(NODE_ADDON_API_DIR
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api>
-    $<INSTALL_INTERFACE:include/node-addon-api>
-  )
-  set(NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR} PARENT_SCOPE)
+    # this is just for IDE support only. Never pass globbed headers to 'target_sources()'!
+    set(NODE_ADDON_API_INC_FILES "")
+    file(GLOB_RECURSE NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+    set(NODE_ADDON_API_INC_FILES ${NODE_ADDON_API_INC_FILES} PARENT_SCOPE)
+    source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
 
-  # this is just for IDE support only. Never pass globbed headers to 'target_sources()'!
-  set(NODE_ADDON_API_INC_FILES "")
-  file(GLOB_RECURSE NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-  set(NODE_ADDON_API_INC_FILES ${NODE_ADDON_API_INC_FILES} PARENT_SCOPE)
-  source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}")
-
-  if(VERBOSE)
-      message(STATUS "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
+    if(VERBOSE)
+        message(STATUS "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
+    endif()
+    
+    set(NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR} CACHE PATH "Node Addon API Headers directory." FORCE)
+    message(DEBUG "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
+    unset(NODE_ADDON_API_INC_FILES)
   endif()
+  if(NOT DEFINED NODE_ADDON_API_INC_FILES)
+    file(GLOB_RECURSE NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
+    source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}") # just for IDE support; another misleading function name!
+  endif()
+  set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE STRING "Node Addon API Header files." FORCE)
 endfunction()
 
 #[=============================================================================[
@@ -307,7 +293,7 @@ side.
 
 (experimental)
 ]=============================================================================]#
-function(cmakejs_create_addon_bindings addon_target)
+function(cmakejs_create_addon_bindings addon_target) # TODO - is this useful? it feels kinda useful, but not if distributing with prebuilds (unless the prebuild system understands this)
 
   # Check that this is a Node Addon target
   get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
@@ -537,21 +523,13 @@ endif()
 #   list(APPEND CMAKEJS_TARGETS  node-dev)
 # endif()
 
-if(CMAKEJS_USING_NODE_API) # user did 'cmake-js configure --link-level=1' or higher
+function(cmakejs_setup_node_api_addons)
+  cmakejs_acquire_napi_c_files()
 
-  # Acquire if needed...
-  if(NOT DEFINED NODE_API_HEADERS_DIR) # Why the NODE_API_* namespace? Because 'node-api-headers' from vcpkg also provides this exact var, so we can help our users from vcpkg-land avoid picking up headers they already have ; but, we still need to process those headers into our target(s) for them!
-    cmakejs_acquire_napi_c_files()
-    set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} CACHE PATH "Node API Headers directory." FORCE)
-    message(DEBUG "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
-    unset(NODE_API_INC_FILES)
+  # Check that this hasnt already been called
+  if(TARGET cmake-js::node-api)
+    return()
   endif()
-  if(NOT DEFINED NODE_API_INC_FILES)
-    file(GLOB_RECURSE NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
-    source_group("Node Addon API (C)" FILES ${NODE_API_INC_FILES}) # IDE only, don't pass this to target_sources()!
-  endif()
-  set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" CACHE STRING "Node API Header files." FORCE)
-
 
   # Node API (C) - requires NodeJS developer headers target, cmake-js::node-dev
   # cmake-js::node-api
@@ -607,22 +585,30 @@ if(CMAKEJS_USING_NODE_API) # user did 'cmake-js configure --link-level=1' or hig
     endif()
   endforeach()
   list(APPEND CMAKEJS_TARGETS node-api)
-endif()
 
-if(CMAKEJS_USING_NODE_ADDON_API) # user did 'cmake-js configure --link-level=2' or higher
+  # setup the install target
+  install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers")
+  install(TARGETS node-api
+    EXPORT CMakeJSTargets
+    LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers" # Having trouble setting this correctly
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers" # this issue stems from their package.json, not our code... but guess who needs to fix it now :)
+    FILE_SET node_api_INTERFACE_HEADERS
+  )
+endfunction()
 
-  # Acquire if needed...
-  if(NOT DEFINED NODE_ADDON_API_DIR) # This matches the 'node-addon-api' package from vcpkg, so will avoid duplicates for those users
-    cmakejs_acquire_napi_cpp_files()
-    set(NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR} CACHE PATH "Node Addon API Headers directory." FORCE)
-    message(DEBUG "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
-    unset(NODE_ADDON_API_INC_FILES)
+
+function(cmakejs_setup_node_addon_api_addons) # TODO: name this
+  cmakejs_acquire_napi_cpp_files()
+
+  cmakejs_setup_node_api_addons() # needs c addons support
+
+  # Check that this hasnt already been called
+  if(TARGET cmake-js::node-addon-api)
+    return()
   endif()
-  if(NOT DEFINED NODE_ADDON_API_INC_FILES)
-    file(GLOB_RECURSE NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
-    source_group("Node Addon API (C++)" FILES "${NODE_ADDON_API_INC_FILES}") # just for IDE support; another misleading function name!
-  endif()
-  set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE STRING "Node Addon API Header files." FORCE)
 
   # Node Addon API (C++) - requires Node API (C) target, cmake-js::node-api
   # cmake-js::node-addon-api
@@ -658,7 +644,19 @@ if(CMAKEJS_USING_NODE_ADDON_API) # user did 'cmake-js configure --link-level=2' 
   endforeach()
 
   list(APPEND CMAKEJS_TARGETS  node-addon-api)
-endif()
+
+  # setup the install target
+  install(FILES ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api")
+  install(TARGETS node-addon-api
+    EXPORT CMakeJSTargets
+    LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api"
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api"
+    FILE_SET node_addon_api_INTERFACE_HEADERS
+  )
+endfunction()
 
 # CMakeJS API - Helpers to ensure delay hook and other build properties are setup
 # cmake-js::cmake-js
@@ -667,7 +665,7 @@ add_library                 (cmake-js::cmake-js ALIAS cmake-js)
 # if(CMAKEJS_NODE_ADDON_API) # TODO: should this have the dependency, or should that be done manually? Perhaps auto vs manual should be an option
 #   target_link_libraries       (cmake-js INTERFACE cmake-js::node-addon-api)
 # endif()
-target_link_libraries       (cmake-js INTERFACE cmake-js::node-api)
+# target_link_libraries       (cmake-js INTERFACE cmake-js::node-api)
 target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
 target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
 set_target_properties       (cmake-js PROPERTIES VERSION   ${_CMAKEJS_VERSION})
@@ -687,6 +685,7 @@ cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_V
 (This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
 ]=============================================================================]#
 function(cmakejs_create_napi_addon name)
+  cmakejs_setup_node_api_addons() # needs c addons support # TODO: keep this?
 
     # Avoid duplicate target names
     if(TARGET ${name})
@@ -1155,32 +1154,6 @@ set(CMAKEJS_INC_DIR
 #     FILE_SET node_dev_INTERFACE_HEADERS
 #   )
 # endif()
-
-if(CMAKEJS_USING_NODE_API)
-  install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers")
-  install(TARGETS node-api
-    EXPORT CMakeJSTargets
-    LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-    RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers" # Having trouble setting this correctly
-    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers" # this issue stems from their package.json, not our code... but guess who needs to fix it now :)
-    FILE_SET node_api_INTERFACE_HEADERS
-  )
-endif()
-
-if(CMAKEJS_USING_NODE_ADDON_API)
-  install(FILES ${NODE_ADDON_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api")
-  install(TARGETS node-addon-api
-    EXPORT CMakeJSTargets
-    LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-    RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api"
-    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api"
-    FILE_SET node_addon_api_INTERFACE_HEADERS
-  )
-endif()
 
 if(CMAKEJS_USING_CMAKEJS)
   install(FILES ${_CMAKEJS_SCRIPT} DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS")
