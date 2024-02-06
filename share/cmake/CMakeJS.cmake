@@ -12,7 +12,7 @@ include(GNUInstallDirs)
 include(CMakeDependentOption)
 
 if (DEFINED CMAKE_JS_VERSION)
-    message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, instead you should use cmake-js2 or cmake")
+    message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, you should use cmake-js2 or cmake instead")
 endif()
 
 #[=============================================================================[
@@ -652,30 +652,24 @@ if(CMAKEJS_USING_CMAKEJS) # user did 'cmake-js configure --link-level=3', or did
   set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
   set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMakeJS_MAJOR_VERSION)
 
-  # # Generate definitions
-  # if(MSVC)
-  #     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
-  #     if(CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
-  #         execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
-  #     endif()
-  # endif()
+  # find the node api definition to generate into node.lib
+  if (MSVC) 
+    target_sources (node-api INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
 
-  # TODO: DELAY_HOOK thing - here? idea of this target is, 'automatically give me everything, all set up'.
-  # I propose that the remainder of the details of Node Addon CMake config which I've not explored yet
-  # should be well-considered as to which target we supply a pre-config for. Wherever you define this stuff,
-  # it will probably propogate down to this target level anyway, due to this one carrying a link line
-  # to all the other targets via it's logical dependency chain. I just think that if you're not using our
-  # nice 'create()' function, you're an intermediate/advanced CMake dev who would rather spec that
-  # stuff themselves. An additional cosideration is making sure we only apply stuff to our targets,
-  # and never just define things globally. Meaning, always use 'target_add_definitions()' and never ever
-  # use regular 'add_definitions()' when taking care of this. Why? Because that global function
-  # will propogate globally, downstream, and who knows where else (see also: never do 'using namespace <vendor>'
-  # in the global namespace scope in a public C++ header file... you don't know where it will propogate,
-  # what it might break, or even where the issue stems from when it does arise).
-  # Keep in mind that PUBLIC defs on a target are propogated to any other targets that link with it.
-  # PRIVATE does not propogate. Sometimes, INTERFACE libs insist you use INTERFACE specifiers.
-  # so whatever is decided, it must be very well considered i.e., not arbitrary, and if CMake
-  # insists something, don't fight it. CMake doggedly refuses to be beaten at it's own games :)
+    execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').def_paths.node_api_def"
+        WORKING_DIRECTORY ${_CMAKEJS_DIR}
+        OUTPUT_VARIABLE CMAKEJS_NODELIB_DEF
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    if (DEFINED CMAKEJS_NODELIB_DEF)
+        message(FATAL_ERROR "Failed to find `node-api-headers` api definition")
+    endif()
+
+    set(CMAKEJS_NODELIB_TARGET "${CMAKE_BINARY_DIR}/node.lib")
+    execute_process(COMMAND ${CMAKE_AR} /def:${CMAKEJS_NODELIB_DEF} /out:${CMAKEJS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
+    target_link_libraries (cmake-js INTERFACE "${CMAKEJS_NODELIB_TARGET}")
+  endif()
 
   list(APPEND CMAKEJS_TARGETS cmake-js)
 
