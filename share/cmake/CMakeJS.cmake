@@ -650,7 +650,21 @@ set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMa
 
 if (MSVC) 
   target_sources (cmake-js INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
+
+  # setup delayload
+  target_link_options(cmake-js PRIVATE "/DELAYLOAD:NODE.EXE")
+  target_link_libraries(cmake-js PRIVATE delayimp)
+
+  if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)")
+      target_link_options(cmake-js PUBLIC "/SAFESEH:NO")
+  endif()
 endif()
+
+# TODO: Does macos need the following still?
+# this.compilerFlags.push('-D_DARWIN_USE_64_BIT_INODE=1')
+# this.compilerFlags.push('-D_LARGEFILE_SOURCE')
+# this.compilerFlags.push('-D_FILE_OFFSET_BITS=64')
+# this.linkerFlags.push('-undefined dynamic_lookup')
 
 function(_cmakejs_export_target name)
   export (
