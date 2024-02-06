@@ -12,7 +12,8 @@ include(GNUInstallDirs)
 include(CMakeDependentOption)
 
 if (DEFINED CMAKE_JS_VERSION)
-    message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, you should use cmake-js2 or cmake instead")
+  # HACK: this should be re-enabled before this is finalised
+  # message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, you should use cmake-js2 or cmake instead")
 endif()
 
 #[=============================================================================[
@@ -67,6 +68,7 @@ if(COMMAND cmakejs_napi_addon_add_sources)
 endif()
 
 set(_CMAKEJS_VERSION "${_version}" CACHE INTERNAL "Current 'CMakeJS.cmake' version. Used for checking for conflicts")
+set(_CMAKEJS_SCRIPT "${CMAKE_CURRENT_LIST_FILE}" CACHE INTERNAL "Path to current 'CMakeJS.cmake' script")
 
 # Default build output directory, if not specified with '-DCMAKEJS_BINARY_DIR:PATH=/some/dir'
 if(NOT DEFINED CMAKEJS_BINARY_DIR)
@@ -360,180 +362,180 @@ if(NOT DEFINED NODE_EXECUTABLE)
   message(DEBUG "NODE_VERSION: ${NODE_VERSION}")
 endif()
 
-if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or higher
-  # NodeJS system installation headers
-  # cmake-js::node-dev
-  add_library                 (node-dev INTERFACE)
-  add_library                 (cmake-js::node-dev ALIAS node-dev)
-  target_sources              (node-dev INTERFACE ${CMAKE_JS_SRC}) # tip: don't enclose this in strings! (or it won't be null if the file is nonexistent)
-  target_link_libraries       (node-dev INTERFACE ${CMAKE_JS_LIB}) # tip: don't enclose this in strings! (or it won't be null if the file is nonexistent)
-  set_target_properties       (node-dev PROPERTIES VERSION ${NODE_VERSION})
-  target_include_directories  (node-dev INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
-    $<INSTALL_INTERFACE:include/node>
-  )
+# if(CMAKEJS_USING_NODE_DEV) # user did 'cmake-js configure --link-level=0' or higher
+#   # NodeJS system installation headers
+#   # cmake-js::node-dev
+#   add_library                 (node-dev INTERFACE)
+#   add_library                 (cmake-js::node-dev ALIAS node-dev)
+#   target_sources              (node-dev INTERFACE ${CMAKE_JS_SRC}) # tip: don't enclose this in strings! (or it won't be null if the file is nonexistent)
+#   target_link_libraries       (node-dev INTERFACE ${CMAKE_JS_LIB}) # tip: don't enclose this in strings! (or it won't be null if the file is nonexistent)
+#   set_target_properties       (node-dev PROPERTIES VERSION ${NODE_VERSION})
+#   target_include_directories  (node-dev INTERFACE
+#     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node>
+#     $<INSTALL_INTERFACE:include/node>
+#   )
 
-  # TODO: this list would be un-manageable for all iterations of NodeJS dev files
-  # across versions; even minor versions seem to have lots of different files!
-  # Fortunately for us, HEADERS should never really go to 'target_sources',
-  # because HEADERS are *not supposed to be compiled*, they are only used
-  # for lookup by the compiler. They are just symbolic, nothing more.
-  #
-  # The two 'correct' mechanisms for adding headers to a target in CMake are:
-  #
-  # Modern CMake: you can put them in 'target_sources()' - one by one, never
-  # by globbing expressions! - if you create a FILE_SET of TYPE HEADERS
-  # and follow the strict naming conventions and BASE_DIRS thing.
-  #
-  # Classic CMake: You don't actually pass any header files to your target
-  # explicitly; instead, you just put their path on 'target_include_directories()',
-  # and your compiler/CMake/IDE/intellisense will loop up the file relative to
-  # that path. So you can then '#include <from/that/path.h>'
-  #
-  # This manual listing of files maybe wouldnt be so bad if we just globbed
-  # everything recursively and dumped them all into one massive dir. But (aHa!),
-  # they have all been authored to '#include <very/specific/paths.h>', and for
-  # very good reason - these libnode-dev headers contain familiar libs such as
-  # openssl, but these ones are doctored by team NodeJS according to their custom
-  # needs, and that's why NodeJS ships these third-party copies under their own
-  # include line.
-  #
-  # We can glob the files; we can even have CMake just pick up the base dir and
-  # throw that around; but, we'd have to generate the entire FILESET below with
-  # a fully-maintained filetree and include line, specific to whichever version
-  # of NodeJS that cmake.js has picked up for us.
-  #
-  # So instead of taking on unthinkable complexity of maintaining this, we can
-  # just pass the relocatable '*_INCLUDE_DIR' from under these copied files that
-  # CMake is already passing around, and just pass that to our target's
-  # 'target_include_directories()' and let it do the 'Classical lookup-only header'
-  # approach. We lose nothing, really, since none of these files are supposed to be
-  # compiled in. CMake only ever just needed to know where the base dir is that
-  # it can instruct the compiler and linker do their symbol lookups from, and
-  # the dir we're passing in has been made CMake-relocatable thanks to it's
-  # BUILD_ and INSTALL_ interfaces and generator expressions. That is really
-  # the definition of an INTERFACE library in CMake parlance anyway - a CMake
-  # - formatted header-only library :)
+#   # TODO: this list would be un-manageable for all iterations of NodeJS dev files
+#   # across versions; even minor versions seem to have lots of different files!
+#   # Fortunately for us, HEADERS should never really go to 'target_sources',
+#   # because HEADERS are *not supposed to be compiled*, they are only used
+#   # for lookup by the compiler. They are just symbolic, nothing more.
+#   #
+#   # The two 'correct' mechanisms for adding headers to a target in CMake are:
+#   #
+#   # Modern CMake: you can put them in 'target_sources()' - one by one, never
+#   # by globbing expressions! - if you create a FILE_SET of TYPE HEADERS
+#   # and follow the strict naming conventions and BASE_DIRS thing.
+#   #
+#   # Classic CMake: You don't actually pass any header files to your target
+#   # explicitly; instead, you just put their path on 'target_include_directories()',
+#   # and your compiler/CMake/IDE/intellisense will loop up the file relative to
+#   # that path. So you can then '#include <from/that/path.h>'
+#   #
+#   # This manual listing of files maybe wouldnt be so bad if we just globbed
+#   # everything recursively and dumped them all into one massive dir. But (aHa!),
+#   # they have all been authored to '#include <very/specific/paths.h>', and for
+#   # very good reason - these libnode-dev headers contain familiar libs such as
+#   # openssl, but these ones are doctored by team NodeJS according to their custom
+#   # needs, and that's why NodeJS ships these third-party copies under their own
+#   # include line.
+#   #
+#   # We can glob the files; we can even have CMake just pick up the base dir and
+#   # throw that around; but, we'd have to generate the entire FILESET below with
+#   # a fully-maintained filetree and include line, specific to whichever version
+#   # of NodeJS that cmake.js has picked up for us.
+#   #
+#   # So instead of taking on unthinkable complexity of maintaining this, we can
+#   # just pass the relocatable '*_INCLUDE_DIR' from under these copied files that
+#   # CMake is already passing around, and just pass that to our target's
+#   # 'target_include_directories()' and let it do the 'Classical lookup-only header'
+#   # approach. We lose nothing, really, since none of these files are supposed to be
+#   # compiled in. CMake only ever just needed to know where the base dir is that
+#   # it can instruct the compiler and linker do their symbol lookups from, and
+#   # the dir we're passing in has been made CMake-relocatable thanks to it's
+#   # BUILD_ and INSTALL_ interfaces and generator expressions. That is really
+#   # the definition of an INTERFACE library in CMake parlance anyway - a CMake
+#   # - formatted header-only library :)
 
 
-  # set(NODE_DEV_FILES "")
-  # list(APPEND NODE_DEV_FILES
-  #   # NodeJS core
-  #   "node_buffer.h"
-  #   "node_object_wrap.h"
-  #   "node_version.h"
-  #   "node.h"
-  #   # NodeJS addon
-  #   "node_api.h"
-  #   "node_api_types.h"
-  #   "js_native_api.h"
-  #   "js_native_api_types.h"
-  #   # uv
-  #   "uv.h"
-  #   # v8
-  #   "v8config.h"
-  #   "v8-array-buffer.h"
-  #   "v8-callbacks.h"
-  #   "v8-container.h"
-  #   "v8-context.h"
-  #   "v8-data.h"
-  #   "v8-date.h"
-  #   "v8-debug.h"
-  #   "v8-embedder-heap.h"
-  #   "v8-embedder-state-scope.h"
-  #   "v8-exception.h"
-  #   "v8-extension.h"
-  #   "v8-forward.h"
-  #   "v8-function-callback.h"
-  #   "v8-function.h"
-  #   "v8-initialization.h"
-  #   "v8-internal.h"
-  #   "v8-isolate.h"
-  #   "v8-json.h"
-  #   "v8-local-handle.h"
-  #   "v8-locker.h"
-  #   "v8-maybe.h"
-  #   "v8-memory-span.h"
-  #   "v8-message.h"
-  #   "v8-microtask-queue.h"
-  #   "v8-microtask.h"
-  #   "v8-object.h"
-  #   "v8-persistent-handle.h"
-  #   "v8-platform.h"
-  #   "v8-primitive-object.h"
-  #   "v8-primitive.h"
-  #   "v8-profiler.h"
-  #   "v8-promise.h"
-  #   "v8-proxy.h"
-  #   "v8-regexp.h"
-  #   "v8-script.h"
-  #   "v8-snapshot.h"
-  #   "v8-statistics.h"
-  #   "v8-template.h"
-  #   "v8-traced-handle.h"
-  #   "v8-typed-array.h"
-  #   "v8-unwinder.h"
-  #   "v8-util.h"
-  #   "v8-value-serializer-version.h"
-  #   "v8-value-serializer.h"
-  #   "v8-value.h"
-  #   "v8-version.h"
-  #   "v8-version-string.h"
-  #   "v8-wasm.h"
-  #   "v8-wasm-trap-handler-posix.h"
-  #   "v8-wasm-trap-handler-win.h"
-  #   "v8-weak-callback.h"
-  #   "v8.h"
-  #   "v8-config.h"
-  #   # zlib
-  #   "zconf.h"
-  #   "zlib.h"
-  # )
+#   # set(NODE_DEV_FILES "")
+#   # list(APPEND NODE_DEV_FILES
+#   #   # NodeJS core
+#   #   "node_buffer.h"
+#   #   "node_object_wrap.h"
+#   #   "node_version.h"
+#   #   "node.h"
+#   #   # NodeJS addon
+#   #   "node_api.h"
+#   #   "node_api_types.h"
+#   #   "js_native_api.h"
+#   #   "js_native_api_types.h"
+#   #   # uv
+#   #   "uv.h"
+#   #   # v8
+#   #   "v8config.h"
+#   #   "v8-array-buffer.h"
+#   #   "v8-callbacks.h"
+#   #   "v8-container.h"
+#   #   "v8-context.h"
+#   #   "v8-data.h"
+#   #   "v8-date.h"
+#   #   "v8-debug.h"
+#   #   "v8-embedder-heap.h"
+#   #   "v8-embedder-state-scope.h"
+#   #   "v8-exception.h"
+#   #   "v8-extension.h"
+#   #   "v8-forward.h"
+#   #   "v8-function-callback.h"
+#   #   "v8-function.h"
+#   #   "v8-initialization.h"
+#   #   "v8-internal.h"
+#   #   "v8-isolate.h"
+#   #   "v8-json.h"
+#   #   "v8-local-handle.h"
+#   #   "v8-locker.h"
+#   #   "v8-maybe.h"
+#   #   "v8-memory-span.h"
+#   #   "v8-message.h"
+#   #   "v8-microtask-queue.h"
+#   #   "v8-microtask.h"
+#   #   "v8-object.h"
+#   #   "v8-persistent-handle.h"
+#   #   "v8-platform.h"
+#   #   "v8-primitive-object.h"
+#   #   "v8-primitive.h"
+#   #   "v8-profiler.h"
+#   #   "v8-promise.h"
+#   #   "v8-proxy.h"
+#   #   "v8-regexp.h"
+#   #   "v8-script.h"
+#   #   "v8-snapshot.h"
+#   #   "v8-statistics.h"
+#   #   "v8-template.h"
+#   #   "v8-traced-handle.h"
+#   #   "v8-typed-array.h"
+#   #   "v8-unwinder.h"
+#   #   "v8-util.h"
+#   #   "v8-value-serializer-version.h"
+#   #   "v8-value-serializer.h"
+#   #   "v8-value.h"
+#   #   "v8-version.h"
+#   #   "v8-version-string.h"
+#   #   "v8-wasm.h"
+#   #   "v8-wasm-trap-handler-posix.h"
+#   #   "v8-wasm-trap-handler-win.h"
+#   #   "v8-weak-callback.h"
+#   #   "v8.h"
+#   #   "v8-config.h"
+#   #   # zlib
+#   #   "zconf.h"
+#   #   "zlib.h"
+#   # )
 
-  # foreach(FILE IN LISTS NODE_DEV_FILES)
-  #   if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}")
-  #     message(DEBUG "Found NodeJS developer header: ${FILE}")
-  #     target_sources(node-dev INTERFACE
-  #     FILE_SET node_dev_INTERFACE_HEADERS
-  #     TYPE HEADERS
-  #     BASE_DIRS
-  #       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-  #       $<INSTALL_INTERFACE:include>
-  #     FILES
-  #       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}>
-  #       $<INSTALL_INTERFACE:include/node/${FILE}>
-  #   )
-  #   endif()
-  # endforeach()
-  set(_CMAKE_JS_INC_FILES "")
+#   # foreach(FILE IN LISTS NODE_DEV_FILES)
+#   #   if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}")
+#   #     message(DEBUG "Found NodeJS developer header: ${FILE}")
+#   #     target_sources(node-dev INTERFACE
+#   #     FILE_SET node_dev_INTERFACE_HEADERS
+#   #     TYPE HEADERS
+#   #     BASE_DIRS
+#   #       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+#   #       $<INSTALL_INTERFACE:include>
+#   #     FILES
+#   #       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node/${FILE}>
+#   #       $<INSTALL_INTERFACE:include/node/${FILE}>
+#   #   )
+#   #   endif()
+#   # endforeach()
+#   set(_CMAKE_JS_INC_FILES "")
 
-  # Not quite working, but not breaking anything...
-  foreach(input IN ITEMS "${CMAKE_JS_INC}")
+#   # Not quite working, but not breaking anything...
+#   foreach(input IN ITEMS "${CMAKE_JS_INC}")
 
-      _cmakejs_normalize_path(input)
-      get_filename_component(file_abs_path  "${input}" ABSOLUTE)
-      get_filename_component(file_name      "${input}" NAME)
-      file(RELATIVE_PATH file_rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${file_abs_path}") # /${file_name}
+#       _cmakejs_normalize_path(input)
+#       get_filename_component(file_abs_path  "${input}" ABSOLUTE)
+#       get_filename_component(file_name      "${input}" NAME)
+#       file(RELATIVE_PATH file_rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${file_abs_path}") # /${file_name}
 
-      message(DEBUG "Found NodeJS development header: ${file_name}")
-      message(DEBUG "file_abs_path: ${file_abs_path}")
-      message(DEBUG "file_rel_path: ${file_rel_path}")
-      target_sources(node-dev INTERFACE
-        FILE_SET node_dev_INTERFACE_HEADERS
-        TYPE HEADERS
-        BASE_DIRS
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include> # /node
-          $<INSTALL_INTERFACE:include> # /node
-        FILES
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${file_rel_path}> # /${file_name}
-          $<INSTALL_INTERFACE:${file_rel_path}>
-      )
+#       message(DEBUG "Found NodeJS development header: ${file_name}")
+#       message(DEBUG "file_abs_path: ${file_abs_path}")
+#       message(DEBUG "file_rel_path: ${file_rel_path}")
+#       target_sources(node-dev INTERFACE
+#         FILE_SET node_dev_INTERFACE_HEADERS
+#         TYPE HEADERS
+#         BASE_DIRS
+#           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include> # /node
+#           $<INSTALL_INTERFACE:include> # /node
+#         FILES
+#           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${file_rel_path}> # /${file_name}
+#           $<INSTALL_INTERFACE:${file_rel_path}>
+#       )
 
-  endforeach()
-  unset(_CMAKE_JS_INC_FILES)
+#   endforeach()
+#   unset(_CMAKE_JS_INC_FILES)
 
-  list(APPEND CMAKEJS_TARGETS  node-dev)
-endif()
+#   list(APPEND CMAKEJS_TARGETS  node-dev)
+# endif()
 
 if(CMAKEJS_USING_NODE_API) # user did 'cmake-js configure --link-level=1' or higher
 
@@ -556,9 +558,30 @@ if(CMAKEJS_USING_NODE_API) # user did 'cmake-js configure --link-level=1' or hig
   add_library                 (node-api INTERFACE)
   add_library                 (cmake-js::node-api ALIAS node-api)
   target_include_directories  (node-api INTERFACE ${NODE_API_HEADERS_DIR}) # no string enclosure here!
-  target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
+  # target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
   set_target_properties       (node-api PROPERTIES VERSION   6.1.0)
   set_target_properties       (node-api PROPERTIES SOVERSION 6)
+
+  # find the node api definition to generate into node.lib
+  if (MSVC) 
+    target_sources (node-api INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
+
+    execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').def_paths.node_api_def"
+        WORKING_DIRECTORY ${_CMAKEJS_DIR}
+        OUTPUT_VARIABLE CMAKEJS_NODELIB_DEF
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    if (DEFINED CMAKEJS_NODELIB_DEF)
+        message(FATAL_ERROR "Failed to find `node-api-headers` api definition")
+    endif()
+
+    set(CMAKEJS_NODELIB_TARGET "${CMAKE_BINARY_DIR}/node.lib")
+    execute_process(COMMAND ${CMAKE_AR} /def:${CMAKEJS_NODELIB_DEF} /out:${CMAKEJS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
+    target_link_libraries (node-api INTERFACE "${CMAKEJS_NODELIB_TARGET}")
+    unset(CMAKEJS_NODELIB_DEF)
+    unset(CMAKEJS_NODELIB_TARGET)
+  endif()
 
   set(NODE_API_FILES "")
   list(APPEND NODE_API_FILES
@@ -589,7 +612,7 @@ endif()
 if(CMAKEJS_USING_NODE_ADDON_API) # user did 'cmake-js configure --link-level=2' or higher
 
   # Acquire if needed...
-  if(NOT DEFINED NODE_ADDON_API_DIR) # Why the NODE_ADDON_API_* namespace? Because 'node-addon-api' from vcpkg also provides this exact var, so we can help our users from vcpkg-land avoid picking up headers they already have ; but, we still need to process those headers into our target(s) for them!
+  if(NOT DEFINED NODE_ADDON_API_DIR) # This matches the 'node-addon-api' package from vcpkg, so will avoid duplicates for those users
     cmakejs_acquire_napi_cpp_files()
     set(NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR} CACHE PATH "Node Addon API Headers directory." FORCE)
     message(DEBUG "NODE_ADDON_API_DIR: ${NODE_ADDON_API_DIR}")
@@ -610,6 +633,7 @@ if(CMAKEJS_USING_NODE_ADDON_API) # user did 'cmake-js configure --link-level=2' 
   set_target_properties       (node-addon-api PROPERTIES VERSION   1.1.0)
   set_target_properties       (node-addon-api PROPERTIES SOVERSION 1)
 
+  # This is rather manual, but ensures the list included is predictable and safe
   set(NODE_ADDON_API_FILES "")
   list(APPEND NODE_ADDON_API_FILES
     "napi-inl.deprecated.h"
@@ -636,45 +660,22 @@ if(CMAKEJS_USING_NODE_ADDON_API) # user did 'cmake-js configure --link-level=2' 
   list(APPEND CMAKEJS_TARGETS  node-addon-api)
 endif()
 
-if(CMAKEJS_USING_CMAKEJS) # user did 'cmake-js configure --link-level=3', or did not specify a link level (fallback case)
+# CMakeJS API - Helpers to ensure delay hook and other build properties are setup
+# cmake-js::cmake-js
+add_library                 (cmake-js INTERFACE)
+add_library                 (cmake-js::cmake-js ALIAS cmake-js)
+# if(CMAKEJS_NODE_ADDON_API) # TODO: should this have the dependency, or should that be done manually? Perhaps auto vs manual should be an option
+#   target_link_libraries       (cmake-js INTERFACE cmake-js::node-addon-api)
+# endif()
+target_link_libraries       (cmake-js INTERFACE cmake-js::node-api)
+target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
+target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
+set_target_properties       (cmake-js PROPERTIES VERSION   ${_CMAKEJS_VERSION})
+set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
+set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMakeJS_MAJOR_VERSION)
 
-  # CMakeJS API - requires Node Addon API (C++) target, cmake-js::node-api; resolves the full Napi Addon dependency chain
-  # cmake-js::cmake-js
-  add_library                 (cmake-js INTERFACE)
-  add_library                 (cmake-js::cmake-js ALIAS cmake-js)
-  if(CMAKEJS_NODE_ADDON_API)
-    target_link_libraries       (cmake-js INTERFACE cmake-js::node-addon-api)
-  endif()
-  target_link_libraries       (cmake-js INTERFACE cmake-js::node-api)
-  target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
-  target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
-  set_target_properties       (cmake-js PROPERTIES VERSION   ${_CMAKEJS_VERSION})
-  set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
-  set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMakeJS_MAJOR_VERSION)
+list(APPEND CMAKEJS_TARGETS cmake-js)
 
-  # find the node api definition to generate into node.lib
-  if (MSVC) 
-    target_sources (node-api INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
-
-    execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').def_paths.node_api_def"
-        WORKING_DIRECTORY ${_CMAKEJS_DIR}
-        OUTPUT_VARIABLE CMAKEJS_NODELIB_DEF
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-
-    if (DEFINED CMAKEJS_NODELIB_DEF)
-        message(FATAL_ERROR "Failed to find `node-api-headers` api definition")
-    endif()
-
-    set(CMAKEJS_NODELIB_TARGET "${CMAKE_BINARY_DIR}/node.lib")
-    execute_process(COMMAND ${CMAKE_AR} /def:${CMAKEJS_NODELIB_DEF} /out:${CMAKEJS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
-    target_link_libraries (cmake-js INTERFACE "${CMAKEJS_NODELIB_TARGET}")
-  endif()
-
-  list(APPEND CMAKEJS_TARGETS cmake-js)
-
-# Note that the below function definitions are contained inside
-# 'if(CMAKEJS_CMAKEJS)' (because they require our main helper library)....
 
 #[=============================================================================[
 Exposes a user-side helper function for creating a dynamic '*.node' library,
@@ -685,194 +686,194 @@ cmakejs_create_napi_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_V
 
 (This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
 ]=============================================================================]#
-  function(cmakejs_create_napi_addon name)
+function(cmakejs_create_napi_addon name)
 
-      # Avoid duplicate target names
-      if(TARGET ${name})
-          message(SEND_ERROR "'cmakejs_create_napi_addon()' given target '${name}' which is already exists. Please choose a unique name for this Addon target.")
-          return()
-      endif()
+    # Avoid duplicate target names
+    if(TARGET ${name})
+        message(SEND_ERROR "'cmakejs_create_napi_addon()' given target '${name}' which is already exists. Please choose a unique name for this Addon target.")
+        return()
+    endif()
 
-      set(options)
-      set(args ALIAS NAMESPACE NAPI_VERSION EXCEPTIONS)
-      set(list_args)
-      cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
+    set(options)
+    set(args ALIAS NAMESPACE NAPI_VERSION EXCEPTIONS)
+    set(list_args)
+    cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
 
-      # Generate the identifier for the resource library's namespace
-      set(ns_re "^[a-zA-Z_][a-zA-Z0-9_]*$")
+    # Generate the identifier for the resource library's namespace
+    set(ns_re "^[a-zA-Z_][a-zA-Z0-9_]*$")
 
-      if(NOT DEFINED ARG_NAMESPACE)
-          # Check that the library name is also a valid namespace
-          if(NOT name MATCHES "${ns_re}")
-              message(SEND_ERROR "Library name is not a valid namespace. Specify the NAMESPACE argument")
-              return()
-          endif()
-          set(ARG_NAMESPACE "${name}")
-      else()
-          if(NOT ARG_NAMESPACE MATCHES "${ns_re}")
-              message(SEND_ERROR "NAMESPACE for ${name} is not a valid C++ namespace identifier (${ARG_NAMESPACE})")
-              return()
-          endif()
-      endif()
-
-      # TODO: This needs more/better validation...
-      if(DEFINED ARG_NAPI_VERSION AND (ARG_NAPI_VERSION LESS_EQUAL 0))
-          message(SEND_ERROR "NAPI_VERSION for ${name} is not a valid Integer number (${ARG_NAPI_VERSION})")
-          return()
-      endif()
-
-      if(NOT DEFINED ARG_NAPI_VERSION)
-          if(NOT DEFINED NAPI_VERSION)
-              # default NAPI version to use if none specified
-              set(NAPI_VERSION 8)
-          endif()
-          set(ARG_NAPI_VERSION ${NAPI_VERSION})
-      endif()
-
-      if(ARG_ALIAS)
-          set(name_alt "${ARG_ALIAS}")
-      else()
-          set(name_alt "${ARG_NAMESPACE}")
-      endif()
-
-      # TODO: How the exceptions are set in fallback cases can be very tricky
-      # to ascertain. There are numerous different '-D' flags for different
-      # compilers and platforms for either enabling or disabling exceptions;
-      # It is also not a good idea to use mixed exceptions policies, or
-      # link different libraries together with different exceptions policies;
-      # The user could call this nice new EXCEPTIONS arg in our function, which
-      # sets a PUBLIC definition (meaning, it propagates to anything that might
-      # be linked with it); our arg accepts YES, NO, or MAYBE as per <napi.h>.
-      # Default is MAYBE (as in, no opinion of our own...)
-      # But, this is not taking into account the users that would rather set
-      # '-D_UNWIND', '-DCPP_EXCEPTIONS', or some other flag specific to their
-      # system. If they did, and we are not honouring it, then we are risking
-      # breaking their global exceptions policy...
-      # I suggest taking a look at the header file that CMakeRC generates
-      # to understand how to grep a variety of different possiple exceptions flags
-      # all into a custom one which handles all cases. The Napi way of having
-      # three seperate args, that can each be defined against logic, is unfortunate
-      # and we don't want to break compatibility of existing users' projects.
-      # I have made one attempt at this in the past which I will revisit
-      # shortly... but definitely a case of, all ideas welcome!
-      if(NOT ARG_EXCEPTIONS)
-        set(ARG_EXCEPTIONS "MAYBE") # YES, NO, or MAYBE...
-      endif()
-
-      if((NOT DEFINED NAPI_CPP_EXCEPTIONS) OR
-         (NOT DEFINED NAPI_DISABLE_CPP_EXCEPTIONS) OR
-         (NOT DEFINED NAPI_CPP_EXCEPTIONS_MAYBE)
-        )
-
-        if(ARG_EXCEPTIONS STREQUAL "YES")
-          set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_CPP_EXCEPTIONS")
-        elseif(ARG_EXCEPTIONS STREQUAL "NO")
-          set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_DISABLE_CPP_EXCEPTIONS")
-        else()
-          set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_CPP_EXCEPTIONS_MAYBE")
+    if(NOT DEFINED ARG_NAMESPACE)
+        # Check that the library name is also a valid namespace
+        if(NOT name MATCHES "${ns_re}")
+            message(SEND_ERROR "Library name is not a valid namespace. Specify the NAMESPACE argument")
+            return()
         endif()
+        set(ARG_NAMESPACE "${name}")
+    else()
+        if(NOT ARG_NAMESPACE MATCHES "${ns_re}")
+            message(SEND_ERROR "NAMESPACE for ${name} is not a valid C++ namespace identifier (${ARG_NAMESPACE})")
+            return()
+        endif()
+    endif()
 
+    # TODO: This needs more/better validation...
+    if(DEFINED ARG_NAPI_VERSION AND (ARG_NAPI_VERSION LESS_EQUAL 0))
+        message(SEND_ERROR "NAPI_VERSION for ${name} is not a valid Integer number (${ARG_NAPI_VERSION})")
+        return()
+    endif()
+
+    if(NOT DEFINED ARG_NAPI_VERSION)
+        if(NOT DEFINED NAPI_VERSION)
+            # default NAPI version to use if none specified
+            set(NAPI_VERSION 8)
+        endif()
+        set(ARG_NAPI_VERSION ${NAPI_VERSION})
+    endif()
+
+    if(ARG_ALIAS)
+        set(name_alt "${ARG_ALIAS}")
+    else()
+        set(name_alt "${ARG_NAMESPACE}")
+    endif()
+
+    # TODO: How the exceptions are set in fallback cases can be very tricky
+    # to ascertain. There are numerous different '-D' flags for different
+    # compilers and platforms for either enabling or disabling exceptions;
+    # It is also not a good idea to use mixed exceptions policies, or
+    # link different libraries together with different exceptions policies;
+    # The user could call this nice new EXCEPTIONS arg in our function, which
+    # sets a PUBLIC definition (meaning, it propagates to anything that might
+    # be linked with it); our arg accepts YES, NO, or MAYBE as per <napi.h>.
+    # Default is MAYBE (as in, no opinion of our own...)
+    # But, this is not taking into account the users that would rather set
+    # '-D_UNWIND', '-DCPP_EXCEPTIONS', or some other flag specific to their
+    # system. If they did, and we are not honouring it, then we are risking
+    # breaking their global exceptions policy...
+    # I suggest taking a look at the header file that CMakeRC generates
+    # to understand how to grep a variety of different possiple exceptions flags
+    # all into a custom one which handles all cases. The Napi way of having
+    # three seperate args, that can each be defined against logic, is unfortunate
+    # and we don't want to break compatibility of existing users' projects.
+    # I have made one attempt at this in the past which I will revisit
+    # shortly... but definitely a case of, all ideas welcome!
+    if(NOT ARG_EXCEPTIONS)
+      set(ARG_EXCEPTIONS "MAYBE") # YES, NO, or MAYBE...
+    endif()
+
+    if((NOT DEFINED NAPI_CPP_EXCEPTIONS) OR
+        (NOT DEFINED NAPI_DISABLE_CPP_EXCEPTIONS) OR
+        (NOT DEFINED NAPI_CPP_EXCEPTIONS_MAYBE)
+      )
+
+      if(ARG_EXCEPTIONS STREQUAL "YES")
+        set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_CPP_EXCEPTIONS")
+      elseif(ARG_EXCEPTIONS STREQUAL "NO")
+        set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_DISABLE_CPP_EXCEPTIONS")
+      else()
+        set(_NAPI_GLOBAL_EXCEPTIONS_POLICY "NAPI_CPP_EXCEPTIONS_MAYBE")
       endif()
 
-      if(VERBOSE)
-          message(STATUS "Configuring Napi Addon: ${name}")
-      endif()
+    endif()
 
-      # Begin a new Napi Addon target
+    if(VERBOSE)
+        message(STATUS "Configuring Napi Addon: ${name}")
+    endif()
 
-      add_library(${name} SHARED)
-      add_library(${name_alt}::${name} ALIAS ${name})
+    # Begin a new Napi Addon target
 
-      # TODO: If we instead set up a var like 'CMAKEJS_LINK_LEVEL',
-      # it can carry an integer number corresponding to which
-      # dependency level the builder wants. The value of this
-      # integer can be determined somehow from the result of the
-      # 'CMakeDependentOption's at the top of this file.
-      #
-      # i.e. (psudeo code);
-      #
-      #   if options = 0; set (CMAKEJS_LINK_LEVEL "cmake-js::node-dev")
-      #   if options = 1; set (CMAKEJS_LINK_LEVEL "cmake-js::node-api")
-      #   if options = 2; set (CMAKEJS_LINK_LEVEL "cmake-js::node-addon-api")
-      #   if options = 3; set (CMAKEJS_LINK_LEVEL "cmake-js::cmake-js")
-      #
-      # target_link_libraries(${name} PRIVATE ${CMAKEJS_LINK_LEVEL})
-      #
-      # Why?
-      #
-      # Because currently, our 'create_napi_addon()' depends on cmake-js::cmake-js,
-      # Which is why I had to wrap our nice custom functions inside of
-      # this 'CMAKEJS_USING_CMAKEJS=TRUE' block, for now.
-      #
-      # cmake-js cli users could then be offered a new flag for setting a
-      # preferred dependency level for their project, controlling the
-      # values on the JS side before being passed to the command line
-      # (default to 3 if not set):
-      #
-      # $ cmake-js configure --link-level=2
-      #
-      # The above would provide dependency resolution up to cmake-js::node-adon-api level.
-      #
-      # If do we make our functions available at all times this way,
-      # we must also validate that all the possible configurations work
-      # (or fail safely, and with a prompt.)
-      #
-      # Testing (and supporting) the above could be exponentially complex.
-      # I think most people won't use the target toggles anyway,
-      # and those that do, won't have access to any broken/untested
-      # variations of our functions.
-      #
-      # Just my suggestion; do as you will :)
+    add_library(${name} SHARED)
+    add_library(${name_alt}::${name} ALIAS ${name})
 
-      target_link_libraries(${name} PRIVATE cmake-js::cmake-js)
+    # TODO: If we instead set up a var like 'CMAKEJS_LINK_LEVEL',
+    # it can carry an integer number corresponding to which
+    # dependency level the builder wants. The value of this
+    # integer can be determined somehow from the result of the
+    # 'CMakeDependentOption's at the top of this file.
+    #
+    # i.e. (psudeo code);
+    #
+    #   if options = 0; set (CMAKEJS_LINK_LEVEL "cmake-js::node-dev")
+    #   if options = 1; set (CMAKEJS_LINK_LEVEL "cmake-js::node-api")
+    #   if options = 2; set (CMAKEJS_LINK_LEVEL "cmake-js::node-addon-api")
+    #   if options = 3; set (CMAKEJS_LINK_LEVEL "cmake-js::cmake-js")
+    #
+    # target_link_libraries(${name} PRIVATE ${CMAKEJS_LINK_LEVEL})
+    #
+    # Why?
+    #
+    # Because currently, our 'create_napi_addon()' depends on cmake-js::cmake-js,
+    # Which is why I had to wrap our nice custom functions inside of
+    # this 'CMAKEJS_USING_CMAKEJS=TRUE' block, for now.
+    #
+    # cmake-js cli users could then be offered a new flag for setting a
+    # preferred dependency level for their project, controlling the
+    # values on the JS side before being passed to the command line
+    # (default to 3 if not set):
+    #
+    # $ cmake-js configure --link-level=2
+    #
+    # The above would provide dependency resolution up to cmake-js::node-adon-api level.
+    #
+    # If do we make our functions available at all times this way,
+    # we must also validate that all the possible configurations work
+    # (or fail safely, and with a prompt.)
+    #
+    # Testing (and supporting) the above could be exponentially complex.
+    # I think most people won't use the target toggles anyway,
+    # and those that do, won't have access to any broken/untested
+    # variations of our functions.
+    #
+    # Just my suggestion; do as you will :)
 
-      set_property(
-        TARGET ${name}
-        PROPERTY "${name}_IS_NAPI_ADDON_LIBRARY" TRUE # Custom property
-      )
+    target_link_libraries(${name} PRIVATE cmake-js::cmake-js cmake-js::node-api)
 
-      set_target_properties(${name}
-        PROPERTIES
+    set_property(
+      TARGET ${name}
+      PROPERTY "${name}_IS_NAPI_ADDON_LIBRARY" TRUE # Custom property
+    )
 
-        LIBRARY_OUTPUT_NAME "${name}"
-        PREFIX ""
-        SUFFIX ".node"
+    set_target_properties(${name}
+      PROPERTIES
 
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Actually we might not need to enforce an opinion here!
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Instead, we call 'cmakejs_create_addon_bindings()'
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin" # on this target, and the user can just 'require()' that file!
+      LIBRARY_OUTPUT_NAME "${name}"
+      PREFIX ""
+      SUFFIX ".node"
 
-        # # Conventional C++-style debug settings might be useful to have...
-        # Getting Javascript bindings to grep different paths is tricky, though!
-        # LIBRARY_OUTPUT_NAME_DEBUG "d${name}"
-        # ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
-        # LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
-        # RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/bin/Debug"
-      )
+      ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Actually we might not need to enforce an opinion here!
+      LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Instead, we call 'cmakejs_create_addon_bindings()'
+      RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin" # on this target, and the user can just 'require()' that file!
 
-      cmakejs_napi_addon_add_sources(${name} ${ARG_UNPARSED_ARGUMENTS})
+      # # Conventional C++-style debug settings might be useful to have...
+      # Getting Javascript bindings to grep different paths is tricky, though!
+      # LIBRARY_OUTPUT_NAME_DEBUG "d${name}"
+      # ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
+      # LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/lib/Debug"
+      # RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKEJS_BINARY_DIR}/bin/Debug"
+    )
 
-      cmakejs_napi_addon_add_definitions(${name}
-        PRIVATE # These definitions only belong to this unique target
-        "CMAKEJS_ADDON_NAME=${name}"
-        "CMAKEJS_ADDON_ALIAS=${name_alt}"
-        "NAPI_CPP_CUSTOM_NAMESPACE=${ARG_NAMESPACE}"
-      )
+    cmakejs_napi_addon_add_sources(${name} ${ARG_UNPARSED_ARGUMENTS})
 
-      cmakejs_napi_addon_add_definitions(${name}
-        PUBLIC # These definitions are shared with anything that links to this addon
-        "NAPI_VERSION=${ARG_NAPI_VERSION}"
-        "BUILDING_NODE_EXTENSION"
-        "${_NAPI_GLOBAL_EXCEPTIONS_POLICY}"
-      )
+    cmakejs_napi_addon_add_definitions(${name}
+      PRIVATE # These definitions only belong to this unique target
+      "CMAKEJS_ADDON_NAME=${name}"
+      "CMAKEJS_ADDON_ALIAS=${name_alt}"
+      "NAPI_CPP_CUSTOM_NAMESPACE=${ARG_NAMESPACE}"
+    )
 
-      # (experimental) :)
-      # cmakejs_create_addon_bindings(${name})
+    cmakejs_napi_addon_add_definitions(${name}
+      PUBLIC # These definitions are shared with anything that links to this addon
+      "NAPI_VERSION=${ARG_NAPI_VERSION}"
+      "BUILDING_NODE_EXTENSION"
+      "${_NAPI_GLOBAL_EXCEPTIONS_POLICY}"
+    )
 
-      # Global exceptions policy
-      unset(_NAPI_GLOBAL_EXCEPTIONS_POLICY)
+    # (experimental) :)
+    # cmakejs_create_addon_bindings(${name})
 
-  endfunction()
+    # Global exceptions policy
+    unset(_NAPI_GLOBAL_EXCEPTIONS_POLICY)
+
+endfunction()
 
 #[=============================================================================[
 Add source files to an existing Napi Addon target.
@@ -882,70 +883,70 @@ cmakejs_napi_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
 cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...]])
 cmakejs_napi_addon_add_sources(<name> [<INTERFACE|PUBLIC|PRIVATE> [BASE_DIRS [<dirs>...]] [items1...]...)
 ]=============================================================================]#
-  function(cmakejs_napi_addon_add_sources name)
+function(cmakejs_napi_addon_add_sources name)
 
-      # Check that this is a Node Addon target
-      get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
-      if(NOT TARGET ${name} OR NOT is_addon_lib)
-          message(SEND_ERROR "'cmakejs_napi_addon_add_sources()' called on '${name}' which is not an existing napi addon library")
-          return()
-      endif()
+    # Check that this is a Node Addon target
+    get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
+    if(NOT TARGET ${name} OR NOT is_addon_lib)
+        message(SEND_ERROR "'cmakejs_napi_addon_add_sources()' called on '${name}' which is not an existing napi addon library")
+        return()
+    endif()
 
-      set(options)
-      set(args BASE_DIRS)
-      set(list_args INTERFACE PRIVATE PUBLIC)
-      cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
+    set(options)
+    set(args BASE_DIRS)
+    set(list_args INTERFACE PRIVATE PUBLIC)
+    cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
 
-      if(NOT ARG_BASE_DIRS)
-          # Default base directory of the passed-in source file(s)
-          set(ARG_BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
-      endif()
-      _cmakejs_normalize_path(ARG_BASE_DIRS)
-      get_filename_component(ARG_BASE_DIRS "${ARG_BASE_DIRS}" ABSOLUTE)
+    if(NOT ARG_BASE_DIRS)
+        # Default base directory of the passed-in source file(s)
+        set(ARG_BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
+    endif()
+    _cmakejs_normalize_path(ARG_BASE_DIRS)
+    get_filename_component(ARG_BASE_DIRS "${ARG_BASE_DIRS}" ABSOLUTE)
 
-      # All remaining unparsed args 'should' be source files for this target, so...
-      foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
+    # All remaining unparsed args 'should' be source files for this target, so...
+    foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
 
-          _cmakejs_normalize_path(input)
-          get_filename_component(abs_in "${input}" ABSOLUTE)
-          file(RELATIVE_PATH relpath "${ARG_BASE_DIRS}" "${abs_in}")
-          if(relpath MATCHES "^\\.\\.")
-              # For now we just error on files that exist outside of the source dir.
-              message(SEND_ERROR "Cannot add file '${input}': File must be in a subdirectory of ${ARG_BASE_DIRS}")
-              return()
-          endif()
+        _cmakejs_normalize_path(input)
+        get_filename_component(abs_in "${input}" ABSOLUTE)
+        file(RELATIVE_PATH relpath "${ARG_BASE_DIRS}" "${abs_in}")
+        if(relpath MATCHES "^\\.\\.")
+            # For now we just error on files that exist outside of the source dir.
+            message(SEND_ERROR "Cannot add file '${input}': File must be in a subdirectory of ${ARG_BASE_DIRS}")
+            return()
+        endif()
 
-          set(rel_file "${ARG_BASE_DIRS}/${relpath}")
-          _cmakejs_normalize_path(rel_file)
-          get_filename_component(source_file "${input}" ABSOLUTE)
-          # If we are here, source file is valid. Add IDE support
-          source_group("${name}" FILES "${source_file}")
+        set(rel_file "${ARG_BASE_DIRS}/${relpath}")
+        _cmakejs_normalize_path(rel_file)
+        get_filename_component(source_file "${input}" ABSOLUTE)
+        # If we are here, source file is valid. Add IDE support
+        source_group("${name}" FILES "${source_file}")
 
-          if(DEFINED ARG_INTERFACE)
-              foreach(item IN LISTS ARG_INTERFACE)
-                  target_sources(${name} INTERFACE "${source_file}")
-              endforeach()
-          endif()
+        if(DEFINED ARG_INTERFACE)
+            foreach(item IN LISTS ARG_INTERFACE)
+                target_sources(${name} INTERFACE "${source_file}")
+            endforeach()
+        endif()
 
-          if(DEFINED ARG_PRIVATE)
-              foreach(item IN LISTS ARG_PRIVATE)
-                  target_sources(${name} PRIVATE "${source_file}")
-              endforeach()
-          endif()
+        if(DEFINED ARG_PRIVATE)
+            foreach(item IN LISTS ARG_PRIVATE)
+                target_sources(${name} PRIVATE "${source_file}")
+            endforeach()
+        endif()
 
-          if(DEFINED ARG_PUBLIC)
-              foreach(item IN LISTS ARG_PUBLIC)
-                  target_sources(${name} PUBLIC "${source_file}")
-              endforeach()
-          endif()
+        if(DEFINED ARG_PUBLIC)
+            foreach(item IN LISTS ARG_PUBLIC)
+                target_sources(${name} PUBLIC "${source_file}")
+            endforeach()
+        endif()
 
-          foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
-              target_sources(${name} PRIVATE "${source_file}")
-          endforeach()
+        foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
+            target_sources(${name} PRIVATE "${source_file}")
+        endforeach()
 
-      endforeach()
+    endforeach()
 
-  endfunction()
+endfunction()
 
 #[=============================================================================[
 Add pre-processor definitions to an existing Napi Addon target.
@@ -953,45 +954,43 @@ Add pre-processor definitions to an existing Napi Addon target.
 cmakejs_napi_addon_add_definitions(<name> [items1...])
 cmakejs_napi_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
 ]=============================================================================]#
-  function(cmakejs_napi_addon_add_definitions name)
+function(cmakejs_napi_addon_add_definitions name)
 
-      # Check that this is a Node Addon target
-      get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
-      if(NOT TARGET ${name} OR NOT is_addon_lib)
-          message(SEND_ERROR "'cmakejs_napi_addon_add_definitions()' called on '${name}' which is not an existing napi addon library")
-          return()
-      endif()
+    # Check that this is a Node Addon target
+    get_target_property(is_addon_lib ${name} ${name}_IS_NAPI_ADDON_LIBRARY)
+    if(NOT TARGET ${name} OR NOT is_addon_lib)
+        message(SEND_ERROR "'cmakejs_napi_addon_add_definitions()' called on '${name}' which is not an existing napi addon library")
+        return()
+    endif()
 
-      set(options)
-      set(args)
-      set(list_args INTERFACE PRIVATE PUBLIC)
-      cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
+    set(options)
+    set(args)
+    set(list_args INTERFACE PRIVATE PUBLIC)
+    cmake_parse_arguments(ARG "${options}" "${args}" "${list_args}" "${ARGN}")
 
-      if(DEFINED ARG_INTERFACE)
-          foreach(item IN LISTS ARG_INTERFACE)
-              target_compile_definitions(${name} INTERFACE "${item}")
-          endforeach()
-      endif()
+    if(DEFINED ARG_INTERFACE)
+        foreach(item IN LISTS ARG_INTERFACE)
+            target_compile_definitions(${name} INTERFACE "${item}")
+        endforeach()
+    endif()
 
-      if(DEFINED ARG_PRIVATE)
-          foreach(item IN LISTS ARG_PRIVATE)
-              target_compile_definitions(${name} PRIVATE "${item}")
-          endforeach()
-      endif()
+    if(DEFINED ARG_PRIVATE)
+        foreach(item IN LISTS ARG_PRIVATE)
+            target_compile_definitions(${name} PRIVATE "${item}")
+        endforeach()
+    endif()
 
-      if(DEFINED ARG_PUBLIC)
-          foreach(item IN LISTS ARG_PUBLIC)
-              target_compile_definitions(${name} PUBLIC "${item}")
-          endforeach()
-      endif()
+    if(DEFINED ARG_PUBLIC)
+        foreach(item IN LISTS ARG_PUBLIC)
+            target_compile_definitions(${name} PUBLIC "${item}")
+        endforeach()
+    endif()
 
-      foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
-          target_compile_definitions(${name} "${item}")
-      endforeach()
+    foreach(input IN LISTS ARG_UNPARSED_ARGUMENTS)
+        target_compile_definitions(${name} "${item}")
+    endforeach()
 
-  endfunction()
-
-endif() # CMAKEJS_CMAKEJS
+endfunction()
 
 # This should enable each target to behave well with intellisense
 # (in case they weren't already)
@@ -1039,7 +1038,6 @@ export (
   FILE share/cmake/CMakeJSTargets.cmake
   NAMESPACE cmake-js::
 )
-
 
 include (CMakePackageConfigHelpers)
 file (WRITE "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in" [==[
@@ -1145,18 +1143,18 @@ set(CMAKEJS_INC_DIR
   CACHE PATH "Installation directory for include files, a relative path that will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path."
   FORCE
 )
-# copy headers (and definitions?) to build dir for distribution
-if(CMAKEJS_USING_NODE_DEV)
-  install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node")
-  install(TARGETS node-dev
-    EXPORT CMakeJSTargets
-    LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-    RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-    FILE_SET node_dev_INTERFACE_HEADERS
-  )
-endif()
+# # copy headers (and definitions?) to build dir for distribution
+# if(CMAKEJS_USING_NODE_DEV)
+#   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node")
+#   install(TARGETS node-dev
+#     EXPORT CMakeJSTargets
+#     LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+#     ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+#     RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
+#     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+#     FILE_SET node_dev_INTERFACE_HEADERS
+#   )
+# endif()
 
 if(CMAKEJS_USING_NODE_API)
   install(FILES ${NODE_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers")
@@ -1232,7 +1230,7 @@ include(CMakeJS)
 
 add_library(my_library SHARED)
 target_sources(my_library PRIVATE src/<vendor>/my_library.cc)
-target_link_libraries(my_library PRIVATE cmake-js::node-dev)
+# target_link_libraries(my_library PRIVATE cmake-js::node-dev)
 
 --
 -- You can include '<node_api.h>' in 'my_library.cc' and start building
