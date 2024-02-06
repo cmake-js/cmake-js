@@ -586,19 +586,18 @@ endfunction()
 
 function(cmakejs_setup_node_api_cpp_library)
   cmakejs_acquire_node_api_cpp_headers() # needs the c++ headers
-  cmakejs_setup_node_api_c_library() # needs c addons support
 
   # Check that this hasnt already been called
   if(TARGET cmake-js::node-addon-api)
     return()
   endif()
 
-  # Node Addon API (C++) - requires Node API (C) target, cmake-js::node-api
+  # Node Addon API (C++) - requires Node API (C) target, or node-dev
   # cmake-js::node-addon-api
   add_library                 (node-addon-api INTERFACE)
   add_library                 (cmake-js::node-addon-api ALIAS node-addon-api)
   target_include_directories  (node-addon-api INTERFACE ${NODE_ADDON_API_DIR})
-  target_link_libraries       (node-addon-api INTERFACE cmake-js::node-api)
+  # target_link_libraries       (node-addon-api INTERFACE cmake-js::node-api)
   set_target_properties       (node-addon-api PROPERTIES VERSION   1.1.0)
   set_target_properties       (node-addon-api PROPERTIES SOVERSION 1)
 
