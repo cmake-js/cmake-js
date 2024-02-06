@@ -1,11 +1,11 @@
 {
-	"name": "@vendor/hello",
+	"name": "@vendor/hello-c",
 	"version": "1.0.0",
 	"description": "A test addon made using CMakeJS.cmake",
 	"main": "index.js",
 	"license": "MIT",
 	"scripts": {
-		"start": "node -p \"const addon = require('./index'); console.log(addon.hello());\"",
+		"start": "node -p \"const addon = require('./build/lib/addon.node'); console.log(addon.hello());\"",
 		"install": "cmake-js install",
 		"postinstall": "cmake-js compile",
 		"configure": "cmake-js configure",
@@ -17,7 +17,6 @@
 	},
 	"dependencies": {
 		"cmake-js": "link:../../../",
-		"node-addon-api": "^7.1.0",
 		"node-api-headers": "^1.1.0"
 	}
 }

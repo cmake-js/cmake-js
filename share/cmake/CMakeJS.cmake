@@ -525,8 +525,6 @@ function(cmakejs_setup_node_api_c_library)
 
   # find the node api definition to generate into node.lib
   if (MSVC) 
-    target_sources (node-api INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
-
     execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').def_paths.node_api_def"
         WORKING_DIRECTORY ${_CMAKEJS_DIR}
         OUTPUT_VARIABLE CMAKEJS_NODELIB_DEF
@@ -649,6 +647,10 @@ target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C+
 set_target_properties       (cmake-js PROPERTIES VERSION   ${_CMAKEJS_VERSION})
 set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
 set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMakeJS_MAJOR_VERSION)
+
+if (MSVC) 
+  target_sources (cmake-js INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
+endif()
 
 function(_cmakejs_export_target name)
   export (
