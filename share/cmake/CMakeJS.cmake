@@ -77,16 +77,6 @@ endif()
 
 message (STATUS "\n-- CMakeJS.cmake v${_CMAKEJS_VERSION}")
 
-#[=============================================================================[
-Setup optional targets dependency chain, e.g., for end-user specification with
-VCPKG_FEATURE_FLAGS or by passing for example '-DCMAKE_NODE_API:BOOL=FALSE'
-]=============================================================================]#
-
-set                   (CMAKEJS_TARGETS "") # This list will auto-populate from --link-level
-option                (CMAKEJS_USING_NODE_API         "Supply cmake-js::node-api target for linkage"       ON)
-cmake_dependent_option(CMAKEJS_USING_NODE_ADDON_API   "Supply cmake-js::node-addon-api target for linkage" ON CMAKEJS_USING_NODE_API OFF)
-cmake_dependent_option(CMAKEJS_USING_CMAKEJS          "Supply cmake-js::cmake-js target for linkage"       ON CMAKEJS_USING_NODE_ADDON_API OFF)
-
 if(MSVC)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
 endif()
@@ -171,7 +161,6 @@ Provides
 function(cmakejs_acquire_node_api_c_headers)
  # Acquire if needed...
   if(NOT DEFINED NODE_API_HEADERS_DIR) # Why the NODE_API_* namespace? Because 'node-api-headers' from vcpkg also provides this exact var, so we can help our users from vcpkg-land avoid picking up headers they already have ; but, we still need to process those headers into our target(s) for them!
-  message("run ${NODE_EXECUTABLE} -p require('node-api-headers').include_dir)")
     execute_process(
       COMMAND "${NODE_EXECUTABLE}" -p "require('node-api-headers').include_dir"
       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -199,16 +188,11 @@ function(cmakejs_acquire_node_api_c_headers)
     )
     set(NODE_API_HEADERS_DIR ${NODE_API_HEADERS_DIR} PARENT_SCOPE) # dont wrap this one in quotes; it breaks!
 
-    # this is just for IDE support only. Never pass globbed headers to 'target_sources()'!
+    # this is just for IDE support only, so globbing is safe
     set(NODE_API_INC_FILES "")
     file(GLOB_RECURSE NODE_API_INC_FILES "${NODE_API_HEADERS_DIR}/*.h")
     set(NODE_API_INC_FILES "${NODE_API_INC_FILES}" PARENT_SCOPE)
     source_group("Node API (C)" FILES "${NODE_API_INC_FILES}")
-    # end IDE support codeblock
-    # it's not a 'source_group' for targets!
-    # VS users will see the above globbed headers as a filegroup named "Node API (C)"
-    # and that is literally all that this 'source_group' function does.
-    # it is not the same as 'target_sources' - so, globbing was ok here!
 
     if(VERBOSE)
         message(STATUS "NODE_API_HEADERS_DIR: ${NODE_API_HEADERS_DIR}")
@@ -264,7 +248,7 @@ function(cmakejs_acquire_node_api_cpp_headers)
     )
     set(NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR} PARENT_SCOPE)
 
-    # this is just for IDE support only. Never pass globbed headers to 'target_sources()'!
+    # this is just for IDE support only, so globbing is safe
     set(NODE_ADDON_API_INC_FILES "")
     file(GLOB_RECURSE NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_DIR}/*.h")
     set(NODE_ADDON_API_INC_FILES ${NODE_ADDON_API_INC_FILES} PARENT_SCOPE)
@@ -298,7 +282,7 @@ function(cmakejs_create_addon_bindings addon_target) # TODO - is this useful? it
   # Check that this is a Node Addon target
   get_target_property(is_addon_lib ${name} ${name}_IS_NODE_API_ADDON_LIBRARY)
   if(NOT TARGET ${name} OR NOT is_addon_lib)
-    message(SEND_ERROR "'cmakejs_create_addon_bindings()' called on '${name}' which is not an existing napi addon library")
+    message(SEND_ERROR "'cmakejs_create_addon_bindings()' called on '${name}' which is not an existing nodejs addon library")
     return()
   endif()
 
@@ -531,12 +515,11 @@ function(cmakejs_setup_node_api_c_library)
     return()
   endif()
 
-  # Node API (C) - requires NodeJS developer headers target, cmake-js::node-dev
+  # Node API (C)
   # cmake-js::node-api
   add_library                 (node-api INTERFACE)
   add_library                 (cmake-js::node-api ALIAS node-api)
   target_include_directories  (node-api INTERFACE ${NODE_API_HEADERS_DIR}) # no string enclosure here!
-  # target_link_libraries       (node-api INTERFACE cmake-js::node-dev)
   set_target_properties       (node-api PROPERTIES VERSION   6.1.0)
   set_target_properties       (node-api PROPERTIES SOVERSION 6)
 
@@ -561,6 +544,7 @@ function(cmakejs_setup_node_api_c_library)
     unset(CMAKEJS_NODELIB_TARGET)
   endif()
 
+  # This is rather manual, but ensures the list included is predictable and safe
   set(NODE_API_FILES "")
   list(APPEND NODE_API_FILES
     "node_api.h"
@@ -571,7 +555,7 @@ function(cmakejs_setup_node_api_c_library)
 
   foreach(FILE IN LISTS NODE_API_FILES)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers/${FILE}")
-      message(DEBUG "Found Napi API C header: ${FILE}")
+      message(DEBUG "Found Node-API C header: ${FILE}")
       target_sources(node-api INTERFACE
         FILE_SET node_api_INTERFACE_HEADERS
         TYPE HEADERS
@@ -628,7 +612,7 @@ function(cmakejs_setup_node_api_cpp_library)
 
   foreach(FILE IN LISTS NODE_ADDON_API_FILES)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api/${FILE}")
-      message(DEBUG "Found Napi Addon API C++ header: ${FILE}")
+      message(DEBUG "Found Node-API C++ header: ${FILE}")
       target_sources(node-addon-api INTERFACE
         FILE_SET node_addon_api_INTERFACE_HEADERS
         TYPE HEADERS
@@ -697,7 +681,7 @@ linked to the Addon API interface.
 cmakejs_create_node_api_addon(<name> [<sources>])
 cmakejs_create_node_api_addon(<name> [ALIAS <alias>] [NAMESPACE <namespace>] [NAPI_VERSION <version>] [<sources>])
 
-(This should wrap the CMakeLists.txt-side requirements for building a Napi Addon)
+(This should wrap the CMakeLists.txt-side requirements for building a Nodejs Addon)
 ]=============================================================================]#
 function(cmakejs_create_node_api_addon name)
   cmakejs_setup_node_api_c_library() # needs c addons support
@@ -790,10 +774,10 @@ function(cmakejs_create_node_api_addon name)
     endif()
 
     if(VERBOSE)
-        message(STATUS "Configuring Napi Addon: ${name}")
+        message(STATUS "Configuring NodeJS Addon: ${name}")
     endif()
 
-    # Begin a new Napi Addon target
+    # Begin a new NodeJS Addon target
 
     add_library(${name} SHARED)
     add_library(${name_alt}::${name} ALIAS ${name})
@@ -854,7 +838,7 @@ function(cmakejs_create_node_api_addon name)
 endfunction()
 
 #[=============================================================================[
-Add source files to an existing Napi Addon target.
+Add source files to an existing Nodejs Addon target.
 
 cmakejs_nodejs_addon_add_sources(<name> [items1...])
 cmakejs_nodejs_addon_add_sources(<name> [BASE_DIRS <dirs>] [items1...])
@@ -866,7 +850,7 @@ function(cmakejs_nodejs_addon_add_sources name)
     # Check that this is a Node Addon target
     get_target_property(is_addon_lib ${name} ${name}_IS_NODE_API_ADDON_LIBRARY)
     if(NOT TARGET ${name} OR NOT is_addon_lib)
-        message(SEND_ERROR "'cmakejs_nodejs_addon_add_sources()' called on '${name}' which is not an existing napi addon library")
+        message(SEND_ERROR "'cmakejs_nodejs_addon_add_sources()' called on '${name}' which is not an existing nodejs addon library")
         return()
     endif()
 
@@ -927,7 +911,7 @@ function(cmakejs_nodejs_addon_add_sources name)
 endfunction()
 
 #[=============================================================================[
-Add pre-processor definitions to an existing Napi Addon target.
+Add pre-processor definitions to an existing NodeJS Addon target.
 
 cmakejs_nodejs_addon_add_definitions(<name> [items1...])
 cmakejs_nodejs_addon_add_definitions(<name> <INTERFACE|PUBLIC|PRIVATE> [items1...] [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
@@ -937,7 +921,7 @@ function(cmakejs_nodejs_addon_add_definitions name)
     # Check that this is a Node Addon target
     get_target_property(is_addon_lib ${name} ${name}_IS_NODE_API_ADDON_LIBRARY)
     if(NOT TARGET ${name} OR NOT is_addon_lib)
-        message(SEND_ERROR "'cmakejs_nodejs_addon_add_definitions()' called on '${name}' which is not an existing napi addon library")
+        message(SEND_ERROR "'cmakejs_nodejs_addon_add_definitions()' called on '${name}' which is not an existing nodejs addon library")
         return()
     endif()
 
@@ -1152,85 +1136,17 @@ install(
 
 if(NOT CMakeJS_IS_TOP_LEVEL)
 
-  # cmake-js --link-level=0
-  if(CMAKEJS_USING_NODE_DEV AND (NOT CMAKEJS_USING_NODE_API))
-    message(STATUS [==[
---
--- To build with the Node.js developer API,
---
--- Add this to your CMakeLists.txt:
---
-
-include(CMakeJS)
-
-add_library(my_library SHARED)
-target_sources(my_library PRIVATE src/<vendor>/my_library.cc)
-# target_link_libraries(my_library PRIVATE cmake-js::node-dev)
-
---
--- You can include '<node_api.h>' in 'my_library.cc' and start building
--- with the Node API, including v8, uv, and all its' dependencies.
---
-]==])
-    endif() # CMAKEJS_USING_NODE_API
-
-  # cmake-js --link-level=1
-  if(CMAKEJS_USING_NODE_API AND (NOT CMAKEJS_USING_NODE_ADDON_API))
-    message(STATUS [==[
---
--- To build a Node.js addon in C,
---
--- Add this to your CMakeLists.txt:
---
-
-include(CMakeJS)
-
-add_library(my_addon SHARED)
-target_sources(my_addon PRIVATE src/<vendor>/my_addon.cc)
-target_link_libraries(my_addon PRIVATE cmake-js::node-api)
-set_target_properties(my_addon PROPERTIES PREFIX "" SUFFIX ".node")
-
---
--- You can include '<node_api.h>' in 'my_addon.cc' and start building
--- with the Node Addon API in C.
---
-]==])
-    endif() # CMAKEJS_USING_NODE_API
-
-  # cmake-js --link-level=2
-  if(CMAKEJS_USING_NODE_ADDON_API AND (NOT CMAKEJS_USING_CMAKEJS))
-    message(STATUS [==[
---
--- To build a Node.js addon in C++,
---
--- Add this to your CMakeLists.txt:
---
-
-include(CMakeJS)
-
-add_library(my_addon SHARED)
-target_sources(my_addon PRIVATE src/<vendor>/my_addon.cpp)
-target_link_libraries(my_addon PRIVATE cmake-js::node-addon-api)
-set_target_properties(my_addon PROPERTIES PREFIX "" SUFFIX ".node")
-add_target_definitions(my_addon PRIVATE BUILDING_NODE_EXTENSION)
-
---
--- You can include '<napi.h>' in 'my_addon.cpp' and start building
--- with the Node Addon API in C++.
---
-]==])
-    endif() # CMAKEJS_USING_NODE_ADDON_API
-
-    # cmake-js --link-level=3 (default)
-    if(CMAKEJS_USING_CMAKEJS)
-    message(STATUS [==[
+  message(STATUS [==[
 --
 -- To build a Node.js addon,
 --
 -- Add this to your CMakeLists.txt:
 --
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/share/cmake")
 include(CMakeJS)
+
+cmakejs_setup_node_api_cpp_library()
 
 cmakejs_create_node_api_addon (
     # CMAKEJS_ADDON_NAME
@@ -1243,10 +1159,10 @@ cmakejs_create_node_api_addon (
 
 ]==])
 
-    # cmake-js --link-level=4 (experimental)
-    if(CMAKEJS_USING_NODE_SEA_CONFIG)
-      # https://nodejs.org/api/single-executable-applications.html
-    endif()
+  # Future?
+  if(CMAKEJS_USING_NODE_SEA_CONFIG)
+    # https://nodejs.org/api/single-executable-applications.html
+  endif()
 
 # Global message (our CLI applies in all scenarios)
 message(STATUS [==[
@@ -1288,7 +1204,6 @@ console.log(`Napi Version: ${my_addon.version()}`);
 -- https://github.com/nodejs/node-addon-examples
 --
 -- ]==])
-    endif() # CMAKEJS_USING_CMAKEJS
 endif()
 
 unset(_version)
