@@ -75,7 +75,7 @@ if(NOT DEFINED CMAKEJS_BINARY_DIR)
     set(CMAKEJS_BINARY_DIR "${CMAKE_BINARY_DIR}")
 endif()
 
-message (STATUS "\n-- CMakeJS.cmake v${_CMAKEJS_VERSION}")
+message (STATUS "\n-- Using cmake-js v${_CMAKEJS_VERSION}")
 
 if(MSVC)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
@@ -993,51 +993,13 @@ include (${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
 
 check_required_components (cmake-js)
 
-# This codeblock make CMakeJS.cmake transportable, by
-# also ensuring that anybody who picks up our CMake package
-# will also have the CLI (which is a requirement of our CMake API)
-
-# Resolve NodeJS development headers
-# TODO: This code block is quite problematic, since:
-# 1 - it might trigger a build run, depending on how the builder has set up their package.json scripts...
-# 2 - it also currently assumes a preference for yarn over npm (and the others)...
-# 3 - finally, because of how cmake-js works, it might create Ninja-build artefacts,
-# even when the CMake user specifies a different generator to CMake manually...
-# We could use 'add_custom_target()' with a user-side ARG for which package manager to use...
-if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
-    # re: package manager to use, we could check IF_EXISTS for a 'yarn.lock'
-    # in the CMAKE_CURRENT_SOURCE_DIR, else use npm?
-    execute_process(
-      COMMAND yarn install
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      OUTPUT_VARIABLE NODE_MODULES_DIR
-    )
-    if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules")
-        message(FATAL_ERROR "Something went wrong - NodeJS modules installation failed!")
-        return()
-    endif()
-endif()
-
-# this would be just 'yarn/npm add cmake-js' if this API were on our 'master' branch
-if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js")
-  execute_process(
-    COMMAND yarn "add https://github.com/nathanjhood/cmake-js#cmakejs_cmake_api"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE CMAKE_JS_EXECUTABLE
-  )
-  if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js")
-      message(FATAL_ERROR "Something went wrong - cmake-js installation failed!")
-      return()
-  endif()
-endif()
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/share/cmake")
 
 # Tell the user what to do
 message(STATUS "-- Appended cmake-js CMake API to your module path.")
 message(STATUS "-- You may 'include(CMakeJS)' in your CMake project to use our API and/or relocatable targets.")
 message(STATUS "-- Read more about our 'CMakeJS.cmake' API here:")
-message(STATUS "-- https://github.com/cmake-js/cmake-js/blob/cmakejs_cmake_api/README.md")
+message(STATUS "-- https://github.com/cmake-js/cmake-js/blob/master/README.md")
 ]==])
 
 # create cmake config file
@@ -1056,8 +1018,7 @@ write_basic_package_version_file (
 # pass our module along
 file(COPY "${_CMAKEJS_SCRIPT}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/cmake")
 
-# This whole block that follows, and the last changes I made to this file (re: 'file/directory reolcation')
-# is all predicated on the idea that our consumers want to control certain vars themselves:
+# These install blocks are predicated on the idea that our consumers want to control certain vars themselves:
 #
 # - CMAKE_BINARY_DIR - where they want CMake's 'configure/build' output to go
 # - CMAKE_INSTALL_PREFIX - where they want CMake's 'install' output to go
@@ -1065,22 +1026,8 @@ file(COPY "${_CMAKEJS_SCRIPT}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/cm
 # Our users should be free to specify things like the above as they wish; we can't possibly
 # know in advance, and we don't want to be opinionated...
 #
-# So, instead, we copied all of our files into a 'CMake-space' and next
-# we will configure the (unknowable-to-us) CMAKE_INSTALL_* vars to prefix the directories
-# of our dependencies. Our users will set CMAKE_INSTALL_* themselves, and *their* CMake
-# will know where our shipped files went (as will they, since they set it). They just do
-# 'target_link_libraries(<name> cmake-js::our-lib)', and *their* CMake will know where
-# it put those files on *their* system.
-#
-# In summary: you don't ship absolute paths. :)
-#
 # It's not just users who will set CMAKE_INSTALL_* though; it's vcpkg and other package
 # managers and installers too! (see CPack)
-#
-# Note that none of these commands install anything. It just prepares an 'install'
-# target, that users can install to wherever they set CMAKE_INSTALL_PREFIX to.
-# To do this, they set '-DCMAKE_INSTALL_PREFIX=./install', configure, then build the
-# 'install' target.
 
 unset(CMAKEJS_INC_DIR)
 set(CMAKEJS_INC_DIR
@@ -1089,6 +1036,7 @@ set(CMAKEJS_INC_DIR
   CACHE PATH "Installation directory for include files, a relative path that will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path."
   FORCE
 )
+
 # # copy headers (and definitions?) to build dir for distribution
 # if(CMAKEJS_USING_NODE_DEV)
 #   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node")
@@ -1126,26 +1074,14 @@ install(
   DESTINATION lib/cmake/CMakeJS
 )
 
-# # Tell the user what to do
-# message(STATUS "\ncmake-js v${_CMAKEJS_VERSION} has made the following targets available for linkage:\n")
-# foreach(TARGET IN LISTS CMAKEJS_TARGETS)
-#     get_target_property(_v ${TARGET} VERSION)
-#     message(STATUS "cmake-js::${TARGET} ${_v}")
-# endforeach()
-
 if(NOT CMakeJS_IS_TOP_LEVEL)
 
   message(STATUS [==[
---
--- To build a Node.js addon,
---
--- Add this to your CMakeLists.txt:
+
+-- Add this to your CMakeLists.txt to build a Node.js addon:
 --
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/share/cmake")
-include(CMakeJS)
-
-cmakejs_setup_node_api_cpp_library()
+cmakejs_setup_node_api_cpp_library() # if you use `node-addon-api`
 
 cmakejs_create_node_api_addon (
     # CMAKEJS_ADDON_NAME
@@ -1165,7 +1101,7 @@ cmakejs_create_node_api_addon (
 
 # Global message (our CLI applies in all scenarios)
 message(STATUS [==[
--- You may use either the regular CMake interface, or the cmake-js CLI, to build your addon!
+You may use either the regular CMake interface, or the cmake-js CLI, to build your addon!
 --
 -- Add this to your package.json:
 
