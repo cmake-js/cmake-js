@@ -82,11 +82,11 @@ jobs:
             if command -v apt-get &> /dev/null
             then
               apt-get update
-              apt-get install -y cmake
+              apt-get install -y cmake curl
             elif command -v apk &> /dev/null
             then
               apk update
-              apk add cmake make g++ gcc
+              apk add cmake make g++ gcc curl
             fi
 
             cd /work
