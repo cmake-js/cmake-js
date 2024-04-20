@@ -5,7 +5,7 @@
 
 ## About
 
-CMake.js is a Node.js native addon build tool which works (almost) _exactly_ like [node-gyp](https://github.com/TooTallNate/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
+CMake.js is a Node.js native addon build tool which works (almost) _exactly_ like [node-gyp](https://github.com/nodejs/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
 
 - Node.js 14.15+ since CMake.js v7.0.0 (for older runtimes please use an earlier version of CMake.js). Newer versions can produce builds targeting older runtimes
 - [NW.js](https://github.com/nwjs/nw.js): all CMake.js based native modules are compatible with NW.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required
@@ -100,7 +100,7 @@ Options:
 
 It is advised to use Node-API for new projects instead of NAN. It provides ABI stability making usage simpler and reducing maintainance.
 
-In a nutshell. _(For more complete documentation please see [the first tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)_
+In a nutshell. _(For more complete documentation please see [the first tutorial](https://github.com/cmake-js/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)_
 
 - Install cmake-js for your module `npm install --save cmake-js`
 - Put a CMakeLists.txt file into your module root with this minimal required content:
@@ -335,29 +335,13 @@ The actual node runtime parameters are detectable in CMakeLists.txt files, the f
 - **NODE_RUNTIMEVERSION**: for example: `"0.12.1"`
 - **NODE_ARCH**: `"x64"`, `"ia32"`, `"arm64"`, `"arm"`
 
-#### NW.js
-
-To make compatible your NW.js application with any NAN CMake.js based modules, write the following to your application's package.json file (this is not neccessary for node-api modules):
-
-```json
-{
-	"cmake-js": {
-		"runtime": "nw",
-		"runtimeVersion": "nw.js-version-here",
-		"arch": "whatever-setting-is-appropriate-for-your-application's-windows-build"
-	}
-}
-```
-
-That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with NW.js out-of-the-box. For more complete documentation please see [the third tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js).
-
 #### Heroku
 
 [Heroku](https://heroku.com) uses the concept of a [buildpack](https://devcenter.heroku.com/articles/buildpacks) to define
 how an application should be prepared to run in a [dyno](https://devcenter.heroku.com/articles/dynos).
 The typical buildpack for note-based applications,
 [heroku/nodejs](https://github.com/heroku/heroku-buildpack-nodejs),
-provides an environment capable of running [node-gyp](https://github.com/TooTallNate/node-gyp),
+provides an environment capable of running [node-gyp](https://github.com/nodejs/node-gyp),
 but not [CMake](http://cmake.org).
 
 The least "painful" way of addressing this is to use heroku's multipack facility:
@@ -375,13 +359,6 @@ The least "painful" way of addressing this is to use heroku's multipack facility
 
 The `heroku-buildpack-multi` will run each buildpack in order allowing the node application to reference CMake in the Heroku
 build environment.
-
-## Tutorials
-
-- [TUTORIAL 01 Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN)
-- [TUTORIAL 02 Creating CMake.js based native addons with Qt Creator](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-02-Creating-CMake.js-based-native-addons-with-QT-Creator)
-- [TUTORIAL 03 Using CMake.js based native modules with NW.js](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js)
-- [TUTORIAL 04 Creating CMake.js based native modules with Boost dependency](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-04-Creating-CMake.js-based-native-modules-with-Boost-dependency)
 
 ## Real examples
 
