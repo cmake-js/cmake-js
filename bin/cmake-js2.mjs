@@ -4,17 +4,31 @@
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import fs from 'fs/promises'
+import path from 'path'
 import { runCommand } from '../rewrite/dist/processHelpers.js'
 import { findCmake } from '../rewrite/dist/toolchain.js'
+import { BuildSystem } from '../rewrite/dist/buildSystem.js'
 
 const packageJsonStr = await fs.readFile(new URL('../package.json', import.meta.url))
 const packageJson = JSON.parse(packageJsonStr.toString())
 
+function parseOptions(args) {
+	const sourceDir = (args.directory && path.resolve(args.directory)) || process.cwd()
+	const buildDir =
+		(args.out && (path.isAbsolute(args.out) ? args.out : path.join(sourceDir, path.resolve(args.out)))) ||
+		path.join(sourceDir, 'build')
+
+	console.log('dirs', sourceDir, buildDir)
+	return { sourceDir, buildDir }
+}
+
 async function runCmake(args) {
 	try {
+		const options = parseOptions(args)
+		const buildSystem = new BuildSystem(options)
+
 		// TODO - replace #GENERATOR# with autoselected generator, to simplify windows
-		const cmakePath = await findCmake()
-		await runCommand([cmakePath, ...args._.slice(1)])
+		await buildSystem.invokeCmake(args._.slice(1))
 	} catch (e) {
 		console.error('fail', e)
 	}
@@ -22,7 +36,9 @@ async function runCmake(args) {
 
 async function runCmakePath() {
 	try {
-		const cmakePath = await findCmake()
+		const options = parseOptions(args)
+		const buildSystem = new BuildSystem(options)
+		const cmakePath = await buildSystem.findCmake()
 		console.log(cmakePath)
 	} catch (e) {
 		console.log(e.message)
@@ -30,13 +46,34 @@ async function runCmakePath() {
 	}
 }
 
+async function runConfigure(args) {
+	const options = parseOptions(args)
+	const buildSystem = new BuildSystem(options)
+
+	await buildSystem.configure(args._.slice(1))
+}
+
+async function runBuild(args) {
+	const options = parseOptions(args)
+	const buildSystem = new BuildSystem(options)
+
+	await buildSystem.ensureConfigured(args._.slice(1))
+	await buildSystem.build({
+		target: args.target,
+		config: args.config || 'Release',
+	})
+}
+
 const args = await yargs(hideBin(process.argv))
+	// .parserConfiguration({ // TODO - this would be nice to have
+	// 	'unknown-options-as-args': true,
+	// })
 	.usage('CMake.js ' + packageJson.version + '\n\nUsage: $0 [<command>] [options]')
 	.version(packageJson.version)
 	.command('cmake', 'Invoke cmake with the given arguments', {}, runCmake)
 	.command('cmake-path', 'Get the path of the cmake binary used', {}, runCmakePath)
-	// 	.command('configure', 'Configure CMake project')
-	// 	.command('build', 'Build the project (will configure first if required)')
+	.command('configure', 'Configure CMake project', {}, runConfigure)
+	.command('build', 'Build the project (will configure first if required)', {}, runBuild)
 	// 	.command('clean', 'Clean the project directory')
 	// 	.command('reconfigure', 'Clean the project directory then configure the project')
 	// 	.command('rebuild', 'Clean the project directory then build the project')
@@ -49,24 +86,18 @@ const args = await yargs(hideBin(process.argv))
 		// 			describe: 'set log level (' + logLevels.join(', ') + '), default is info',
 		// 			type: 'string',
 		// 		},
-		// 		d: {
-		// 			alias: 'directory',
-		// 			demand: false,
-		// 			describe: "specify CMake project's directory (where CMakeLists.txt located)",
-		// 			type: 'string',
-		// 		},
 		// D: {
 		// 	alias: 'debug',
 		// 	demand: false,
 		// 	describe: 'build debug configuration',
 		// 	type: 'boolean',
 		// },
-		// 		B: {
-		// 			alias: 'config',
-		// 			demand: false,
-		// 			describe: "specify build configuration (Debug, RelWithDebInfo, Release), will ignore '--debug' if specified",
-		// 			type: 'string',
-		// 		},
+		config: {
+			// alias: 'B',
+			demand: false,
+			describe: "specify build configuration (Debug, RelWithDebInfo, Release), will ignore '--debug' if specified",
+			type: 'string',
+		},
 		// 		c: {
 		// 			alias: 'cmake-path',
 		// 			demand: false,
@@ -109,12 +140,12 @@ const args = await yargs(hideBin(process.argv))
 		// 			describe: 'use specified platform name',
 		// 			type: 'string',
 		// 		},
-		// 		T: {
-		// 			alias: 'target',
-		// 			demand: false,
-		// 			describe: 'only build the specified target',
-		// 			type: 'string',
-		// 		},
+		target: {
+			// alias: 'T',
+			demand: false,
+			describe: 'only build the specified target',
+			type: 'string',
+		},
 		// 		C: {
 		// 			alias: 'prefer-clang',
 		// 			demand: false,
@@ -165,11 +196,16 @@ const args = await yargs(hideBin(process.argv))
 		// 			describe: 'Prevents CMake.js to print to the stdio',
 		// 			type: 'boolean',
 		// 		},
-		// 		O: {
-		// 			alias: 'out',
-		// 			describe: 'Specify the output directory to compile to, default is projectRoot/build',
-		// 			type: 'string',
-		// 		},
+		directory: {
+			// alias: 'd',
+			describe: 'Specify the source directory to compile, default is the current directory',
+			type: 'string',
+		},
+		out: {
+			// alias: 'out',
+			describe: 'Specify the output directory to compile to, default is projectRoot/build',
+			type: 'string',
+		},
 	})
 	.help()
 	.parseAsync()

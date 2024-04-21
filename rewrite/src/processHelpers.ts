@@ -1,6 +1,6 @@
 import { spawn, execFile as execFileRaw } from 'child_process'
 
-export async function runCommand(command: string[], options?: { silent?: boolean }): Promise<void> {
+export async function runCommand(command: string[], options?: { silent?: boolean; cwd?: string }): Promise<void> {
 	return new Promise<void>(function (resolve, reject) {
 		if (!options) options = {}
 
@@ -15,6 +15,7 @@ export async function runCommand(command: string[], options?: { silent?: boolean
 		const child = spawn(command[0], command.slice(1), {
 			stdio: options.silent ? 'ignore' : 'inherit',
 			env,
+			cwd: options.cwd,
 		})
 		let ended = false
 		child.on('error', function (e) {
