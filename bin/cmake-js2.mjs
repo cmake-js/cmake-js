@@ -35,11 +35,22 @@ function parseOptions(args) {
 	}
 }
 
-async function runCmake(args) {
-	try {
+async function wrapCommand(fn) {
+	return async (args) => {
 		const options = parseOptions(args)
 		const buildSystem = new BuildSystem(options)
 
+		// try {
+		await fn(buildSystem, args)
+		// } catch (e) {
+		// 	console.error('fail', e)
+		// 	process.exit(1)
+		// }
+	}
+}
+
+async function runCmake(buildSystem, args) {
+	try {
 		// TODO - replace #GENERATOR# with autoselected generator, to simplify windows
 		await buildSystem.invokeCmake(args._.slice(1))
 	} catch (e) {
@@ -47,10 +58,8 @@ async function runCmake(args) {
 	}
 }
 
-async function runCmakePath() {
+async function runCmakePath(buildSystem) {
 	try {
-		const options = parseOptions(args)
-		const buildSystem = new BuildSystem(options)
 		const cmakePath = await buildSystem.findCmake()
 		console.log(cmakePath)
 	} catch (e) {
@@ -59,42 +68,29 @@ async function runCmakePath() {
 	}
 }
 
-async function runConfigure(args) {
-	const options = parseOptions(args)
-	const buildSystem = new BuildSystem(options)
-
+async function runConfigure(buildSystem, args) {
 	await buildSystem.configure(args._.slice(1))
 }
 
-async function runBuild(args) {
-	const options = parseOptions(args)
-	const buildSystem = new BuildSystem(options)
-
+async function runBuild(buildSystem, args) {
 	await buildSystem.ensureConfigured(args._.slice(1))
 	await buildSystem.build({
 		target: args.target,
 	})
 }
 
-async function runClean(args) {
-	const options = parseOptions(args)
-	const buildSystem = new BuildSystem(options)
-
+async function runClean(buildSystem, args) {
 	await buildSystem.clean()
 }
 
-async function runListGenerators(args) {
-	const options = parseOptions(args)
-	const buildSystem = new BuildSystem(options)
+async function runListGenerators(buildSystem, args) {
 	const generators = await buildSystem.getGenerators()
 
 	console.log('Available generators:')
 	console.log(generators.map((g) => ' - ' + g).join('\n'))
 }
 
-async function runSelectGenerators(args) {
-	const options = parseOptions(args)
-	const buildSystem = new BuildSystem(options)
+async function runSelectGenerators(buildSystem, args) {
 	const bestGenerator = await buildSystem.selectGeneratorAndPlatform(args)
 
 	if (!bestGenerator) {
@@ -111,16 +107,16 @@ const args = await yargs(hideBin(process.argv))
 	// })
 	.usage('CMake.js ' + packageJson.version + '\n\nUsage: $0 [<command>] [options]')
 	.version(packageJson.version)
-	.command('cmake', 'Invoke cmake with the given arguments', {}, runCmake)
-	.command('cmake-path', 'Get the path of the cmake binary used', {}, runCmakePath)
-	.command('configure', 'Configure CMake project', {}, runConfigure)
-	.command('build', 'Build the project (will configure first if required)', {}, runBuild)
-	.command('clean', 'Clean the project directory', {}, runClean)
+	.command('cmake', 'Invoke cmake with the given arguments', {}, wrapCommand(runCmake))
+	.command('cmake-path', 'Get the path of the cmake binary used', {}, wrapCommand(runCmakePath))
+	.command('configure', 'Configure CMake project', {}, wrapCommand(runConfigure))
+	.command('build', 'Build the project (will configure first if required)', {}, wrapCommand(runBuild))
+	.command('clean', 'Clean the project directory', {}, wrapCommand(runClean))
 	// 	.command('reconfigure', 'Clean the project directory then configure the project')
 	// 	.command('rebuild', 'Clean the project directory then build the project')
 	// 	.command('compile', 'Build the project, and if build fails, try a full rebuild')
-	.command('list-generators', 'List available generators', {}, runListGenerators)
-	.command('select-generator', 'Select the best available generators', {}, runSelectGenerators)
+	.command('list-generators', 'List available generators', {}, wrapCommand(runListGenerators))
+	.command('select-generator', 'Select the best available generators', {}, wrapCommand(runSelectGenerators))
 	.demandCommand()
 	.options({
 		// 		l: {

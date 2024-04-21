@@ -125,10 +125,10 @@ export class BuildSystem {
 
 	async selectGeneratorAndPlatform(): Promise<{ generator: string; platform: string | null } | null> {
 		if (os.platform() === 'win32') {
-			const targetArch: string = 'x64' // TODO
+			const targetArch = os.arch() // TODO
 
 			const cmakePath = await this.findCmake() // TODO - this should not be done here...
-			const foundVsInfo = await getTopSupportedVisualStudioGenerator(cmakePath, targetArch as any, null)
+			const foundVsInfo = await getTopSupportedVisualStudioGenerator(cmakePath, targetArch, null)
 
 			if (foundVsInfo) {
 				let platform: string | null = null
