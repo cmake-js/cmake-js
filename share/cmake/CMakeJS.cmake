@@ -415,10 +415,10 @@ endif()
 
 if (APPLE)
   # TODO: Does macos need the following still?
-  target_compile_options(cmake-js PRIVATE "-D_DARWIN_USE_64_BIT_INODE=1")
-  target_compile_options(cmake-js PRIVATE "-D_LARGEFILE_SOURCE")
-  target_compile_options(cmake-js PRIVATE "-D_FILE_OFFSET_BITS=64")
-  target_link_options(cmake-js PRIVATE "-undefined dynamic_lookup")
+  target_compile_options(cmake-js PUBLIC "-D_DARWIN_USE_64_BIT_INODE=1")
+  target_compile_options(cmake-js PUBLIC "-D_LARGEFILE_SOURCE")
+  target_compile_options(cmake-js PUBLIC "-D_FILE_OFFSET_BITS=64")
+  target_link_options(cmake-js PUBLIC "-undefined dynamic_lookup")
 endif()
 
 function(_cmakejs_export_target name)
@@ -569,7 +569,7 @@ function(cmakejs_create_node_api_addon name)
       SUFFIX ".node"
 
       ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Actually we might not need to enforce an opinion here!
-      LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Instead, we call 'cmakejs_create_addon_bindings()'
+      LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}" # Instead, we call 'cmakejs_create_addon_bindings()'
       RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin" # on this target, and the user can just 'require()' that file!
 
       # # Conventional C++-style debug settings might be useful to have...

@@ -5,21 +5,22 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import fs from 'fs/promises'
 import path from 'path'
-import { runCommand } from '../rewrite/dist/processHelpers.js'
-import { findCmake } from '../rewrite/dist/toolchain.js'
 import { BuildSystem } from '../rewrite/dist/buildSystem.js'
 
 const packageJsonStr = await fs.readFile(new URL('../package.json', import.meta.url))
 const packageJson = JSON.parse(packageJsonStr.toString())
 
 function parseOptions(args) {
+	const config = args.config || 'Release'
 	const sourceDir = (args.directory && path.resolve(args.directory)) || process.cwd()
-	const buildDir =
+	const buildDir = path.join(
 		(args.out && (path.isAbsolute(args.out) ? args.out : path.join(sourceDir, path.resolve(args.out)))) ||
-		path.join(sourceDir, 'build')
+			path.join(sourceDir, 'build'),
+		config,
+	)
 
 	console.log('dirs', sourceDir, buildDir)
-	return { sourceDir, buildDir }
+	return { sourceDir, buildDir, config }
 }
 
 async function runCmake(args) {
@@ -60,8 +61,24 @@ async function runBuild(args) {
 	await buildSystem.ensureConfigured(args._.slice(1))
 	await buildSystem.build({
 		target: args.target,
-		config: args.config || 'Release',
+		config: options.config,
 	})
+}
+
+async function runClean(args) {
+	const options = parseOptions(args)
+	const buildSystem = new BuildSystem(options)
+
+	await buildSystem.clean()
+}
+
+async function runListGenerators(args) {
+	const options = parseOptions(args)
+	const buildSystem = new BuildSystem(options)
+	const generators = await buildSystem.getGenerators()
+
+	console.log('Available generators:')
+	console.log(generators.map((g) => ' - ' + g).join('\n'))
 }
 
 const args = await yargs(hideBin(process.argv))
@@ -74,10 +91,11 @@ const args = await yargs(hideBin(process.argv))
 	.command('cmake-path', 'Get the path of the cmake binary used', {}, runCmakePath)
 	.command('configure', 'Configure CMake project', {}, runConfigure)
 	.command('build', 'Build the project (will configure first if required)', {}, runBuild)
-	// 	.command('clean', 'Clean the project directory')
+	.command('clean', 'Clean the project directory', {}, runClean)
 	// 	.command('reconfigure', 'Clean the project directory then configure the project')
 	// 	.command('rebuild', 'Clean the project directory then build the project')
 	// 	.command('compile', 'Build the project, and if build fails, try a full rebuild')
+	.command('list-generators', 'List available generators', {}, runListGenerators)
 	.demandCommand()
 	.options({
 		// 		l: {
@@ -162,33 +180,10 @@ const args = await yargs(hideBin(process.argv))
 		// 			describe: 'use the specified C++ compiler',
 		// 			type: 'string',
 		// 		},
-		// 		r: {
-		// 			alias: 'runtime',
-		// 			demand: false,
-		// 			describe: 'the runtime to use',
-		// 			type: 'string',
-		// 		},
-		// 		v: {
-		// 			alias: 'runtime-version',
-		// 			demand: false,
-		// 			describe: 'the runtime version to use',
-		// 			type: 'string',
-		// 		},
 		// 		a: {
 		// 			alias: 'arch',
 		// 			demand: false,
 		// 			describe: 'the architecture to build in',
-		// 			type: 'string',
-		// 		},
-		// 		p: {
-		// 			alias: 'parallel',
-		// 			demand: false,
-		// 			describe: 'the number of threads cmake can use',
-		// 			type: 'number',
-		// 		},
-		// 		CD: {
-		// 			demand: false,
-		// 			describe: 'Custom argument passed to CMake in format: -D<your-arg-here>',
 		// 			type: 'string',
 		// 		},
 		// 		i: {
@@ -255,19 +250,6 @@ const args = await yargs(hideBin(process.argv))
 
 // log.verbose('CON', 'Parsing arguments')
 
-// // Extract custom cMake options
-// const customOptions = {}
-// for (const arg of process.argv) {
-// 	if (arg.startsWith('--CD')) {
-// 		const separator = arg.indexOf('=')
-// 		if (separator < 5) continue
-// 		const key = arg.substring(4, separator)
-// 		const value = arg.substring(separator + 1)
-// 		if (!value) continue
-// 		customOptions[key] = value
-// 	}
-// }
-
 // const options = {
 // 	directory: argv.directory || null,
 // 	debug: argv.debug,
@@ -282,49 +264,12 @@ const args = await yargs(hideBin(process.argv))
 // 	preferClang: argv.C,
 // 	cCompilerPath: argv.cc,
 // 	cppCompilerPath: argv.cxx,
-// 	runtime: argv.r,
-// 	runtimeVersion: argv.v,
 // 	arch: argv.a,
-// 	cMakeOptions: customOptions,
 // 	silent: argv.i,
 // 	out: argv.O,
 // 	config: argv.B,
-// 	parallel: argv.p,
-// 	extraCMakeArgs: argv._.slice(1),
 // }
 
-// log.verbose('CON', 'options:')
-// log.verbose('CON', util.inspect(options))
-
-// const command = argv._[0] || 'build'
-
-// log.verbose('CON', 'Running command: ' + command)
-
-// const buildSystem = new BuildSystem(options)
-
-// function ifCommand(c, f) {
-// 	if (c === command) {
-// 		f()
-// 		return true
-// 	}
-// 	return false
-// }
-
-// function exitOnError(promise) {
-// 	promise.catch(function () {
-// 		process.exit(1)
-// 	})
-// }
-
-// function install() {
-// 	exitOnError(buildSystem.install())
-// }
-// function configure() {
-// 	exitOnError(buildSystem.configure())
-// }
-// function build() {
-// 	exitOnError(buildSystem.build())
-// }
 // function clean() {
 // 	exitOnError(buildSystem.clean())
 // }
@@ -337,11 +282,3 @@ const args = await yargs(hideBin(process.argv))
 // function compile() {
 // 	exitOnError(buildSystem.compile())
 // }
-
-// let done = ifCommand('install', install)
-// done = done || ifCommand('configure', configure)
-// done = done || ifCommand('build', build)
-// done = done || ifCommand('clean', clean)
-// done = done || ifCommand('reconfigure', reconfigure)
-// done = done || ifCommand('rebuild', rebuild)
-// done = done || ifCommand('compile', compile)

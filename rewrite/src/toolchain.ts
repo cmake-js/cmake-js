@@ -1,5 +1,6 @@
 import fs from 'fs/promises'
 import which from 'which'
+import { execFile } from './processHelpers'
 
 export async function findCmake(): Promise<string> {
 	const overridePath = process.env['CMAKEJS_CMAKE_PATH']
@@ -20,4 +21,21 @@ export async function findCmake(): Promise<string> {
 		}
 		return res
 	}
+}
+
+export async function getGenerators(cmakePath: string, log: any): Promise<string[]> {
+	const generators: string[] = []
+
+	// parsing machine-readable capabilities (available since CMake 3.7)
+	try {
+		const stdout = await execFile([cmakePath, '-E', 'capabilities'])
+		const capabilities = JSON.parse(stdout)
+		return capabilities.generators.map((x: any) => x.name)
+	} catch (error) {
+		if (log) {
+			log.verbose('TOOL', 'Failed to query CMake capabilities (CMake is probably older than 3.7)')
+		}
+	}
+
+	return generators
 }

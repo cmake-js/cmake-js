@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { runCommand } from './processHelpers'
-import { findCmake } from './toolchain'
+import { findCmake, getGenerators } from './toolchain'
 
 export interface BuildSystemOptions {
 	sourceDir: string
@@ -75,13 +75,12 @@ export class BuildSystem {
 
 		const cmakePath = await this.findCmake()
 
-		// TODO --parallel should be driven from some environment variable
-		// TODO --config ??
-
 		const buildCommand = [cmakePath, '--build', this.#options.buildDir, '--config', buildOptions.config]
 		if (buildOptions.target) {
 			buildCommand.push('--target', buildOptions.target)
 		}
+
+		// TODO --parallel should be driven from some environment variable
 		// if (this.options.parallel) {
 		// 	command.push('--parallel', this.options.parallel)
 		// }
@@ -90,5 +89,18 @@ export class BuildSystem {
 		await runCommand(buildCommand, {
 			cwd: this.#options.buildDir,
 		})
+	}
+
+	async clean(): Promise<void> {
+		try {
+			await fs.rm(this.#options.buildDir, { recursive: true })
+		} catch (e) {
+			// Ignore
+		}
+	}
+
+	async getGenerators(): Promise<string[]> {
+		const cmakePath = await this.findCmake()
+		return getGenerators(cmakePath, null)
 	}
 }
