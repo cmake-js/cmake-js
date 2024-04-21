@@ -12,6 +12,7 @@ const packageJson = JSON.parse(packageJsonStr.toString())
 
 function parseOptions(args) {
 	const config = args.config || 'Release'
+	const generator = args.generator
 	const sourceDir = (args.directory && path.resolve(args.directory)) || process.cwd()
 	const buildDir = path.join(
 		(args.out && (path.isAbsolute(args.out) ? args.out : path.join(sourceDir, path.resolve(args.out)))) ||
@@ -19,8 +20,19 @@ function parseOptions(args) {
 		config,
 	)
 
+	const preferMake = !!args['prefer-make']
+	const preferXcode = !!args['prefer-xcode']
+
 	console.log('dirs', sourceDir, buildDir)
-	return { sourceDir, buildDir, config }
+	return {
+		sourceDir,
+		buildDir,
+		config,
+		generator,
+
+		preferMake,
+		preferXcode,
+	}
 }
 
 async function runCmake(args) {
@@ -61,7 +73,6 @@ async function runBuild(args) {
 	await buildSystem.ensureConfigured(args._.slice(1))
 	await buildSystem.build({
 		target: args.target,
-		config: options.config,
 	})
 }
 
@@ -81,6 +92,19 @@ async function runListGenerators(args) {
 	console.log(generators.map((g) => ' - ' + g).join('\n'))
 }
 
+async function runSelectGenerators(args) {
+	const options = parseOptions(args)
+	const buildSystem = new BuildSystem(options)
+	const bestGenerator = await buildSystem.selectGeneratorAndPlatform(args)
+
+	if (!bestGenerator) {
+		console.error('No suitable generator found')
+		process.exit(1)
+	} else {
+		console.log(bestGenerator.generator + (bestGenerator.platform ? ' ' + bestGenerator.platform : ''))
+	}
+}
+
 const args = await yargs(hideBin(process.argv))
 	// .parserConfiguration({ // TODO - this would be nice to have
 	// 	'unknown-options-as-args': true,
@@ -96,6 +120,7 @@ const args = await yargs(hideBin(process.argv))
 	// 	.command('rebuild', 'Clean the project directory then build the project')
 	// 	.command('compile', 'Build the project, and if build fails, try a full rebuild')
 	.command('list-generators', 'List available generators', {}, runListGenerators)
+	.command('select-generator', 'Select the best available generators', {}, runSelectGenerators)
 	.demandCommand()
 	.options({
 		// 		l: {
@@ -104,54 +129,30 @@ const args = await yargs(hideBin(process.argv))
 		// 			describe: 'set log level (' + logLevels.join(', ') + '), default is info',
 		// 			type: 'string',
 		// 		},
-		// D: {
-		// 	alias: 'debug',
-		// 	demand: false,
-		// 	describe: 'build debug configuration',
-		// 	type: 'boolean',
-		// },
 		config: {
 			// alias: 'B',
 			demand: false,
 			describe: "specify build configuration (Debug, RelWithDebInfo, Release), will ignore '--debug' if specified",
 			type: 'string',
 		},
-		// 		c: {
-		// 			alias: 'cmake-path',
-		// 			demand: false,
-		// 			describe: 'path of CMake executable',
-		// 			type: 'string',
-		// 		},
-		// 		m: {
-		// 			alias: 'prefer-make',
-		// 			demand: false,
-		// 			describe: 'use Unix Makefiles even if Ninja is available (Posix)',
-		// 			type: 'boolean',
-		// 		},
-		// 		x: {
-		// 			alias: 'prefer-xcode',
-		// 			demand: false,
-		// 			describe: 'use Xcode instead of Unix Makefiles',
-		// 			type: 'boolean',
-		// 		},
-		// 		g: {
-		// 			alias: 'prefer-gnu',
-		// 			demand: false,
-		// 			describe: 'use GNU compiler instead of default CMake compiler, if available (Posix)',
-		// 			type: 'boolean',
-		// 		},
-		// 		G: {
-		// 			alias: 'generator',
-		// 			demand: false,
-		// 			describe: 'use specified generator',
-		// 			type: 'string',
-		// 		},
-		// 		t: {
-		// 			alias: 'toolset',
-		// 			demand: false,
-		// 			describe: 'use specified toolset',
-		// 			type: 'string',
-		// 		},
+		'prefer-make': {
+			// alias: 'm',
+			demand: false,
+			describe: 'use Unix Makefiles generator even if Ninja is available (Posix)',
+			type: 'boolean',
+		},
+		'prefer-xcode': {
+			// alias: 'x',
+			demand: false,
+			describe: 'use Xcode generator instead of Unix Makefiles',
+			type: 'boolean',
+		},
+		generator: {
+			// alias: 'G',
+			demand: false,
+			describe: 'use specified generator',
+			type: 'string',
+		},
 		// 		A: {
 		// 			alias: 'platform',
 		// 			demand: false,
@@ -164,22 +165,6 @@ const args = await yargs(hideBin(process.argv))
 			describe: 'only build the specified target',
 			type: 'string',
 		},
-		// 		C: {
-		// 			alias: 'prefer-clang',
-		// 			demand: false,
-		// 			describe: 'use Clang compiler instead of default CMake compiler, if available (Posix)',
-		// 			type: 'boolean',
-		// 		},
-		// 		cc: {
-		// 			demand: false,
-		// 			describe: 'use the specified C compiler',
-		// 			type: 'string',
-		// 		},
-		// 		cxx: {
-		// 			demand: false,
-		// 			describe: 'use the specified C++ compiler',
-		// 			type: 'string',
-		// 		},
 		// 		a: {
 		// 			alias: 'arch',
 		// 			demand: false,
@@ -226,18 +211,6 @@ const args = await yargs(hideBin(process.argv))
 // 	}
 // }
 
-// const yargs = require('yargs')
-// 	.usage('CMake.js ' + version + '\n\nUsage: $0 [<command>] [options]')
-// 	.version(version)
-// const argv = yargs.argv
-
-// // If help, then print and exit:
-
-// if (argv.h) {
-// 	console.info(yargs.help())
-// 	process.exit(0)
-// }
-
 // // Setup log level:
 
 // if (argv.l && logLevels.includes(argv.l)) {
@@ -245,34 +218,13 @@ const args = await yargs(hideBin(process.argv))
 // 	log.resume()
 // }
 
-// log.silly('CON', 'argv:')
-// log.silly('CON', util.inspect(argv))
-
-// log.verbose('CON', 'Parsing arguments')
-
 // const options = {
-// 	directory: argv.directory || null,
-// 	debug: argv.debug,
-// 	cmakePath: argv.c || null,
-// 	generator: argv.G,
-// 	toolset: argv.t,
 // 	platform: argv.A,
-// 	target: argv.T,
-// 	preferMake: argv.m,
-// 	preferXcode: argv.x,
-// 	preferGnu: argv.g,
-// 	preferClang: argv.C,
-// 	cCompilerPath: argv.cc,
-// 	cppCompilerPath: argv.cxx,
 // 	arch: argv.a,
 // 	silent: argv.i,
 // 	out: argv.O,
-// 	config: argv.B,
 // }
 
-// function clean() {
-// 	exitOnError(buildSystem.clean())
-// }
 // function reconfigure() {
 // 	exitOnError(buildSystem.reconfigure())
 // }
