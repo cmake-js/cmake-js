@@ -109,7 +109,7 @@ In a nutshell. _(For more complete documentation please see [the first tutorial]
 cmake_minimum_required(VERSION 3.15...3.31)
 project(your-addon-name-here)
 
-add_definitions(-DNAPI_VERSION=4)
+add_compile_definitions(-DNAPI_VERSION=4)
 
 file(GLOB SOURCE_FILES "your-source files-location-here")
 
