@@ -14,29 +14,31 @@ jobs:
       matrix:
         include:
           # windows
-          - os: windows-2019
-            arch: x64
           - os: windows-2022
             arch: x64
-          - os: windows-2019
+          - os: windows-2025
+            arch: x64
+          - os: windows-2022
             arch: x86
+          - os: windows-11-arm
+            arch: arm64
+            node-version: 20.x
           # macos
-          - os: macos-12
+          - os: macos-13
             arch: x64
-          # - os: macos-11
-          #   arch: arm64
-          - os: macos-11
-            arch: x64
+          - os: macos-14
+            arch: arm64
+            node-version: 16.x
           # linux
           - os: ubuntu-22.04
             arch: x64
-          - os: ubuntu-20.04
+          - os: ubuntu-24.04
             arch: x64
-          # linux-libc
-          - os: ubuntu-latest
+          - os: ubuntu-22.04-arm
             arch: arm64
-            docker-arch: linux/arm64
-            docker-image: node:14-bullseye
+          - os: ubuntu-24.04-arm
+            arch: arm64
+          # linux-libc
           - os: ubuntu-latest
             arch: arm
             docker-arch: linux/arm/v7
@@ -51,12 +53,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Use Node.js 14.x
+      - name: Use Node.js
         if: ${{ !matrix.docker-arch }}
         uses: actions/setup-node@v3
         with:
           architecture: ${{ matrix.arch }}
-          node-version: 14.x
+          node-version: ${{ matrix.node-version || '14.x' }}
 
       - name: run tests
         if: ${{ !matrix.docker-arch }}
