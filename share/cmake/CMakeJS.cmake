@@ -418,7 +418,7 @@ if (APPLE)
   target_compile_options(cmake-js PUBLIC "-D_DARWIN_USE_64_BIT_INODE=1")
   target_compile_options(cmake-js PUBLIC "-D_LARGEFILE_SOURCE")
   target_compile_options(cmake-js PUBLIC "-D_FILE_OFFSET_BITS=64")
-  target_link_options(cmake-js PUBLIC "-undefined dynamic_lookup")
+  target_link_options(cmake-js INTERFACE "-undefined dynamic_lookup")
 endif()
 
 function(_cmakejs_export_target name)
