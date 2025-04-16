@@ -16,6 +16,7 @@ export async function runCommand(command: string[], options?: { silent?: boolean
 			stdio: options.silent ? 'ignore' : 'inherit',
 			env,
 			cwd: options.cwd,
+			shell: true, // Because of windows
 		})
 		let ended = false
 		child.on('error', function (e) {

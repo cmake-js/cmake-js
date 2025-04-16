@@ -32,56 +32,6 @@ endfunction()
 
 set(_CMAKEJS_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE INTERNAL "Path to cmake-js directory")
 
-# Find the cmake-js helper
-find_program(CMAKEJS_HELPER_EXECUTABLE
-  NAMES "cmake-js-helper.mjs"
-  PATHS "${_CMAKEJS_DIR}/bin"
-  DOC "cmake-js helper binary"
-  REQUIRED
-)
-if (NOT CMAKEJS_HELPER_EXECUTABLE)
-  message(FATAL_ERROR "Failed to find cmake-js helper!")
-  return()
-endif()
-
-_cmakejs_normalize_path(CMAKEJS_HELPER_EXECUTABLE)
-string(REGEX REPLACE "[\r\n\"]" "" CMAKEJS_HELPER_EXECUTABLE "${CMAKEJS_HELPER_EXECUTABLE}")
-
-# get the cmake-js version number
-execute_process(
-  COMMAND "${CMAKEJS_HELPER_EXECUTABLE}" "version"
-  WORKING_DIRECTORY ${_CMAKEJS_DIR}
-  OUTPUT_VARIABLE _version
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-if (NOT DEFINED _version OR "${_version}" STREQUAL "")
-  message(FATAL_ERROR "Failed to get cmake-js version!")
-  return()
-endif()
-
-# check multiple versions havent been loaded
-if(COMMAND cmakejs_nodejs_addon_add_sources)
-    if(NOT DEFINED _CMAKEJS_VERSION OR NOT (_version STREQUAL _CMAKEJS_VERSION))
-        message(WARNING "More than one 'CMakeJS.cmake' version has been included in this project.")
-    endif()
-    # CMakeJS has already been included! Don't do anything
-    return()
-endif()
-
-set(_CMAKEJS_VERSION "${_version}" CACHE INTERNAL "Current 'CMakeJS.cmake' version. Used for checking for conflicts")
-set(_CMAKEJS_SCRIPT "${CMAKE_CURRENT_LIST_FILE}" CACHE INTERNAL "Path to current 'CMakeJS.cmake' script")
-
-# Default build output directory, if not specified with '-DCMAKEJS_BINARY_DIR:PATH=/some/dir'
-if(NOT DEFINED CMAKEJS_BINARY_DIR)
-    set(CMAKEJS_BINARY_DIR "${CMAKE_BINARY_DIR}")
-endif()
-
-message (STATUS "Using cmake-js v${_CMAKEJS_VERSION}")
-
-if(MSVC)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
-endif()
-
 #[=============================================================================[
 Get the in-use NodeJS binary for executing NodeJS commands in CMake scripts.
 
@@ -118,6 +68,63 @@ function(cmakejs_acquire_node_executable)
     endif()
   endif()
 endfunction()
+
+if(NOT DEFINED NODE_EXECUTABLE)
+  cmakejs_acquire_node_executable()
+  message(DEBUG "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
+  message(DEBUG "NODE_VERSION: ${NODE_VERSION}")
+endif()
+
+# Find the cmake-js helper
+find_program(CMAKEJS_HELPER_EXECUTABLE
+  NAMES "cmake-js-helper.mjs"
+  PATHS "${_CMAKEJS_DIR}/bin"
+  DOC "cmake-js helper binary"
+  REQUIRED
+)
+if (NOT CMAKEJS_HELPER_EXECUTABLE)
+  message(FATAL_ERROR "Failed to find cmake-js helper!")
+  return()
+endif()
+
+_cmakejs_normalize_path(CMAKEJS_HELPER_EXECUTABLE)
+string(REGEX REPLACE "[\r\n\"]" "" CMAKEJS_HELPER_EXECUTABLE "${CMAKEJS_HELPER_EXECUTABLE}")
+
+# get the cmake-js version number
+execute_process(
+  COMMAND "${NODE_EXECUTABLE}" "${CMAKEJS_HELPER_EXECUTABLE}" "version"
+  WORKING_DIRECTORY ${_CMAKEJS_DIR}
+  OUTPUT_VARIABLE _version
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if (NOT DEFINED _version OR "${_version}" STREQUAL "")
+  message(FATAL_ERROR "Failed to get cmake-js version!")
+  return()
+endif()
+
+# check multiple versions havent been loaded
+if(COMMAND cmakejs_nodejs_addon_add_sources)
+    if(NOT DEFINED _CMAKEJS_VERSION OR NOT (_version STREQUAL _CMAKEJS_VERSION))
+        message(WARNING "More than one 'CMakeJS.cmake' version has been included in this project.")
+    endif()
+    # CMakeJS has already been included! Don't do anything
+    return()
+endif()
+
+set(_CMAKEJS_VERSION "${_version}" CACHE INTERNAL "Current 'CMakeJS.cmake' version. Used for checking for conflicts")
+set(_CMAKEJS_SCRIPT "${CMAKE_CURRENT_LIST_FILE}" CACHE INTERNAL "Path to current 'CMakeJS.cmake' script")
+
+# Default build output directory, if not specified with '-DCMAKEJS_BINARY_DIR:PATH=/some/dir'
+if(NOT DEFINED CMAKEJS_BINARY_DIR)
+    set(CMAKEJS_BINARY_DIR "${CMAKE_BINARY_DIR}")
+endif()
+
+message (STATUS "Using cmake-js v${_CMAKEJS_VERSION}")
+
+if(MSVC)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
+endif()
+
 
 #[=============================================================================[
 Get NodeJS C Addon development files.
@@ -252,11 +259,6 @@ cmake-js::cmake-js
 
 ]=============================================================================]#
 
-if(NOT DEFINED NODE_EXECUTABLE)
-  cmakejs_acquire_node_executable()
-  message(DEBUG "NODE_EXECUTABLE: ${NODE_EXECUTABLE}")
-  message(DEBUG "NODE_VERSION: ${NODE_VERSION}")
-endif()
 
 function(cmakejs_setup_node_api_c_library)
   cmakejs_acquire_node_api_c_headers()
@@ -276,13 +278,13 @@ function(cmakejs_setup_node_api_c_library)
 
   # find the node api definition to generate into node.lib
   if (MSVC) 
-    execute_process(COMMAND ${NODE_PATH} -p "require('node-api-headers').def_paths.node_api_def"
+    execute_process(COMMAND ${NODE_EXECUTABLE} -p "require('node-api-headers').def_paths.node_api_def"
         WORKING_DIRECTORY ${_CMAKEJS_DIR}
         OUTPUT_VARIABLE CMAKEJS_NODELIB_DEF
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
-    if (DEFINED CMAKEJS_NODELIB_DEF)
+    if (NOT DEFINED CMAKEJS_NODELIB_DEF)
         message(FATAL_ERROR "Failed to find `node-api-headers` api definition")
         return()
     endif()
@@ -404,20 +406,20 @@ if (MSVC)
   target_sources (cmake-js INTERFACE "${_CMAKEJS_DIR}/lib/cpp/win_delay_load_hook.cc")
 
   # setup delayload
-  target_link_options(cmake-js PRIVATE "/DELAYLOAD:NODE.EXE")
-  target_link_libraries(cmake-js PRIVATE delayimp)
+  target_link_options(cmake-js INTERFACE "/DELAYLOAD:NODE.EXE")
+  target_link_libraries(cmake-js INTERFACE delayimp)
 
   if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)")
-      target_link_options(cmake-js PUBLIC "/SAFESEH:NO")
+      target_link_options(cmake-js INTERFACE "/SAFESEH:NO")
   endif()
 endif()
 
 
 if (APPLE)
   # TODO: Does macos need the following still?
-  target_compile_options(cmake-js PUBLIC "-D_DARWIN_USE_64_BIT_INODE=1")
-  target_compile_options(cmake-js PUBLIC "-D_LARGEFILE_SOURCE")
-  target_compile_options(cmake-js PUBLIC "-D_FILE_OFFSET_BITS=64")
+  target_compile_options(cmake-js INTERFACE "-D_DARWIN_USE_64_BIT_INODE=1")
+  target_compile_options(cmake-js INTERFACE "-D_LARGEFILE_SOURCE")
+  target_compile_options(cmake-js INTERFACE "-D_FILE_OFFSET_BITS=64")
   target_link_options(cmake-js INTERFACE "-undefined dynamic_lookup")
 endif()
 
@@ -756,93 +758,93 @@ to be.
 ]=============================================================================]#
 
 
-include (CMakePackageConfigHelpers)
-file (WRITE "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in" [==[
-@PACKAGE_INIT@
+# include (CMakePackageConfigHelpers)
+# file (WRITE "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in" [==[
+# @PACKAGE_INIT@
 
-include (${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
+# include (${CMAKE_CURRENT_LIST_DIR}/CMakeJSTargets.cmake)
 
-check_required_components (cmake-js)
+# check_required_components (cmake-js)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/share/cmake")
+# list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/cmake-js/share/cmake")
 
-# Tell the user what to do
-message(STATUS "-- Appended cmake-js CMake API to your module path.")
-message(STATUS "-- You may 'include(CMakeJS)' in your CMake project to use our API and/or relocatable targets.")
-message(STATUS "-- Read more about our 'CMakeJS.cmake' API here:")
-message(STATUS "-- https://github.com/cmake-js/cmake-js/blob/master/README.md")
-]==])
+# # Tell the user what to do
+# message(STATUS "-- Appended cmake-js CMake API to your module path.")
+# message(STATUS "-- You may 'include(CMakeJS)' in your CMake project to use our API and/or relocatable targets.")
+# message(STATUS "-- Read more about our 'CMakeJS.cmake' API here:")
+# message(STATUS "-- https://github.com/cmake-js/cmake-js/blob/master/README.md")
+# ]==])
 
-# create cmake config file
-configure_package_config_file (
-    "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfig.cmake"
-  INSTALL_DESTINATION
-    "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS"
-)
-# generate the version file for the cmake config file
-write_basic_package_version_file (
-	"${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfigVersion.cmake"
-	VERSION ${_version}
-	COMPATIBILITY AnyNewerVersion
-)
-# pass our module along
-file(COPY "${_CMAKEJS_SCRIPT}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/cmake")
+# # create cmake config file
+# configure_package_config_file (
+#     "${CMAKE_CURRENT_BINARY_DIR}/CMakeJSConfig.cmake.in"
+#     "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfig.cmake"
+#   INSTALL_DESTINATION
+#     "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS"
+# )
+# # generate the version file for the cmake config file
+# write_basic_package_version_file (
+# 	"${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfigVersion.cmake"
+# 	VERSION ${_version}
+# 	COMPATIBILITY AnyNewerVersion
+# )
+# # pass our module along
+# file(COPY "${_CMAKEJS_SCRIPT}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/cmake")
 
-# These install blocks are predicated on the idea that our consumers want to control certain vars themselves:
-#
-# - CMAKE_BINARY_DIR - where they want CMake's 'configure/build' output to go
-# - CMAKE_INSTALL_PREFIX - where they want CMake's 'install' output to go
-#
-# Our users should be free to specify things like the above as they wish; we can't possibly
-# know in advance, and we don't want to be opinionated...
-#
-# It's not just users who will set CMAKE_INSTALL_* though; it's vcpkg and other package
-# managers and installers too! (see CPack)
+# # These install blocks are predicated on the idea that our consumers want to control certain vars themselves:
+# #
+# # - CMAKE_BINARY_DIR - where they want CMake's 'configure/build' output to go
+# # - CMAKE_INSTALL_PREFIX - where they want CMake's 'install' output to go
+# #
+# # Our users should be free to specify things like the above as they wish; we can't possibly
+# # know in advance, and we don't want to be opinionated...
+# #
+# # It's not just users who will set CMAKE_INSTALL_* though; it's vcpkg and other package
+# # managers and installers too! (see CPack)
 
-unset(CMAKEJS_INC_DIR)
-set(CMAKEJS_INC_DIR
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-  CACHE PATH "Installation directory for include files, a relative path that will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path."
-  FORCE
-)
+# unset(CMAKEJS_INC_DIR)
+# set(CMAKEJS_INC_DIR
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+#   $<INSTALL_INTERFACE:include>
+#   CACHE PATH "Installation directory for include files, a relative path that will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path."
+#   FORCE
+# )
 
-# # copy headers (and definitions?) to build dir for distribution
-# if(CMAKEJS_USING_NODE_DEV)
-#   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node")
-#   install(TARGETS node-dev
-#     EXPORT CMakeJSTargets
-#     LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-#     ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-#     RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
-#     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-#     FILE_SET node_dev_INTERFACE_HEADERS
-#   )
-# endif()
+# # # copy headers (and definitions?) to build dir for distribution
+# # if(CMAKEJS_USING_NODE_DEV)
+# #   install(FILES ${CMAKE_JS_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node")
+# #   install(TARGETS node-dev
+# #     EXPORT CMakeJSTargets
+# #     LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+# #     ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+# #     RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
+# #     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+# #     FILE_SET node_dev_INTERFACE_HEADERS
+# #   )
+# # endif()
 
-install(FILES ${_CMAKEJS_SCRIPT} DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS")
-install(TARGETS cmake-js
-  EXPORT CMakeJSTargets
-  LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-  ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
-  RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
-  INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-)
+# install(FILES ${_CMAKEJS_SCRIPT} DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS")
+# install(TARGETS cmake-js
+#   EXPORT CMakeJSTargets
+#   LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+#   ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+#   RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
+#   INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+# )
 
-# install config files
-install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfig.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfigVersion.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS"
-)
+# # install config files
+# install(FILES
+#   "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfig.cmake"
+#   "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/CMakeJSConfigVersion.cmake"
+#   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeJS"
+# )
 
-# install 'CMakeJSTargets' export file
-install(
-  EXPORT CMakeJSTargets
-  FILE CMakeJSTargets.cmake
-  NAMESPACE cmake-js::
-  DESTINATION lib/cmake/CMakeJS
-)
+# # install 'CMakeJSTargets' export file
+# install(
+#   EXPORT CMakeJSTargets
+#   FILE CMakeJSTargets.cmake
+#   NAMESPACE cmake-js::
+#   DESTINATION lib/cmake/CMakeJS
+# )
 
 unset(_version)
