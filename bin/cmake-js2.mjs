@@ -7,6 +7,8 @@ import fs from 'fs/promises'
 import path from 'path'
 import { BuildSystem } from '../rewrite/dist/buildSystem.js'
 
+// TODO - inject NODE_EXECUTABLE
+
 const packageJsonStr = await fs.readFile(new URL('../package.json', import.meta.url))
 const packageJson = JSON.parse(packageJsonStr.toString())
 

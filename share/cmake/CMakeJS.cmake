@@ -18,7 +18,7 @@ if (DEFINED CMAKE_JS_VERSION)
 endif()
 
 #[=============================================================================[
-Internal helper (borrowed from CMakeRC).
+Internal helper.
 ]=============================================================================]#
 function(_cmakejs_normalize_path var)
     set(path "${${var}}")
@@ -552,7 +552,7 @@ function(cmakejs_create_node_api_addon name)
     if(TARGET cmake-js::node-addon-api)
       target_link_libraries(${name} PRIVATE cmake-js::node-addon-api)
     elseif(NOT _cmakejs_node_api_cpp_missing_logged)
-      message(STATUS "Node Addon API (C++) library not found. Skipping...")
+      message(STATUS "Node Addon API (C++) library not loaded. Skipping...")
       set(_cmakejs_node_api_cpp_missing_logged TRUE)
     endif()
 
@@ -721,6 +721,14 @@ endfunction()
 #[=============================================================================[
 Collect targets and allow CMake to provide them
 
+Julian: I have no idea what any of this means, or why anyone would want to do 
+        it with a nodejs addon.
+        For me, the value in cmake-js is in building the `.node` addon files, 
+        which need to be in paths that nodejs understands, so why do we care 
+        about cmake and its CMAKE_BINARY_DIR?
+        Anyway, this was contributed, and I feel bad ripping it out without 
+        more of a reason.
+
 Builders working with CMake at any level know how fussy CMake is about stuff
 like filepaths, and how to resolve your project's dependencies. Enough people
 went "agh if CMake is gonna be so fussy about my project's filepaths, why can't
@@ -836,72 +844,5 @@ install(
   NAMESPACE cmake-js::
   DESTINATION lib/cmake/CMakeJS
 )
-
-# if(NOT CMakeJS_IS_TOP_LEVEL)
-
-#   message(STATUS [==[
-
-# -- Add this to your CMakeLists.txt to build a Node.js addon:
-# --
-
-# cmakejs_setup_node_api_cpp_library() # if you use `node-addon-api`
-
-# cmakejs_create_node_api_addon (
-#     # CMAKEJS_ADDON_NAME
-#     my_addon
-#     # SOURCES
-#     src/<vendor>/my_addon.cpp
-#     # NAPI_CPP_CUSTOM_NAMESPACE
-#     NAMESPACE <vendor>
-#   )
-
-# ]==])
-
-#   # Future?
-#   if(CMAKEJS_USING_NODE_SEA_CONFIG)
-#     # https://nodejs.org/api/single-executable-applications.html
-#   endif()
-
-# # Global message (our CLI applies in all scenarios)
-# message(STATUS [==[
-# You may use either the regular CMake interface, or the cmake-js CLI, to build your addon!
-# --
-# -- Add this to your package.json:
-
-# {
-#     "name": "@<vendor>/my-addon",
-#     "dependencies": {
-#         "cmake-js": "^7.3.3"
-#     },
-#     "scripts": {
-#         "install":     "cmake-js install",
-#         "configure":   "cmake-js configure",
-#         "reconfigure": "cmake-js reconfigure",
-#         "build":       "cmake-js build",
-#         "rebuild":     "cmake-js rebuild"
-#         "clean":       "cmake-js clean"
-#     // ...
-# }
-
-# -- You will be able to load your built addon in JavaScript code:
-# --
-
-# const my_addon = require("./build/lib/my_addon.node");
-
-# console.log(`Napi Status:  ${my_addon.hello()}`);
-# console.log(`Napi Version: ${my_addon.version()}`);
-
-
-# -- Make sure to register a module in your C/C++ code like official example does:
-# -- https://github.com/nodejs/node-addon-examples/blob/main/src/1-getting-started/1_hello_world/node-addon-api/hello.cc
-# --
-# -- Read more about our 'CMakeJS.cmake' API here:
-# -- https://github.com/cmake-js/cmake-js/blob/cmakejs_cmake_api/README.md
-# --
-# -- See more node addon examples here:
-# -- https://github.com/nodejs/node-addon-examples
-# --
-# -- ]==])
-# endif()
 
 unset(_version)
