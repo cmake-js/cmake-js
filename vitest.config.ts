@@ -9,5 +9,6 @@ export default defineConfig({
 	test: {
 		hookTimeout: 30_000,
 		testTimeout: testTimeout,
+		fileParallelism: !process.env.CI,
 	},
 })

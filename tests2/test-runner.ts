@@ -36,7 +36,10 @@ export class CmakeTestRunner {
 		})
 
 		// Make sure addon is loadable
-		const launched = await runCommand(['node', path.join(buildDir, 'lib/addon.node')], {
+		const addonPath =
+			process.platform === 'win32' ? path.join(buildDir, 'lib/Debug/addon.node') : path.join(buildDir, 'lib/addon.node')
+
+		const launched = await runCommand(['node', addonPath], {
 			cwd: buildDir,
 		}).then(
 			() => true,
