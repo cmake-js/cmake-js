@@ -7,6 +7,7 @@ if (process.platform === 'win32') testTimeout *= 3
 
 export default defineConfig({
 	test: {
+		hookTimeout: 30_000,
 		testTimeout: testTimeout,
 	},
 })
