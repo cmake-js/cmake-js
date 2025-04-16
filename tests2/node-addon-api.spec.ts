@@ -12,6 +12,31 @@ describe('node-addon-api', () => {
 		await testRunner.testInvokeCmakeDirect()
 	})
 
+	if (process.platform === 'darwin') {
+		test('cmake direct invocation multiarch', async () => {
+			await testRunner.testInvokeCmakeDirect(['-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64'])
+
+			// TODO - assert binary is universal
+		})
+	}
+
+	if (process.platform === 'win32') {
+		test('cmake direct invocation ia32', async () => {
+			await testRunner.testInvokeCmakeDirect(['-A', 'x86'], true)
+		})
+
+		if (process.arch !== 'x64') {
+			test('cmake direct invocation x64', async () => {
+				await testRunner.testInvokeCmakeDirect(['-A', 'x64'], true)
+			})
+		}
+		if (process.arch !== 'arm64') {
+			test('cmake direct invocation arm64', async () => {
+				await testRunner.testInvokeCmakeDirect(['-A', 'ARM64'], true)
+			})
+		}
+	}
+
 	// test('build', async () => {
 
 	//     await runCommand([''])

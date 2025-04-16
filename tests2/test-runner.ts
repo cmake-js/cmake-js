@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { runCommand } from '../rewrite/src/processHelpers'
 import { rimraf } from 'rimraf'
 import fs from 'node:fs/promises'
+import { expect } from 'vitest'
 
 export class CmakeTestRunner {
 	readonly projectDir: string
@@ -17,7 +18,7 @@ export class CmakeTestRunner {
 		})
 	}
 
-	async testInvokeCmakeDirect() {
+	async testInvokeCmakeDirect(cmakeArgs: string[] = [], launchCheckShouldFail = false) {
 		await rimraf(path.join(this.projectDir, 'build'))
 
 		// make build dir
@@ -25,7 +26,7 @@ export class CmakeTestRunner {
 		await fs.mkdir(buildDir)
 
 		// Prepare build
-		await runCommand(['cmake', '..'], {
+		await runCommand(['cmake', '..', ...cmakeArgs], {
 			cwd: buildDir,
 		})
 
@@ -35,8 +36,13 @@ export class CmakeTestRunner {
 		})
 
 		// Make sure addon is loadable
-		await runCommand(['node', path.join(buildDir, 'lib/addon.node')], {
+		const launched = await runCommand(['node', path.join(buildDir, 'lib/addon.node')], {
 			cwd: buildDir,
-		})
+		}).then(
+			() => true,
+			() => false,
+		)
+
+		expect(launched).toBe(!launchCheckShouldFail)
 	}
 }
