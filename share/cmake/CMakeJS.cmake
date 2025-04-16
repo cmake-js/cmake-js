@@ -398,8 +398,8 @@ add_library                 (cmake-js INTERFACE)
 add_library                 (cmake-js::cmake-js ALIAS cmake-js)
 target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
 target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
-set_target_properties       (cmake-js PROPERTIES VERSION   ${_CMAKEJS_VERSION})
-set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
+# set_target_properties       (cmake-js PROPERTIES VERSION   ${_CMAKEJS_VERSION})
+# set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
 set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMakeJS_MAJOR_VERSION)
 
 if (MSVC) 
