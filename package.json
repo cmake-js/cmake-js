@@ -21,7 +21,7 @@
 		"node-addon-api"
 	],
 	"main": "lib",
-	"version": "7.3.0",
+	"version": "8.0.0-0",
 	"author": "Gábor Mező aka unbornchikken",
 	"maintainers": [
 		{
@@ -39,7 +39,7 @@
 		"cmake-js-simple": "./bin/cmake-js2.mjs"
 	},
 	"engines": {
-		"node": ">= 14.15.0"
+		"node": ">= 18.16.0"
 	},
 	"dependencies": {
 		"axios": "^1.6.5",
@@ -61,7 +61,6 @@
 		"@types/which": "^2.0.2",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
-		"mocha": "*",
 		"nan": "^2.18.0",
 		"node-addon-api": "^6.1.0",
 		"prettier": "^3.2.2",
@@ -70,7 +69,7 @@
 		"vitest": "^3.1.1"
 	},
 	"scripts": {
-		"test": "mocha tests",
+		"test": "vitest",
 		"lint": "eslint lib bin/cmake-js tests",
 		"demo:configure": "cmake --fresh -S . -B ./build -DBUILD_TESTS:BOOL=TRUE -DCMAKE_INSTALL_PREFIX:PATH=./install -G Ninja",
 		"demo:build": "cmake --build    ./build",
