@@ -252,6 +252,7 @@ Provides
 ::
   NODE_DEV_API_DIR, where to find node.h, etc.
   NODE_DEV_API_INC_FILES, the headers required to use Node unstable API.
+  NODE_DEV_API_LIB_FILES, the .lib files required to use Node unstable API.
 
 ]=============================================================================]#
 function(cmakejs_acquire_node_dev_headers)
@@ -270,12 +271,18 @@ function(cmakejs_acquire_node_dev_headers)
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
   message (STATUS "Runtime headers require c++${CMAKEJS_CXX_STANDARD}")
+  set(CMAKEJS_CXX_STANDARD "${CMAKEJS_CXX_STANDARD}" CACHE STRING "Required CXX Standard." FORCE)
 
   if(NOT DEFINED NODE_DEV_API_INC_FILES)
     file(GLOB_RECURSE NODE_DEV_API_INC_FILES "${NODE_DEV_API_DIR}/*.h")
     source_group("Node Addon API (C++)" FILES "${NODE_DEV_API_INC_FILES}") # just for IDE support; another misleading function name!
   endif()
   set(NODE_DEV_API_INC_FILES "${NODE_DEV_API_INC_FILES}" CACHE STRING "Node Addon API Header files." FORCE)
+
+  if(NOT DEFINED NODE_DEV_API_LIB_FILES)
+    file(GLOB NODE_DEV_API_LIB_FILES "${NODE_DEV_API_DIR}/*.lib")
+  endif()
+  set(NODE_DEV_API_LIB_FILES "${NODE_DEV_API_LIB_FILES}" CACHE STRING "Node Addon API Lib files." FORCE)
 endfunction()
 
 #[=============================================================================[
@@ -500,6 +507,10 @@ function(cmakejs_setup_node_dev_library)
   # target_link_libraries       (node-dev INTERFACE cmake-js::node-api)
   # set_target_properties       (node-dev PROPERTIES VERSION   1.1.0)
   # set_target_properties       (node-dev PROPERTIES SOVERSION 1)
+
+  if (MSVC)
+    target_link_libraries (node-api INTERFACE "${NODE_DEV_API_LIB_FILES}")
+  endif()
 
   foreach(FILE IN LISTS NODE_DEV_API_INC_FILES)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-dev/${FILE}")
