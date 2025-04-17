@@ -57,8 +57,12 @@
 	},
 	"devDependencies": {
 		"@tsconfig/node14": "^14.1.2",
+		"@types/axios": "^0.14.4",
+		"@types/fs-extra": "^11.0.4",
 		"@types/node": "^20.11.14",
+		"@types/semver": "^7.7.0",
 		"@types/tar": "^6.1.13",
+		"@types/url-join": "4",
 		"@types/which": "^2.0.2",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",

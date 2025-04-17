@@ -1,11 +1,9 @@
-import * as environment from './environment'
-import * as path from 'path'
-import * as urljoin from 'url-join'
+import path from 'node:path'
+import urljoin from 'url-join'
 import * as fs from 'fs-extra'
-import TargetOptions from './targetOptions'
-import * as runtimePaths from './runtimePaths'
-import Downloader from './downloader'
-import * as os from 'os'
+import RuntimePaths, { RuntimePathsInfo, TargetOptions } from './runtimePaths.mjs'
+import Downloader from './downloader.mjs'
+import os from 'node:os'
 
 interface ShaSum {
 	getPath: string
@@ -17,15 +15,6 @@ interface Stat {
 	isDirectory: () => boolean
 }
 
-interface LibPath {
-	dir: string
-	name: string
-}
-
-interface DistOptions {
-	runtimeDirectory: string
-}
-
 function testSum(sums: ShaSum[], sum: string | undefined, fPath: string): void {
 	const serverSum = sums.find((s) => s.getPath === fPath)
 	if (serverSum && serverSum.sum === sum) {
@@ -34,24 +23,17 @@ function testSum(sums: ShaSum[], sum: string | undefined, fPath: string): void {
 	throw new Error("SHA sum of file '" + fPath + "' mismatch!")
 }
 
-class Dist {
-	private options: DistOptions
-	private targetOptions: TargetOptions
-	private downloader: Downloader
+export default class DistDownloader {
+	private readonly targetOptions: TargetOptions
+	private readonly downloader: Downloader
+	private readonly runtimePaths: RuntimePathsInfo
 
 	get internalPath(): string {
 		const cacheDirectory = '.cmake-js'
-		const runtimeArchDirectory = this.targetOptions.runtime + '-' + this.targetOptions.arch
+		const runtimeArchDirectory = this.targetOptions.runtime + '-' + this.targetOptions.runtimeArch
 		const runtimeVersionDirectory = 'v' + this.targetOptions.runtimeVersion
 
-		return (
-			this.options.runtimeDirectory ||
-			path.join(os.homedir(), cacheDirectory, runtimeArchDirectory, runtimeVersionDirectory)
-		)
-	}
-
-	get externalPath(): string {
-		return runtimePaths.get(this.targetOptions).externalPath
+		return path.join(os.homedir(), cacheDirectory, runtimeArchDirectory, runtimeVersionDirectory)
 	}
 
 	get downloaded(): boolean {
@@ -69,7 +51,7 @@ class Dist {
 					headers = stat.isFile()
 				}
 			}
-			if (environment.isWin) {
+			if (process.platform === 'win32') {
 				for (const libPath of this.winLibs) {
 					stat = getStat(libPath)
 					libs = libs && stat.isFile()
@@ -91,7 +73,7 @@ class Dist {
 	}
 
 	get winLibs(): string[] {
-		const libs = runtimePaths.get(this.targetOptions).winLibs
+		const libs = this.runtimePaths.winLibs
 		const result: string[] = []
 		for (const lib of libs) {
 			result.push(path.join(this.internalPath, lib.dir, lib.name))
@@ -100,13 +82,15 @@ class Dist {
 	}
 
 	get headerOnly(): boolean {
-		return runtimePaths.get(this.targetOptions).headerOnly
+		return this.runtimePaths.headerOnly
 	}
 
-	constructor(options: DistOptions) {
-		this.options = options
-		this.targetOptions = new TargetOptions(this.options)
+	constructor(targetOptions: TargetOptions) {
+		this.targetOptions = targetOptions
 		this.downloader = new Downloader()
+
+		this.runtimePaths = RuntimePaths[this.targetOptions.runtime]?.(this.targetOptions)
+		if (!this.runtimePaths) throw new Error('Unknown runtime: ' + this.targetOptions.runtime)
 	}
 
 	async ensureDownloaded(): Promise<void> {
@@ -124,43 +108,45 @@ class Dist {
 
 	async _downloadShaSums(): Promise<ShaSum[] | null> {
 		if (this.targetOptions.runtime === 'node') {
-			const sumUrl = urljoin(this.externalPath, 'SHASUMS256.txt')
+			const sumUrl = urljoin(this.runtimePaths.externalPath, 'SHASUMS256.txt')
 			console.debug('DIST', '\t- ' + sumUrl)
 			return (await this.downloader.downloadString(sumUrl))
 				.split('\n')
-				.map(function (line: string) {
+				.map((line: string) => {
 					const parts = line.split(/\s+/)
 					return {
 						getPath: parts[1],
 						sum: parts[0],
 					}
 				})
-				.filter(function (i: ShaSum) {
-					return i.getPath && i.sum
-				})
+				.filter((i: ShaSum) => i.getPath && i.sum)
 		} else {
 			return null
 		}
 	}
 
 	async _downloadTar(sums: ShaSum[] | null): Promise<void> {
-		const self = this
-		const tarLocalPath = runtimePaths.get(self.targetOptions).tarPath
-		const tarUrl = urljoin(self.externalPath, tarLocalPath)
+		const tarLocalPath = this.runtimePaths.tarPath
+		const tarUrl = urljoin(this.runtimePaths.externalPath, tarLocalPath)
 		console.debug('DIST', '\t- ' + tarUrl)
 
-		const sum = await this.downloader.downloadTgz(tarUrl, {
-			hash: sums ? 'sha256' : null,
-			cwd: self.internalPath,
-			strip: 1,
-			filter: function (entryPath: string) {
-				if (entryPath === self.internalPath) {
-					return true
-				}
-				const ext = path.extname(entryPath)
-				return ext && ext.toLowerCase() === '.h'
+		const sum = await this.downloader.downloadTgz(
+			tarUrl,
+			{
+				cwd: this.internalPath,
+				strip: 1,
+				filter: (entryPath: string) => {
+					if (entryPath === this.internalPath) {
+						return true
+					}
+					const ext = path.extname(entryPath)
+					return !!ext && ext.toLowerCase() === '.h'
+				},
 			},
-		})
+			{
+				hash: sums ? 'sha256' : null,
+			},
+		)
 
 		if (sums) {
 			testSum(sums, sum, tarLocalPath)
@@ -169,16 +155,15 @@ class Dist {
 
 	async _downloadLibs(sums: ShaSum[] | null): Promise<void> {
 		const self = this
-		if (!environment.isWin) {
+		if (process.platform !== 'win32') {
 			return
 		}
 
-		const paths = runtimePaths.get(self.targetOptions)
-		for (const dirs of paths.winLibs) {
+		for (const dirs of this.runtimePaths.winLibs) {
 			const subDir = dirs.dir
 			const fn = dirs.name
 			const fPath = subDir ? urljoin(subDir, fn) : fn
-			const libUrl = urljoin(self.externalPath, fPath)
+			const libUrl = urljoin(this.runtimePaths.externalPath, fPath)
 			console.debug('DIST', '\t- ' + libUrl)
 
 			await fs.ensureDir(path.join(self.internalPath, subDir))
@@ -194,5 +179,3 @@ class Dist {
 		}
 	}
 }
-
-export default Dist

@@ -5,15 +5,25 @@ import zlib from 'node:zlib'
 import tar from 'tar'
 import { createWriteStream } from 'node:fs'
 
-interface DownloadOptions {
-	path?: string
-	cwd?: string
-	hash?: string
+interface DownloadFileOptions {
+	path: string
+	hash: string | null
 	sum?: string
 }
 
-class Downloader {
-	private downloadToStream(url: string, stream: NodeJS.WritableStream, hash?: string): Promise<string | undefined> {
+interface DownloadTarGzOptions {
+	// path: string
+	// cwd: string
+	hash: string | null
+	sum?: string
+}
+
+export default class Downloader {
+	private downloadToStream(
+		url: string,
+		stream: NodeJS.WritableStream,
+		hash: string | null,
+	): Promise<string | undefined> {
 		const shasum = hash ? crypto.createHash(hash) : null
 
 		return new Promise<string | undefined>((resolve, reject) => {
@@ -62,45 +72,29 @@ class Downloader {
 
 	async downloadString(url: string): Promise<string> {
 		const result = new MemoryStream()
-		await this.downloadToStream(url, result)
+		await this.downloadToStream(url, result, null)
 		return result.toString()
 	}
 
-	async downloadFile(url: string, options: DownloadOptions): Promise<string | undefined> {
-		let opts: DownloadOptions
-		if (typeof options === 'string') {
-			opts = { path: options }
-		} else {
-			opts = options
-		}
-
+	async downloadFile(url: string, opts: DownloadFileOptions): Promise<string | undefined> {
 		const result = createWriteStream(opts.path)
 		const sum = await this.downloadToStream(url, result, opts.hash)
 		this.testSum(url, sum, opts)
 		return sum
 	}
 
-	async downloadTgz(url: string, options: DownloadOptions | string): Promise<string | undefined> {
-		let opts: DownloadOptions
-		if (typeof options === 'string') {
-			opts = { cwd: options }
-		} else {
-			opts = options
-		}
-
+	async downloadTgz(url: string, tarOpts: tar.ExtractOptions, opts: DownloadTarGzOptions): Promise<string | undefined> {
 		const gunzip = zlib.createGunzip()
-		const extractor = tar.extract(opts)
+		const extractor = tar.extract(tarOpts)
 		gunzip.pipe(extractor)
 		const sum = await this.downloadToStream(url, gunzip, opts.hash)
 		this.testSum(url, sum, opts)
 		return sum
 	}
 
-	private testSum(url: string, sum: string | undefined, options: DownloadOptions): void {
+	private testSum(url: string, sum: string | undefined, options: { hash: string | null; sum?: string }): void {
 		if (options.hash && sum && options.sum && options.sum !== sum) {
 			throw new Error(options.hash.toUpperCase() + " sum of download '" + url + "' mismatch!")
 		}
 	}
 }
-
-export default Downloader
