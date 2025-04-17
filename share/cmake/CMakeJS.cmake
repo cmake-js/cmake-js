@@ -260,6 +260,8 @@ function(cmakejs_acquire_node_dev_headers)
   if(NOT DEFINED NODE_DEV_API_DIR OR NODE_DEV_API_DIR STREQUAL "")
     message(FATAL_ERROR "NODE_DEV_API_DIR is not set. Please set it to the path of the NodeJS include directory.")
   endif()
+
+  message (STATUS "Using Node dev headers from ${NODE_DEV_API_DIR}")
   
   if(NOT DEFINED NODE_DEV_API_INC_FILES)
     file(GLOB_RECURSE NODE_DEV_API_INC_FILES "${NODE_DEV_API_DIR}/*.h")

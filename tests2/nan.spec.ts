@@ -24,7 +24,7 @@ function getArchsForRuntime(runtime: Omit<TargetOptions, 'runtimeArch'>): Target
 		case 'win32':
 			return [
 				{ ...runtime, runtimeArch: 'x64' },
-				{ ...runtime, runtimeArch: 'ia32' },
+				{ ...runtime, runtimeArch: 'x86' },
 				{ ...runtime, runtimeArch: 'arm64' },
 			]
 		default:
