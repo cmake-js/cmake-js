@@ -41,7 +41,7 @@ jobs:
           - os: ubuntu-latest
             arch: arm
             docker-arch: linux/arm/v7
-            docker-image: node:18-bullseye
+            docker-image: node:18-bookworm
           # linux-musl
           - os: ubuntu-latest
             arch: x64
@@ -83,11 +83,11 @@ jobs:
             if command -v apt-get &> /dev/null
             then
               apt-get update
-              apt-get install -y cmake
+              apt-get install -y cmake ninja-build
             elif command -v apk &> /dev/null
             then
               apk update
-              apk add cmake make g++ gcc
+              apk add cmake make g++ gcc ninja-build
             fi
 
             cd /work
