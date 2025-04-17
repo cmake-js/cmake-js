@@ -71,7 +71,7 @@ jobs:
           npm_config_build_from_source: true
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         if: matrix.docker-arch
       - name: run tests (in docker)
         uses: addnab/docker-run-action@v3
