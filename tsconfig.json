@@ -10,7 +10,7 @@
 		},
 		"types": ["node"],
 		"module": "Node16",
-		"typeRoots": ["./typings", "./node_modules/@types"],
+		// "typeRoots": ["./typings", "./node_modules/@types"],
 		"declaration": true
 	}
 }

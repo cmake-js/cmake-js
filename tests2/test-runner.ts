@@ -8,6 +8,9 @@ import { expect } from 'vitest'
 export class CmakeTestRunner {
 	readonly projectDir: string
 
+	public generator: string | null = null
+	public nodeDevDirectory: string | null = null
+
 	constructor(projectName: string) {
 		this.projectDir = fileURLToPath(new URL(path.join('./projects', projectName), import.meta.url))
 	}
@@ -18,7 +21,7 @@ export class CmakeTestRunner {
 		})
 	}
 
-	async testInvokeCmakeDirect(generator: string | null, cmakeArgs: string[] = [], launchCheckShouldFail = false) {
+	async testInvokeCmakeDirect(cmakeArgs: string[] = [], launchCheckShouldFail = false) {
 		await rimraf(path.join(this.projectDir, 'build'))
 
 		// make build dir
@@ -27,7 +30,9 @@ export class CmakeTestRunner {
 
 		// Prepare build
 		const cmakeCommand = ['cmake', '..', ...cmakeArgs]
-		if (generator) cmakeCommand.push('-G', `"${generator}"`)
+		if (this.generator) cmakeCommand.push('-G', `"${this.generator}"`)
+		if (this.nodeDevDirectory) cmakeCommand.push('-D', `NODE_DEV_API_DIR="${this.nodeDevDirectory}"`)
+
 		await runCommand(cmakeCommand, {
 			cwd: buildDir,
 		})

@@ -36,7 +36,7 @@
 	},
 	"bin": {
 		"cmake-js": "./bin/cmake-js",
-		"cmake-js-simple": "./bin/cmake-js2.mjs"
+		"cmake-js-next": "./bin/cmake-js-next.mjs"
 	},
 	"engines": {
 		"node": ">= 18.16.0"
@@ -50,7 +50,7 @@
 		"npmlog": "^6.0.2",
 		"rc": "^1.2.7",
 		"semver": "^7.5.4",
-		"tar": "^6.2.0",
+		"tar": "^6.2.1",
 		"url-join": "^4.0.1",
 		"which": "^2.0.2",
 		"yargs": "^17.7.2"
@@ -58,6 +58,7 @@
 	"devDependencies": {
 		"@tsconfig/node14": "^14.1.2",
 		"@types/node": "^20.11.14",
+		"@types/tar": "^6.1.13",
 		"@types/which": "^2.0.2",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
