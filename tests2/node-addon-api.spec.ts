@@ -23,9 +23,11 @@ describe('node-addon-api', () => {
 			}
 
 			if (process.platform === 'win32') {
-				test('cmake direct invocation Win32', async () => {
-					await testRunner.testInvokeCmakeDirect(generator, ['-A', 'Win32'], true)
-				})
+				if (process.arch !== 'ia32') {
+					test('cmake direct invocation Win32', async () => {
+						await testRunner.testInvokeCmakeDirect(generator, ['-A', 'Win32'], true)
+					})
+				}
 
 				if (process.arch !== 'x64') {
 					test('cmake direct invocation x64', async () => {

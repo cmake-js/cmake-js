@@ -87,7 +87,7 @@ jobs:
             elif command -v apk &> /dev/null
             then
               apk update
-              apk add cmake make g++ gcc ninja-build
+              apk add cmake make g++ gcc samurai
             fi
 
             cd /work
