@@ -262,7 +262,15 @@ function(cmakejs_acquire_node_dev_headers)
   endif()
 
   message (STATUS "Using Node dev headers from ${NODE_DEV_API_DIR}")
-  
+
+  execute_process(
+    COMMAND "${NODE_EXECUTABLE}" "${CMAKEJS_HELPER_EXECUTABLE}" "cxx_standard" "${NODE_DEV_API_DIR}"
+    WORKING_DIRECTORY ${_CMAKEJS_DIR}
+    OUTPUT_VARIABLE CMAKEJS_CXX_STANDARD
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  message (STATUS "Runtime headers require c++${CMAKEJS_CXX_STANDARD}")
+
   if(NOT DEFINED NODE_DEV_API_INC_FILES)
     file(GLOB_RECURSE NODE_DEV_API_INC_FILES "${NODE_DEV_API_DIR}/*.h")
     source_group("Node Addon API (C++)" FILES "${NODE_DEV_API_INC_FILES}") # just for IDE support; another misleading function name!
@@ -742,6 +750,13 @@ function(cmakejs_create_node_api_addon name)
       TARGET ${name}
       PROPERTY "${name}_IS_NODE_API_ADDON_LIBRARY" TRUE # Custom property
     )
+
+    # ensure the cxx standard is defined
+    if (DEFINED CMAKEJS_CXX_STANDARD)
+        set_property(TARGET ${name} PROPERTY CXX_STANDARD ${CMAKEJS_CXX_STANDARD})
+    else()
+        set_property(TARGET ${name} PROPERTY CXX_STANDARD 14)
+    endif()
 
     set_target_properties(${name}
       PROPERTIES
