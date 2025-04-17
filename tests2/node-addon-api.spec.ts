@@ -1,5 +1,6 @@
 import { beforeAll, describe, test } from 'vitest'
 import { CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
+import { beforeEach } from 'node:test'
 
 describe('node-addon-api', () => {
 	const testRunner = new CmakeTestRunner('node-addon-api')
@@ -9,9 +10,11 @@ describe('node-addon-api', () => {
 	})
 
 	for (const generator of getGeneratorsForPlatform()) {
-		testRunner.generator = generator
-
 		describe(`Using generator "${generator}"`, () => {
+			beforeEach(() => {
+				testRunner.generator = generator
+			})
+
 			test('cmake direct invocation', async () => {
 				await testRunner.testInvokeCmakeDirect()
 			})

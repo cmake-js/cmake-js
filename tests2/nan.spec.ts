@@ -40,8 +40,6 @@ describe('nan', () => {
 	})
 
 	for (const generator of getGeneratorsForPlatform()) {
-		testRunner.generator = generator
-
 		for (const runtime of runtimesAndVersions) {
 			for (const fullRuntime of getArchsForRuntime(runtime)) {
 				describe(`Using generator "${generator}" (${fullRuntime.runtime}@${fullRuntime.runtimeVersion} ${fullRuntime.runtimeArch})`, () => {
@@ -50,17 +48,18 @@ describe('nan', () => {
 					beforeEach(async () => {
 						await distDownloader.ensureDownloaded()
 
+						testRunner.generator = generator
 						testRunner.nodeDevDirectory = path.join(distDownloader.internalPath, 'include/node')
 					})
 
 					test('cmake direct invocation', async () => {
-						await testRunner.testInvokeCmakeDirect([], true)
+						await testRunner.testInvokeCmakeDirectSimple([])
 						// TODO - assert binary was built correct?
 					})
 
 					if (process.platform === 'darwin') {
 						test('cmake direct invocation multiarch', async () => {
-							await testRunner.testInvokeCmakeDirect(['-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"'], true)
+							await testRunner.testInvokeCmakeDirectSimple(['-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"'])
 
 							// TODO - assert binary is universal
 						})

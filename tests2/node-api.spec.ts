@@ -1,4 +1,4 @@
-import { beforeAll, describe, test } from 'vitest'
+import { beforeAll, beforeEach, describe, test } from 'vitest'
 import { CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
 
 describe('node-api', () => {
@@ -9,9 +9,11 @@ describe('node-api', () => {
 	})
 
 	for (const generator of getGeneratorsForPlatform()) {
-		testRunner.generator = generator
-
 		describe(`Using generator "${generator}"`, () => {
+			beforeEach(() => {
+				testRunner.generator = generator
+			})
+
 			test('cmake direct invocation', async () => {
 				await testRunner.testInvokeCmakeDirect()
 			})

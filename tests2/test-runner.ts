@@ -7,12 +7,14 @@ import { expect } from 'vitest'
 
 export class CmakeTestRunner {
 	readonly projectDir: string
+	readonly buildDir: string
 
 	public generator: string | null = null
 	public nodeDevDirectory: string | null = null
 
 	constructor(projectName: string) {
 		this.projectDir = fileURLToPath(new URL(path.join('./projects', projectName), import.meta.url))
+		this.buildDir = path.join(this.projectDir, 'build')
 	}
 
 	async prepareProject() {
@@ -21,12 +23,10 @@ export class CmakeTestRunner {
 		})
 	}
 
-	async testInvokeCmakeDirect(cmakeArgs: string[] = [], launchCheckShouldFail = false) {
-		await rimraf(path.join(this.projectDir, 'build'))
-
+	async testInvokeCmakeDirectSimple(cmakeArgs: string[] = []) {
 		// make build dir
-		const buildDir = path.join(this.projectDir, 'build')
-		await fs.mkdir(buildDir)
+		await rimraf(this.buildDir)
+		await fs.mkdir(this.buildDir)
 
 		// Prepare build
 		const cmakeCommand = ['cmake', '..', ...cmakeArgs]
@@ -34,20 +34,26 @@ export class CmakeTestRunner {
 		if (this.nodeDevDirectory) cmakeCommand.push('-D', `NODE_DEV_API_DIR="${this.nodeDevDirectory}"`)
 
 		await runCommand(cmakeCommand, {
-			cwd: buildDir,
+			cwd: this.buildDir,
 		})
 
 		// Perform build
 		await runCommand(['cmake', '--build', '.'], {
-			cwd: buildDir,
+			cwd: this.buildDir,
 		})
+	}
+
+	async testInvokeCmakeDirect(cmakeArgs: string[] = [], launchCheckShouldFail = false) {
+		await this.testInvokeCmakeDirectSimple(cmakeArgs)
 
 		// Make sure addon is loadable
 		const addonPath =
-			process.platform === 'win32' ? path.join(buildDir, 'Debug/addon.node') : path.join(buildDir, 'lib/addon.node')
+			process.platform === 'win32'
+				? path.join(this.buildDir, 'Debug/addon.node')
+				: path.join(this.buildDir, 'lib/addon.node')
 
 		const launched = await runCommand(['node', addonPath], {
-			cwd: buildDir,
+			cwd: this.buildDir,
 		}).then(
 			() => true,
 			() => false,
