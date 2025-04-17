@@ -4,6 +4,7 @@ import MemoryStream from 'memory-stream'
 import zlib from 'node:zlib'
 import tar from 'tar'
 import { createWriteStream } from 'node:fs'
+import { once } from 'node:stream'
 
 interface DownloadFileOptions {
 	path: string
@@ -86,8 +87,13 @@ export default class Downloader {
 	async downloadTgz(url: string, tarOpts: tar.ExtractOptions, opts: DownloadTarGzOptions): Promise<string | undefined> {
 		const gunzip = zlib.createGunzip()
 		const extractor = tar.extract(tarOpts)
+
 		gunzip.pipe(extractor)
 		const sum = await this.downloadToStream(url, gunzip, opts.hash)
+
+		// Ensure the extractor is closed before resolving
+		await once(extractor, 'close')
+
 		this.testSum(url, sum, opts)
 		return sum
 	}

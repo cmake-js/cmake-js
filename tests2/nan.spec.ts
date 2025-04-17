@@ -9,6 +9,7 @@ const runtimesAndVersions: Omit<TargetOptions, 'runtimeArch'>[] = [
 	{ runtime: 'node', runtimeVersion: '16.10.0' },
 	{ runtime: 'node', runtimeVersion: '18.16.1' },
 	{ runtime: 'node', runtimeVersion: '20.18.1' },
+	{ runtime: 'node', runtimeVersion: '22.14.0' },
 ]
 
 function getArchsForRuntime(runtime: Omit<TargetOptions, 'runtimeArch'>): TargetOptions[] {
