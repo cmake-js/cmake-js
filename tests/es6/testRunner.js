@@ -7,24 +7,36 @@ const util = require('util')
 
 function* generateRuntimeOptions() {
 	function* generateForNode(arch) {
-		// Old:
-		yield {
-			runtime: 'node',
-			runtimeVersion: '14.0.0',
-			arch: arch,
+		if (arch !== 'arm64') {
+			yield {
+				runtime: 'node',
+				runtimeVersion: '14.0.0',
+				arch: arch,
+			}
+
+			yield {
+				runtime: 'node',
+				runtimeVersion: '16.0.0',
+				arch: arch,
+			}
+
+			yield {
+				runtime: 'node',
+				runtimeVersion: '18.13.0',
+				arch: arch,
+			}
 		}
 
-		// LTS:
 		yield {
 			runtime: 'node',
-			runtimeVersion: '16.0.0',
+			runtimeVersion: '20.19.0',
 			arch: arch,
 		}
 
 		// Current:
 		yield {
 			runtime: 'node',
-			runtimeVersion: '18.13.0',
+			runtimeVersion: '22.9.0',
 			arch: arch,
 		}
 	}
@@ -39,23 +51,31 @@ function* generateRuntimeOptions() {
 	}
 
 	function* generateForElectron(arch) {
-		// Latest:
 		yield {
 			runtime: 'electron',
 			runtimeVersion: '18.2.1',
+			arch: arch,
+		}
+
+		yield {
+			runtime: 'electron',
+			runtimeVersion: '31.7.7',
 			arch: arch,
 		}
 	}
 
 	function* generateForArch(arch) {
 		yield* generateForNode(arch)
-		yield* generateForNWJS(arch)
+		if (!environment.isWin || arch !== 'arm64') {
+			yield* generateForNWJS(arch)
+		}
 		yield* generateForElectron(arch)
 	}
 
 	if (environment.isWin) {
 		yield* generateForArch('x64')
 		yield* generateForArch('ia32')
+		yield* generateForArch('arm64')
 	} else {
 		yield* generateForArch()
 	}

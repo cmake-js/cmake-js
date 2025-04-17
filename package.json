@@ -58,7 +58,7 @@
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"mocha": "*",
-		"nan": "^2.18.0",
+		"nan": "^2.22.2",
 		"node-addon-api": "^6.1.0",
 		"prettier": "^3.2.2"
 	},
