@@ -18,7 +18,7 @@ export class CmakeTestRunner {
 		})
 	}
 
-	async testInvokeCmakeDirect(cmakeArgs: string[] = [], launchCheckShouldFail = false) {
+	async testInvokeCmakeDirect(generator: string | null, cmakeArgs: string[] = [], launchCheckShouldFail = false) {
 		await rimraf(path.join(this.projectDir, 'build'))
 
 		// make build dir
@@ -26,7 +26,9 @@ export class CmakeTestRunner {
 		await fs.mkdir(buildDir)
 
 		// Prepare build
-		await runCommand(['cmake', '..', ...cmakeArgs], {
+		const cmakeCommand = ['cmake', '..', ...cmakeArgs]
+		if (generator) cmakeCommand.push('-G', `"${generator}"`)
+		await runCommand(cmakeCommand, {
 			cwd: buildDir,
 		})
 
@@ -47,5 +49,17 @@ export class CmakeTestRunner {
 		)
 
 		expect(launched).toBe(!launchCheckShouldFail)
+	}
+}
+
+export function getGeneratorsForPlatform(): Array<string | null> {
+	switch (process.platform) {
+		case 'darwin':
+		case 'linux':
+			return ['Ninja', 'Unix Makefiles', null]
+		case 'win32':
+			return [null]
+		default:
+			throw new Error(`Unsupported platform: ${process.platform}`)
 	}
 }

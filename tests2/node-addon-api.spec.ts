@@ -1,5 +1,5 @@
 import { beforeAll, describe, test } from 'vitest'
-import { CmakeTestRunner } from './test-runner'
+import { CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
 
 describe('node-addon-api', () => {
 	const testRunner = new CmakeTestRunner('node-addon-api')
@@ -8,33 +8,37 @@ describe('node-addon-api', () => {
 		await testRunner.prepareProject()
 	})
 
-	test('cmake direct invocation', async () => {
-		await testRunner.testInvokeCmakeDirect()
-	})
-
-	if (process.platform === 'darwin') {
-		test('cmake direct invocation multiarch', async () => {
-			await testRunner.testInvokeCmakeDirect(['-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64'])
-
-			// TODO - assert binary is universal
-		})
-	}
-
-	if (process.platform === 'win32') {
-		test('cmake direct invocation ia32', async () => {
-			await testRunner.testInvokeCmakeDirect(['-A', 'x86'], true)
-		})
-
-		if (process.arch !== 'x64') {
-			test('cmake direct invocation x64', async () => {
-				await testRunner.testInvokeCmakeDirect(['-A', 'x64'], true)
+	for (const generator of getGeneratorsForPlatform()) {
+		describe(`Using generator "${generator}"`, () => {
+			test('cmake direct invocation', async () => {
+				await testRunner.testInvokeCmakeDirect(generator)
 			})
-		}
-		if (process.arch !== 'arm64') {
-			test('cmake direct invocation arm64', async () => {
-				await testRunner.testInvokeCmakeDirect(['-A', 'ARM64'], true)
-			})
-		}
+
+			if (process.platform === 'darwin') {
+				test('cmake direct invocation multiarch', async () => {
+					await testRunner.testInvokeCmakeDirect(generator, ['-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64'])
+
+					// TODO - assert binary is universal
+				})
+			}
+
+			if (process.platform === 'win32') {
+				test('cmake direct invocation ia32', async () => {
+					await testRunner.testInvokeCmakeDirect(generator, ['-A', 'x86'], true)
+				})
+
+				if (process.arch !== 'x64') {
+					test('cmake direct invocation x64', async () => {
+						await testRunner.testInvokeCmakeDirect(generator, ['-A', 'x64'], true)
+					})
+				}
+				if (process.arch !== 'arm64') {
+					test('cmake direct invocation arm64', async () => {
+						await testRunner.testInvokeCmakeDirect(generator, ['-A', 'ARM64'], true)
+					})
+				}
+			}
+		})
 	}
 
 	// test('build', async () => {
