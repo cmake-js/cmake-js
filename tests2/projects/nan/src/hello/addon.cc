@@ -13,7 +13,7 @@ namespace vendor
 
   NAN_METHOD(Hello)
   {
-    info.GetReturnValue().Set(Nan::New("addon.node is online!"));
+    info.GetReturnValue().Set(Nan::New("addon.node is online!").ToLocalChecked());
   }
 
   // Expose the C++ function 'Hello' as a javascript function named 'hello', etc...

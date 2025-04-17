@@ -245,14 +245,36 @@ function(cmakejs_acquire_node_api_cpp_headers)
   set(NODE_ADDON_API_INC_FILES "${NODE_ADDON_API_INC_FILES}" CACHE STRING "Node Addon API Header files." FORCE)
 endfunction()
 
+#[=============================================================================[
+Get NodeJS unstable development files.
+
+Provides
+::
+  NODE_DEV_API_DIR, where to find node.h, etc.
+  NODE_DEV_API_INC_FILES, the headers required to use Node unstable API.
+
+]=============================================================================]#
+function(cmakejs_acquire_node_dev_headers)
+  set(NODE_DEV_API_DIR "" CACHE STRING "Node Dev Headers directory.")
+
+  if(NOT DEFINED NODE_DEV_API_DIR OR NODE_DEV_API_DIR STREQUAL "")
+    message(FATAL_ERROR "NODE_DEV_API_DIR is not set. Please set it to the path of the NodeJS include directory.")
+  endif()
+  
+  if(NOT DEFINED NODE_DEV_API_INC_FILES)
+    file(GLOB_RECURSE NODE_DEV_API_INC_FILES "${NODE_DEV_API_DIR}/*.h")
+    source_group("Node Addon API (C++)" FILES "${NODE_DEV_API_INC_FILES}") # just for IDE support; another misleading function name!
+  endif()
+  set(NODE_DEV_API_INC_FILES "${NODE_DEV_API_INC_FILES}" CACHE STRING "Node Addon API Header files." FORCE)
+endfunction()
 
 #[=============================================================================[
 Get NodeJS NAN development files.
 
 Provides
 ::
-  NODE_NAN_API_DIR, where to find napi.h, etc.
-  NODE_NAN_API_INC_FILES, the headers required to use Node Addon API.
+  NODE_NAN_API_DIR, where to find nan.h, etc.
+  NODE_NAN_API_INC_FILES, the headers required to use NAN.
 
 ]=============================================================================]#
 function(cmakejs_acquire_node_nan_headers)
@@ -270,8 +292,6 @@ function(cmakejs_acquire_node_nan_headers)
       return()
     endif()
 
-    message(INFO "NAN ${NODE_NAN_API_DIR}")
-    
     # relocate...
     set(_NODE_NAN_API_INC_FILES "")
     file(GLOB_RECURSE _NODE_NAN_API_INC_FILES "${NODE_NAN_API_DIR}/*.h")
@@ -454,6 +474,53 @@ function(cmakejs_setup_node_api_cpp_library)
   )
 endfunction()
 
+function(cmakejs_setup_node_dev_library)
+  cmakejs_acquire_node_dev_headers() # needs the headers
+
+  # Check that this hasnt already been called
+  if(TARGET cmake-js::node-dev)
+    return()
+  endif()
+
+  # Node NAN (C++) - requires node-dev
+  # cmake-js::node-dev
+  add_library                 (node-dev INTERFACE)
+  add_library                 (cmake-js::node-dev ALIAS node-dev)
+  target_include_directories  (node-dev INTERFACE ${NODE_DEV_API_DIR})
+  # target_link_libraries       (node-dev INTERFACE cmake-js::node-api)
+  # set_target_properties       (node-dev PROPERTIES VERSION   1.1.0)
+  # set_target_properties       (node-dev PROPERTIES SOVERSION 1)
+
+  foreach(FILE IN LISTS NODE_DEV_API_INC_FILES)
+    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-dev/${FILE}")
+      message(DEBUG "Found NAN C++ header: ${FILE}")
+      target_sources(node-dev INTERFACE
+        FILE_SET node_dev_INTERFACE_HEADERS
+        TYPE HEADERS
+        BASE_DIRS
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+          $<INSTALL_INTERFACE:include>
+        FILES
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-dev/${FILE}>
+          $<INSTALL_INTERFACE:include/node-dev/${FILE}>
+      )
+    endif()
+  endforeach()
+
+  _cmakejs_export_target(node-dev)
+
+  # setup the install target
+  install(FILES ${NODE_DEV_API_INC_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-dev")
+  install(TARGETS node-dev
+    EXPORT CMakeJSTargets
+    LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-dev"
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-dev"
+    FILE_SET node_dev_INTERFACE_HEADERS
+  )
+endfunction()
 
 function(cmakejs_setup_node_nan_library)
   cmakejs_acquire_node_nan_headers() # needs the headers
@@ -471,8 +538,6 @@ function(cmakejs_setup_node_nan_library)
   # target_link_libraries       (node-nan INTERFACE cmake-js::node-api)
   # set_target_properties       (node-nan PROPERTIES VERSION   1.1.0)
   # set_target_properties       (node-nan PROPERTIES SOVERSION 1)
-
-message(INFO "TEST: ${NODE_NAN_API_INC_FILES}")
 
   foreach(FILE IN LISTS NODE_NAN_API_INC_FILES)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-nan/${FILE}")
