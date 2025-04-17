@@ -59,6 +59,14 @@ jobs:
           architecture: ${{ matrix.arch }}
           node-version: ${{ matrix.node-version || '18.x' }}
 
+      - name: Cache node headers
+        if: ${{ !matrix.docker-arch }}
+        uses: actions/cache@v4
+        with:
+          key: ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.libc }}
+          path: |
+            ~/.cmake-js
+
       - name: run tests
         if: ${{ !matrix.docker-arch }}
         shell: bash

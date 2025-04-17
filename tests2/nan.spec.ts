@@ -3,6 +3,7 @@ import { CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
 import DistDownloader from '../rewrite/src/dist.mjs'
 import path from 'node:path'
 import { TargetOptions } from '../rewrite/src/runtimePaths.mjs'
+import semver from 'semver'
 
 const runtimesAndVersions: Omit<TargetOptions, 'runtimeArch'>[] = [
 	{ runtime: 'node', runtimeVersion: '14.15.0' },
@@ -21,12 +22,19 @@ function getArchsForRuntime(runtime: Omit<TargetOptions, 'runtimeArch'>): Target
 				{ ...runtime, runtimeArch: 'x64' },
 				{ ...runtime, runtimeArch: 'arm64' },
 			]
-		case 'win32':
-			return [
+		case 'win32': {
+			const res = [
 				{ ...runtime, runtimeArch: 'x64' },
 				{ ...runtime, runtimeArch: 'x86' },
-				{ ...runtime, runtimeArch: 'arm64' },
 			]
+
+			// Only newer targets support arm64
+			if (runtime.runtime === 'node' && semver.gte(runtime.runtimeVersion, '20.0.0')) {
+				res.push({ ...runtime, runtimeArch: 'arm64' })
+			}
+
+			return res
+		}
 		default:
 			throw new Error(`Unsupported platform: ${process.platform}`)
 	}
