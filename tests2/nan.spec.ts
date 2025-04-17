@@ -1,4 +1,4 @@
-import { beforeAll, describe, test } from 'vitest'
+import { beforeAll, beforeEach, describe, test } from 'vitest'
 import { CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
 import DistDownloader from '../rewrite/src/dist.mjs'
 import path from 'node:path'
@@ -46,10 +46,11 @@ describe('nan', () => {
 			for (const fullRuntime of getArchsForRuntime(runtime)) {
 				describe(`Using generator "${generator}" (${fullRuntime.runtime}@${fullRuntime.runtimeVersion} ${fullRuntime.runtimeArch})`, () => {
 					const distDownloader = new DistDownloader(fullRuntime)
-					testRunner.nodeDevDirectory = path.join(distDownloader.internalPath, 'include/node')
 
-					beforeAll(async () => {
+					beforeEach(async () => {
 						await distDownloader.ensureDownloaded()
+
+						testRunner.nodeDevDirectory = path.join(distDownloader.internalPath, 'include/node')
 					})
 
 					test('cmake direct invocation', async () => {
