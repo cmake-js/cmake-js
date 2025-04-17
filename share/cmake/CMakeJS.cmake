@@ -271,7 +271,10 @@ function(cmakejs_acquire_node_dev_headers)
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
   message (STATUS "Runtime headers require c++${CMAKEJS_CXX_STANDARD}")
-  set(CMAKEJS_CXX_STANDARD "${CMAKEJS_CXX_STANDARD}" CACHE STRING "Required CXX Standard." FORCE)
+  # override the cxx standard when needed
+  if (DEFINED CMAKEJS_CXX_STANDARD)
+    target_compile_features(cmake-js INTERFACE cxx_std_${CMAKEJS_CXX_STANDARD})
+  endif()
 
   if(NOT DEFINED NODE_DEV_API_INC_FILES)
     file(GLOB_RECURSE NODE_DEV_API_INC_FILES "${NODE_DEV_API_DIR}/*.h")
@@ -596,7 +599,8 @@ endfunction()
 add_library                 (cmake-js INTERFACE)
 add_library                 (cmake-js::cmake-js ALIAS cmake-js)
 target_compile_definitions  (cmake-js INTERFACE "BUILDING_NODE_EXTENSION")
-target_compile_features     (cmake-js INTERFACE cxx_nullptr) # Signal a basic C++11 feature to require C++11.
+target_compile_features     (cmake-js INTERFACE cxx_std_14)
+
 # set_target_properties       (cmake-js PROPERTIES VERSION   ${_CMAKEJS_VERSION})
 # set_target_properties       (cmake-js PROPERTIES SOVERSION 7)
 set_target_properties       (cmake-js PROPERTIES COMPATIBLE_INTERFACE_STRING CMakeJS_MAJOR_VERSION)
@@ -762,12 +766,6 @@ function(cmakejs_create_node_api_addon name)
       PROPERTY "${name}_IS_NODE_API_ADDON_LIBRARY" TRUE # Custom property
     )
 
-    # ensure the cxx standard is defined
-    if (DEFINED CMAKEJS_CXX_STANDARD)
-        set_property(TARGET ${name} PROPERTY CXX_STANDARD ${CMAKEJS_CXX_STANDARD})
-    else()
-        set_property(TARGET ${name} PROPERTY CXX_STANDARD 14)
-    endif()
 
     set_target_properties(${name}
       PROPERTIES
