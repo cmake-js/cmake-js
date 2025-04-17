@@ -7,10 +7,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/s
 
 include(CMakeJS)
 
-cmakejs_setup_node_api_c_library()
+cmakejs_setup_node_nan_library()
 
 add_library(addon SHARED "src/hello/addon.cc")
-target_link_libraries(addon PRIVATE cmake-js::cmake-js cmake-js::node-api)
+target_link_libraries(addon PRIVATE cmake-js::cmake-js cmake-js::node-nan)
 set_target_properties(addon PROPERTIES PREFIX "" SUFFIX ".node")
 set_target_properties(addon PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-
