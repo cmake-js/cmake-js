@@ -506,13 +506,13 @@ function(cmakejs_setup_node_dev_library)
   # cmake-js::node-dev
   add_library                 (node-dev INTERFACE)
   add_library                 (cmake-js::node-dev ALIAS node-dev)
-  target_include_directories  (node-dev INTERFACE ${NODE_DEV_API_DIR})
+  target_include_directories  (node-dev INTERFACE "${NODE_DEV_API_DIR}/include/node")
   # target_link_libraries       (node-dev INTERFACE cmake-js::node-api)
   # set_target_properties       (node-dev PROPERTIES VERSION   1.1.0)
   # set_target_properties       (node-dev PROPERTIES SOVERSION 1)
 
   if (MSVC)
-    target_link_libraries (node-api INTERFACE "${NODE_DEV_API_LIB_FILES}")
+    target_link_libraries (node-dev INTERFACE "${NODE_DEV_API_LIB_FILES}")
   endif()
 
   foreach(FILE IN LISTS NODE_DEV_API_INC_FILES)

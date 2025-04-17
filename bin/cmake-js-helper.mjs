@@ -3,7 +3,7 @@
 import fs from 'fs/promises'
 import semver from 'semver'
 
-const regexPath = /\/(\w+)-(\w+)\/v([0-9]+.[0-9]+.[0-9]+)\//
+const regexPath = /\/(\w+)-(\w+)\/v([0-9]+.[0-9]+.[0-9]+)(\/?)$/
 
 switch (process.argv[2]) {
 	case 'version': {

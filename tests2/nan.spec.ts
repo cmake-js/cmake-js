@@ -57,7 +57,7 @@ describe('nan', () => {
 						await distDownloader.ensureDownloaded()
 
 						testRunner.generator = generator
-						testRunner.nodeDevDirectory = path.join(distDownloader.internalPath, 'include/node')
+						testRunner.nodeDevDirectory = distDownloader.internalPath
 					})
 
 					test('cmake direct invocation', async () => {
