@@ -55,7 +55,7 @@ jobs:
 
       - name: Use Node.js
         if: ${{ !matrix.docker-arch }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           architecture: ${{ matrix.arch }}
           node-version: ${{ matrix.node-version || '14.x' }}
