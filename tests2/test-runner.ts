@@ -55,6 +55,8 @@ export class CmakeTestRunner {
 export function getGeneratorsForPlatform(): Array<string | null> {
 	switch (process.platform) {
 		case 'darwin':
+		// TODO: This would be good, but Xcode requires an explicit compiler path to be defined
+		// return ['Xcode', 'Ninja', 'Unix Makefiles', null]
 		case 'linux':
 			return ['Ninja', 'Unix Makefiles', null]
 		case 'win32':

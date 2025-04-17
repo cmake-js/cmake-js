@@ -16,7 +16,7 @@ describe('node-api', () => {
 
 			if (process.platform === 'darwin') {
 				test('cmake direct invocation multiarch', async () => {
-					await testRunner.testInvokeCmakeDirect(generator, ['-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64'])
+					await testRunner.testInvokeCmakeDirect(generator, ['-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"'])
 
 					// TODO - assert binary is universal
 				})
