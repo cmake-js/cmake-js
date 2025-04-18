@@ -16,6 +16,15 @@ if (DEFINED CMAKE_JS_VERSION)
   message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, you should use cmake-js-next or cmake directly instead")
 endif()
 
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE "Release" CACHE
+      STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+    "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
 #[=============================================================================[
 Internal helper.
 ]=============================================================================]#
@@ -120,7 +129,7 @@ endif()
 
 message (STATUS "Using cmake-js v${_CMAKEJS_VERSION}")
 
-if(MSVC)
+if(MSVC AND NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Select the MSVC runtime library for use by compilers targeting the MSVC ABI." FORCE)
 endif()
 
