@@ -37,6 +37,10 @@ function chooseCxxStandard(runtime, version) {
 	if (runtime === 'electron' && semver.gte(version, '29.0.0')) {
 		return 17
 	}
+	if (runtime === 'nw' && semver.gte(version, '0.70.0')) {
+		// TODO - this version is a guess
+		return 17
+	}
 	if (runtime === 'nw' && semver.gte(version, '0.90.0')) {
 		return 20
 	}
