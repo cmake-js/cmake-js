@@ -506,7 +506,18 @@ function(cmakejs_setup_node_dev_library)
   # cmake-js::node-dev
   add_library                 (node-dev INTERFACE)
   add_library                 (cmake-js::node-dev ALIAS node-dev)
-  target_include_directories  (node-dev INTERFACE "${NODE_DEV_API_DIR}/include/node")
+  
+  if (EXISTS "${NODE_DEV_API_DIR}/include/node/node.h")
+    # most runtime headers are in this directory
+    target_include_directories  (node-dev INTERFACE "${NODE_DEV_API_DIR}/include/node")
+  else()
+    # some runtimes (or older versions) have the headers elsewhere
+    target_include_directories  (node-dev INTERFACE 
+      "${NODE_DEV_API_DIR}/src"
+      "${NODE_DEV_API_DIR}/deps/v8/include"
+      "${NODE_DEV_API_DIR}/deps/uv/include"
+    )
+  endif()
   # target_link_libraries       (node-dev INTERFACE cmake-js::node-api)
   # set_target_properties       (node-dev PROPERTIES VERSION   1.1.0)
   # set_target_properties       (node-dev PROPERTIES SOVERSION 1)
