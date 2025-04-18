@@ -1,8 +1,11 @@
 import { beforeAll, beforeEach, describe, test } from 'vitest'
 import { appendSystemCmakeArgs, CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
-import DistDownloader from '../rewrite/src/dist.mjs'
+import BuildDepsDownloader from '../rewrite/src/buildDeps.mjs'
 import { TargetOptions } from '../rewrite/src/runtimePaths.mjs'
 import semver from 'semver'
+import { fileURLToPath } from 'node:url'
+
+const cacheDir = fileURLToPath(new URL('../.cache', import.meta.url))
 
 const runtimesAndVersions: Omit<TargetOptions, 'runtimeArch'>[] = [
 	{ runtime: 'node', runtimeVersion: '14.15.0' },
@@ -61,7 +64,7 @@ describe('nan', () => {
 		for (const runtime of runtimesAndVersions) {
 			for (const fullRuntime of getArchsForRuntime(runtime)) {
 				describe(`Using generator "${generator}" (${fullRuntime.runtime}@${fullRuntime.runtimeVersion} ${fullRuntime.runtimeArch})`, () => {
-					const distDownloader = new DistDownloader(fullRuntime)
+					const distDownloader = new BuildDepsDownloader(cacheDir, fullRuntime)
 
 					beforeEach(async () => {
 						await distDownloader.ensureDownloaded()

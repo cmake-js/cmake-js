@@ -3,7 +3,6 @@ import urljoin from 'url-join'
 import * as fs from 'fs-extra'
 import RuntimePaths, { RuntimePathsInfo, TargetOptions } from './runtimePaths.mjs'
 import Downloader from './downloader.mjs'
-import os from 'node:os'
 
 interface ShaSum {
 	getPath: string
@@ -15,20 +14,20 @@ interface Stat {
 	isDirectory: () => boolean
 }
 
-export default class DistDownloader {
+export default class BuildDepsDownloader {
+	private readonly storageDir: string
 	private readonly targetOptions: TargetOptions
 	private readonly downloader: Downloader
 	private readonly runtimePaths: RuntimePathsInfo
 
 	get internalPath(): string {
-		const cacheDirectory = '.cmake-js'
 		const runtimeArchDirectory = this.targetOptions.runtime + '-' + this.targetOptions.runtimeArch
 		const runtimeVersionDirectory = 'v' + this.targetOptions.runtimeVersion
 
-		return path.join(os.homedir(), cacheDirectory, runtimeArchDirectory, runtimeVersionDirectory)
+		return path.join(this.storageDir, runtimeArchDirectory, runtimeVersionDirectory)
 	}
 
-	get downloaded(): boolean {
+	private isDownloaded(): boolean {
 		let headers = false
 		let libs = true
 		let stat = getStat(this.internalPath)
@@ -77,7 +76,8 @@ export default class DistDownloader {
 		return this.runtimePaths.headerOnly
 	}
 
-	constructor(targetOptions: TargetOptions) {
+	constructor(storageDir: string, targetOptions: TargetOptions) {
+		this.storageDir = storageDir
 		this.targetOptions = targetOptions
 		this.downloader = new Downloader()
 
@@ -86,7 +86,7 @@ export default class DistDownloader {
 	}
 
 	async ensureDownloaded(): Promise<void> {
-		if (!this.downloaded) {
+		if (!this.isDownloaded()) {
 			await this.download()
 		}
 	}
@@ -128,6 +128,7 @@ export default class DistDownloader {
 				hash: sums ? 'sha256' : null,
 				sum: sums?.find((s) => s.getPath === tarLocalPath)?.sum ?? null,
 			},
+			120_000_000, // Arbitrary cap of 120MB
 			{
 				cwd: this.internalPath,
 				strip: 1,
@@ -143,7 +144,6 @@ export default class DistDownloader {
 	}
 
 	private async _downloadLibs(sums: ShaSum[] | null): Promise<void> {
-		const self = this
 		if (process.platform !== 'win32') {
 			return
 		}
@@ -155,7 +155,7 @@ export default class DistDownloader {
 			const libUrl = urljoin(this.runtimePaths.externalPath, fPath)
 			console.debug('DIST', '\t- ' + libUrl)
 
-			await fs.ensureDir(path.join(self.internalPath, subDir))
+			await fs.ensureDir(path.join(this.internalPath, subDir))
 
 			await this.downloader.downloadFile(
 				{
@@ -163,7 +163,8 @@ export default class DistDownloader {
 					hash: sums ? 'sha256' : null,
 					sum: sums?.find((s) => s.getPath === fPath)?.sum ?? null,
 				},
-				path.join(self.internalPath, fPath),
+				25_000_000, // Arbitrary cap of 25MB
+				path.join(this.internalPath, fPath),
 			)
 		}
 	}

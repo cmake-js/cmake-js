@@ -30,6 +30,7 @@ dist
 install
 package-lock.json
 yarn.lock
+/.cache
 
 # Users Environment Variables
 .lock-wscript
