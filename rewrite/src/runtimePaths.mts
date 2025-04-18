@@ -57,11 +57,11 @@ const RuntimePaths: Record<string, (targetOptions: TargetOptions) => RuntimePath
 				externalPath: `${NWJS_MIRROR}/v${targetOptions.runtimeVersion}/`,
 				winLibs: [
 					{
-						dir: targetOptions.runtimeArch,
+						dir: targetOptions.runtimeArch === 'x86' ? '' : targetOptions.runtimeArch,
 						name: 'nw.lib',
 					},
 					{
-						dir: targetOptions.runtimeArch,
+						dir: targetOptions.runtimeArch === 'x86' ? '' : targetOptions.runtimeArch,
 						name: 'node.lib',
 					},
 				],
@@ -73,7 +73,7 @@ const RuntimePaths: Record<string, (targetOptions: TargetOptions) => RuntimePath
 			externalPath: `https://node-webkit.s3.amazonaws.com/v${targetOptions.runtimeVersion}/`,
 			winLibs: [
 				{
-					dir: targetOptions.runtimeArch,
+					dir: targetOptions.runtimeArch === 'x86' ? '' : targetOptions.runtimeArch,
 					name: 'nw.lib',
 				},
 			],
