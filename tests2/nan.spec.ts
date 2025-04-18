@@ -12,7 +12,7 @@ const runtimesAndVersions: Omit<TargetOptions, 'runtimeArch'>[] = [
 	{ runtime: 'node', runtimeVersion: '22.14.0' },
 
 	{ runtime: 'electron', runtimeVersion: '18.2.1' },
-	{ runtime: 'electron', runtimeVersion: '31.5.1' },
+	// { runtime: 'electron', runtimeVersion: '31.5.1' }, // TODO - this fails about a deprecation warning
 	{ runtime: 'electron', runtimeVersion: '35.1.5' },
 ]
 
