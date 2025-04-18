@@ -1,7 +1,6 @@
 import { beforeAll, beforeEach, describe, test } from 'vitest'
 import { CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
 import DistDownloader from '../rewrite/src/dist.mjs'
-import path from 'node:path'
 import { TargetOptions } from '../rewrite/src/runtimePaths.mjs'
 import semver from 'semver'
 
@@ -11,6 +10,10 @@ const runtimesAndVersions: Omit<TargetOptions, 'runtimeArch'>[] = [
 	{ runtime: 'node', runtimeVersion: '18.16.1' },
 	{ runtime: 'node', runtimeVersion: '20.18.1' },
 	{ runtime: 'node', runtimeVersion: '22.14.0' },
+
+	{ runtime: 'electron', runtimeVersion: '18.2.1' },
+	{ runtime: 'electron', runtimeVersion: '31.5.1' },
+	{ runtime: 'electron', runtimeVersion: '35.1.5' },
 ]
 
 function getArchsForRuntime(runtime: Omit<TargetOptions, 'runtimeArch'>): TargetOptions[] {
@@ -30,6 +33,7 @@ function getArchsForRuntime(runtime: Omit<TargetOptions, 'runtimeArch'>): Target
 
 			// Only newer targets support arm64
 			if (runtime.runtime === 'node' && semver.gte(runtime.runtimeVersion, '20.0.0')) {
+				// TODO - include some electron versions too
 				res.push({ ...runtime, runtimeArch: 'arm64' })
 			}
 

@@ -283,7 +283,7 @@ function(cmakejs_acquire_node_dev_headers)
   set(NODE_DEV_API_INC_FILES "${NODE_DEV_API_INC_FILES}" CACHE STRING "Node Addon API Header files." FORCE)
 
   if(NOT DEFINED NODE_DEV_API_LIB_FILES)
-    file(GLOB NODE_DEV_API_LIB_FILES "${NODE_DEV_API_DIR}/*.lib")
+    file(GLOB_RECURSE NODE_DEV_API_LIB_FILES "${NODE_DEV_API_DIR}/*.lib")
   endif()
   set(NODE_DEV_API_LIB_FILES "${NODE_DEV_API_LIB_FILES}" CACHE STRING "Node Addon API Lib files." FORCE)
 endfunction()

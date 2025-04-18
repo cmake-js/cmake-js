@@ -13,7 +13,7 @@ switch (process.argv[2]) {
 		break
 	}
 	case 'cxx_standard': {
-		const match = regexPath.exec(process.argv[3])
+		const match = regexPath.exec(process.argv[3].replaceAll('\\', '/'))
 		if (!match) {
 			console.error(`Invalid path: ${process.argv[3]}`)
 			process.exit(1)
