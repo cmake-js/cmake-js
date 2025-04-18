@@ -17,11 +17,15 @@ const runtimesAndVersions: Omit<TargetOptions, 'runtimeArch'>[] = [
 	{ runtime: 'electron', runtimeVersion: '18.2.1' },
 	{ runtime: 'electron', runtimeVersion: '31.5.0' },
 	{ runtime: 'electron', runtimeVersion: '35.1.5' },
-
-	{ runtime: 'nw', runtimeVersion: '0.64.0' },
-	{ runtime: 'nw', runtimeVersion: '0.79.0' },
-	{ runtime: 'nw', runtimeVersion: '0.98.2' },
 ]
+if (process.platform !== 'win32') {
+	// HACK: this isn't working on windows currently. some weird linker issues
+	runtimesAndVersions.push(
+		{ runtime: 'nw', runtimeVersion: '0.64.0' },
+		{ runtime: 'nw', runtimeVersion: '0.79.0' },
+		{ runtime: 'nw', runtimeVersion: '0.98.2' },
+	)
+}
 
 function getArchsForRuntime(runtime: Omit<TargetOptions, 'runtimeArch'>): TargetOptions[] {
 	switch (process.platform) {
