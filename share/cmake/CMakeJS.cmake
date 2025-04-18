@@ -513,6 +513,7 @@ function(cmakejs_setup_node_dev_library)
 
   if (MSVC)
     target_link_libraries (node-dev INTERFACE "${NODE_DEV_API_LIB_FILES}")
+    target_compile_options (node-dev INTERFACE "/Zc:__cplusplus") # some headers check the value of this and need it to be accurate
   endif()
 
   foreach(FILE IN LISTS NODE_DEV_API_INC_FILES)
