@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { runCommand } from '../rewrite/src/processHelpers'
+import { runCommand } from '../rewrite/src/processHelpers.mts'
 import { rimraf } from 'rimraf'
 import fs from 'node:fs/promises'
 import { expect } from 'vitest'

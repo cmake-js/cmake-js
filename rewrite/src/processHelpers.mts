@@ -1,6 +1,9 @@
-import { spawn, execFile as execFileRaw } from 'child_process'
+import { spawn, execFile as execFileRaw } from 'node:child_process'
 
-export async function runCommand(command: string[], options?: { silent?: boolean; cwd?: string }): Promise<void> {
+export async function runCommand(
+	command: Array<string | number>,
+	options?: { silent?: boolean; cwd?: string },
+): Promise<void> {
 	return new Promise<void>(function (resolve, reject) {
 		if (!options) options = {}
 
@@ -12,7 +15,7 @@ export async function runCommand(command: string[], options?: { silent?: boolean
 			delete env.Path
 		}
 
-		const child = spawn(command[0], command.slice(1), {
+		const child = spawn(String(command[0]), command.slice(1) as string[], {
 			stdio: options.silent ? 'ignore' : 'inherit',
 			env,
 			cwd: options.cwd,

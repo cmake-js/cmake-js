@@ -63,6 +63,7 @@
 		"@types/tar": "^6.1.13",
 		"@types/url-join": "4",
 		"@types/which": "^2.0.2",
+		"@types/yargs": "^17.0.33",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"mocha": "^11.1.0",
@@ -70,10 +71,12 @@
 		"node-addon-api": "^6.1.0",
 		"prettier": "^3.2.2",
 		"rimraf": "^5.0.10",
+		"tsx": "^4.19.3",
 		"typescript": "~5.3.3",
 		"vitest": "^3.1.1"
 	},
 	"scripts": {
+		"cmake-js-bin": "tsx rewrite/src/cmake-js-bin.mjs",
 		"test:old": "mocha tests",
 		"test:unit": "vitest --dir test-apps",
 		"test:cmake": "vitest --dir tests-cmake",

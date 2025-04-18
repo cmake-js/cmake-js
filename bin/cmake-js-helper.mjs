@@ -3,6 +3,12 @@
 import fs from 'fs/promises'
 import semver from 'semver'
 
+/*
+ * This file is a collection of helper functions for the cmake-js package.
+ * It gets called automatically by the CMake scripts, to perform some tasks that are hard
+ * to do in CMake, but easy to do in Node.js
+ */
+
 const regexPath = /\/(\w+)-(\w+)\/v([0-9]+.[0-9]+.[0-9]+)(\/?)$/
 
 switch (process.argv[2]) {

@@ -72,7 +72,7 @@ jobs:
         shell: bash
         run: |
           yarn install
-          yarn test
+          yarn test:cmake
         env:
           CI: true
           npm_config_build_from_source: true
@@ -100,5 +100,5 @@ jobs:
 
             cd /work
 
-            npm install
-            npm test
+            yarn install
+            yarn test:cmake
