@@ -54,6 +54,7 @@ export class CmakeTestRunner {
 
 		const launched = await runCommand(['node', addonPath], {
 			cwd: this.buildDir,
+			silent: launchCheckShouldFail, // Silence output as it's errors are 'normal'
 		}).then(
 			() => true,
 			() => false,

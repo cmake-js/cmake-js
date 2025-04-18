@@ -65,7 +65,26 @@ describe('nan', () => {
 					})
 
 					test('cmake direct invocation', async () => {
-						await testRunner.testInvokeCmakeDirectSimple([])
+						const args = []
+
+						if (process.platform === 'win32') {
+							switch(fullRuntime.runtimeArch) { 
+								case 'x86':
+									args.push('-A', 'Win32')
+									break
+								case 'x64':
+									args.push('-A', 'x64')
+									break
+								case 'arm64':
+									args.push('-A', 'ARM64')
+									break
+								default:
+									throw new Error(`Unhandled arch: ${fullRuntime.runtimeArch}`)
+							}
+						}
+
+
+						await testRunner.testInvokeCmakeDirectSimple(args)
 						// TODO - assert binary was built correct?
 					})
 
