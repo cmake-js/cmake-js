@@ -1,0 +1,34 @@
+{
+  "name": "@vendor/hello_with_types",
+  "version": "1.0.0",
+  "description": "A test addon with Typescript support made using CMakeJS.cmake",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start":       "node ./index.js",
+    "install":     "cmake-js install     --CDhello_IS_INSTALLABLE:BOOL=TRUE --CDBUILD_TESTS:BOOL=TRUE  --CDCMAKE_INSTALL_PREFIX:PATH=./dist",
+    "postinstall": "cmake-js compile     --CDhello_IS_INSTALLABLE:BOOL=TRUE --CDBUILD_TESTS:BOOL=TRUE  --CDCMAKE_INSTALL_PREFIX:PATH=./dist",
+    "configure":   "cmake-js configure   --CDhello_IS_INSTALLABLE:BOOL=TRUE --CDBUILD_TESTS:BOOL=TRUE  --CDCMAKE_INSTALL_PREFIX:PATH=./dist",
+    "reconfigure": "cmake-js reconfigure --CDhello_IS_INSTALLABLE:BOOL=TRUE --CDBUILD_TESTS:BOOL=TRUE  --CDCMAKE_INSTALL_PREFIX:PATH=./dist",
+    "build":       "cmake-js build",
+    "rebuild":     "cmake-js rebuild",
+    "clean":       "cmake-js clean && rm -rvf ./dist",
+    "wipe":        "cmake-js clean && rm -rvf ./node_modules",
+
+    "ctest":       "ctest --test-dir ./build --rerun-failed --output-on-failure --verbose",
+    "cpack":       "cpack --config   ./build/CPackSourceConfig.cmake -B ./dist",
+    "cdist":       "cpack --config   ./build/CPackConfig.cmake       -B ./dist",
+
+    "curl:get":    "node -p \"const addon = require('./index'); addon.get( 'https://httpbin.org/anything', /** follow redirects? */ true);\"",
+    "curl:post":   "node -p \"const addon = require('./index'); addon.post('https://httpbin.org/anything', 'name=nathanjhood&project=cmake-js');\""
+  },
+  "dependencies": {
+    "cmake-js": "https://github.com/nathanjhood/cmake-js#cmakejs_cmake_api",
+    "node-addon-api": "^7.1.0",
+    "node-api-headers": "^1.1.0"
+  },
+  "devDependencies": {
+		"@types/node": "^20.11.14",
+		"typescript": "^5.3.3"
+	}
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@vendor/hello",
+  "version": "1.0.0",
+  "description": "A test addon made using CMakeJS.cmake",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start":       "node -p \"const addon = require('./index'); console.log(addon.hello());\"",
+    "install":     "cmake-js install",
+    "postinstall": "cmake-js compile",
+    "configure":   "cmake-js configure",
+    "reconfigure": "cmake-js reconfigure",
+    "build":       "cmake-js build",
+    "rebuild":     "cmake-js rebuild",
+    "clean":       "cmake-js clean",
+    "wipe":        "cmake-js clean && rm -rvf ./node_modules"
+  },
+  "dependencies": {
+    "cmake-js": "https://github.com/nathanjhood/cmake-js#cmakejs_cmake_api"
+  }
+}
