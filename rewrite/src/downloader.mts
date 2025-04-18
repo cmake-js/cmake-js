@@ -1,22 +1,14 @@
 import crypto from 'node:crypto'
 import axios from 'axios'
-import MemoryStream from 'memory-stream'
 import zlib from 'node:zlib'
 import tar from 'tar'
 import { createWriteStream } from 'node:fs'
 import { once } from 'node:stream'
 
-interface DownloadFileOptions {
-	path: string
+interface DownloadSourceOptions {
+	url: string
 	hash: string | null
-	sum?: string
-}
-
-interface DownloadTarGzOptions {
-	// path: string
-	// cwd: string
-	hash: string | null
-	sum?: string
+	sum: string | null
 }
 
 export default class Downloader {
@@ -72,35 +64,42 @@ export default class Downloader {
 	}
 
 	async downloadString(url: string): Promise<string> {
-		const result = new MemoryStream()
-		await this.downloadToStream(url, result, null)
-		return result.toString()
+		return axios.get(url, { responseType: 'text' }).then((response) => response.data)
 	}
 
-	async downloadFile(url: string, opts: DownloadFileOptions): Promise<string | undefined> {
-		const result = createWriteStream(opts.path)
-		const sum = await this.downloadToStream(url, result, opts.hash)
-		this.testSum(url, sum, opts)
-		return sum
+	async downloadFile(source: DownloadSourceOptions, targetPath: string): Promise<void> {
+		const result = createWriteStream(targetPath)
+		const sum = await this.downloadToStream(source.url, result, source.hash)
+		this.testSum(source, sum)
 	}
 
-	async downloadTgz(url: string, tarOpts: tar.ExtractOptions, opts: DownloadTarGzOptions): Promise<string | undefined> {
+	async downloadTgz(source: DownloadSourceOptions, tarOpts: tar.ExtractOptions): Promise<void> {
 		const gunzip = zlib.createGunzip()
 		const extractor = tar.extract(tarOpts)
-
 		gunzip.pipe(extractor)
-		const sum = await this.downloadToStream(url, gunzip, opts.hash)
+
+		// TODO - should this download first, then extract?
+		// maybe not even streaming the file?
+		// the downside being losing the progress numbers
+		// The current approach is flawed, in that it exracts the tar before checking the checksum.
+		// And if the checksum is wrong, it will leave a bad data extracted, where the next run will
+		// find it and assume it is good to use
+		// Could a corrupt file cause it to expand to an infinite size?
+		// We could set an arbitrary cap based on the actual size of the header archives,
+		// surely they can't be more than like 10MB, so cap it at 50MB?
+		// considering this is a step just before a compiler, 50MB of memory is nothing to use temporarily.
+
+		const sum = await this.downloadToStream(source.url, gunzip, source.hash)
 
 		// Ensure the extractor is closed before resolving
-		await once(extractor, 'close')
+		// await once(extractor, 'close')
 
-		this.testSum(url, sum, opts)
-		return sum
+		this.testSum(source, sum)
 	}
 
-	private testSum(url: string, sum: string | undefined, options: { hash: string | null; sum?: string }): void {
-		if (options.hash && sum && options.sum && options.sum !== sum) {
-			throw new Error(options.hash.toUpperCase() + " sum of download '" + url + "' mismatch!")
+	private testSum(source: DownloadSourceOptions, sum: string | undefined): void {
+		if (source.hash && source.sum && source.sum !== sum) {
+			throw new Error(`${source.hash.toUpperCase()} sum of download '${source.url}' mismatch!`)
 		}
 	}
 }

@@ -15,14 +15,6 @@ interface Stat {
 	isDirectory: () => boolean
 }
 
-function testSum(sums: ShaSum[], sum: string | undefined, fPath: string): void {
-	const serverSum = sums.find((s) => s.getPath === fPath)
-	if (serverSum && serverSum.sum === sum) {
-		return
-	}
-	throw new Error("SHA sum of file '" + fPath + "' mismatch!")
-}
-
 export default class DistDownloader {
 	private readonly targetOptions: TargetOptions
 	private readonly downloader: Downloader
@@ -106,7 +98,7 @@ export default class DistDownloader {
 		await Promise.all([this._downloadLibs(sums), this._downloadTar(sums)])
 	}
 
-	async _downloadShaSums(): Promise<ShaSum[] | null> {
+	private async _downloadShaSums(): Promise<ShaSum[] | null> {
 		if (this.targetOptions.runtime === 'node') {
 			const sumUrl = urljoin(this.runtimePaths.externalPath, 'SHASUMS256.txt')
 			console.debug('DIST', '\t- ' + sumUrl)
@@ -116,7 +108,7 @@ export default class DistDownloader {
 					const parts = line.split(/\s+/)
 					return {
 						getPath: parts[1],
-						sum: parts[0],
+						sum: parts[0] + '1',
 					}
 				})
 				.filter((i: ShaSum) => i.getPath && i.sum)
@@ -125,13 +117,17 @@ export default class DistDownloader {
 		}
 	}
 
-	async _downloadTar(sums: ShaSum[] | null): Promise<void> {
+	private async _downloadTar(sums: ShaSum[] | null): Promise<void> {
 		const tarLocalPath = this.runtimePaths.tarPath
 		const tarUrl = urljoin(this.runtimePaths.externalPath, tarLocalPath)
 		console.debug('DIST', '\t- ' + tarUrl)
 
-		const sum = await this.downloader.downloadTgz(
-			tarUrl,
+		await this.downloader.downloadTgz(
+			{
+				url: tarUrl,
+				hash: sums ? 'sha256' : null,
+				sum: sums?.find((s) => s.getPath === tarLocalPath)?.sum ?? null,
+			},
 			{
 				cwd: this.internalPath,
 				strip: 1,
@@ -143,17 +139,10 @@ export default class DistDownloader {
 					return !!ext && ext.toLowerCase() === '.h'
 				},
 			},
-			{
-				hash: sums ? 'sha256' : null,
-			},
 		)
-
-		if (sums) {
-			testSum(sums, sum, tarLocalPath)
-		}
 	}
 
-	async _downloadLibs(sums: ShaSum[] | null): Promise<void> {
+	private async _downloadLibs(sums: ShaSum[] | null): Promise<void> {
 		const self = this
 		if (process.platform !== 'win32') {
 			return
@@ -168,14 +157,14 @@ export default class DistDownloader {
 
 			await fs.ensureDir(path.join(self.internalPath, subDir))
 
-			const sum = await this.downloader.downloadFile(libUrl, {
-				path: path.join(self.internalPath, fPath),
-				hash: sums ? 'sha256' : null,
-			})
-
-			if (sums) {
-				testSum(sums, sum, fPath)
-			}
+			await this.downloader.downloadFile(
+				{
+					url: libUrl,
+					hash: sums ? 'sha256' : null,
+					sum: sums?.find((s) => s.getPath === fPath)?.sum ?? null,
+				},
+				path.join(self.internalPath, fPath),
+			)
 		}
 	}
 }
