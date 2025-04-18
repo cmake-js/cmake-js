@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, test } from 'vitest'
-import { CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
+import { appendSystemCmakeArgs, CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
 import DistDownloader from '../rewrite/src/dist.mjs'
 import { TargetOptions } from '../rewrite/src/runtimePaths.mjs'
 import semver from 'semver'
@@ -65,24 +65,9 @@ describe('nan', () => {
 					})
 
 					test('cmake direct invocation', async () => {
-						const args = []
+						const args: string[] = []
 
-						if (process.platform === 'win32') {
-							switch(fullRuntime.runtimeArch) { 
-								case 'x86':
-									args.push('-A', 'Win32')
-									break
-								case 'x64':
-									args.push('-A', 'x64')
-									break
-								case 'arm64':
-									args.push('-A', 'ARM64')
-									break
-								default:
-									throw new Error(`Unhandled arch: ${fullRuntime.runtimeArch}`)
-							}
-						}
-
+						appendSystemCmakeArgs(args, fullRuntime.runtimeArch)
 
 						await testRunner.testInvokeCmakeDirectSimple(args)
 						// TODO - assert binary was built correct?

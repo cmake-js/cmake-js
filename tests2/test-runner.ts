@@ -77,3 +77,22 @@ export function getGeneratorsForPlatform(): Array<string | null> {
 			throw new Error(`Unsupported platform: ${process.platform}`)
 	}
 }
+
+export function appendSystemCmakeArgs(args: string[], arch: string): void {
+	if (process.platform === 'win32') {
+		switch (arch) {
+			case 'x86':
+			case 'ia32':
+				args.push('-A', 'Win32')
+				break
+			case 'x64':
+				args.push('-A', 'x64')
+				break
+			case 'arm64':
+				args.push('-A', 'ARM64')
+				break
+			default:
+				throw new Error(`Unhandled arch: ${arch}`)
+		}
+	}
+}

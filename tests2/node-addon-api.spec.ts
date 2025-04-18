@@ -1,5 +1,5 @@
 import { beforeAll, describe, test } from 'vitest'
-import { CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
+import { appendSystemCmakeArgs, CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
 import { beforeEach } from 'node:test'
 
 describe('node-addon-api', () => {
@@ -16,7 +16,10 @@ describe('node-addon-api', () => {
 			})
 
 			test('cmake direct invocation', async () => {
-				await testRunner.testInvokeCmakeDirect()
+				const args: string[] = []
+				appendSystemCmakeArgs(args, process.arch)
+
+				await testRunner.testInvokeCmakeDirect(args)
 			})
 
 			if (process.platform === 'darwin') {
