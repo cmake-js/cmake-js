@@ -624,7 +624,7 @@ if (MSVC)
   target_link_options(cmake-js INTERFACE "/DELAYLOAD:NODE.EXE")
   target_link_libraries(cmake-js INTERFACE delayimp)
 
-  if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)" OR CMAKE_GENERATOR_PLATFORM STREQUAL "Win32"))
+  if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)" OR CMAKE_GENERATOR_PLATFORM STREQUAL "Win32")
       target_link_options(cmake-js INTERFACE "/SAFESEH:NO")
   endif()
 endif()
