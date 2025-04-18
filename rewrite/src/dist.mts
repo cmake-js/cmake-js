@@ -108,7 +108,7 @@ export default class DistDownloader {
 					const parts = line.split(/\s+/)
 					return {
 						getPath: parts[1],
-						sum: parts[0] + '1',
+						sum: parts[0],
 					}
 				})
 				.filter((i: ShaSum) => i.getPath && i.sum)

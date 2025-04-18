@@ -99,7 +99,9 @@ export default class Downloader {
 
 	private testSum(source: DownloadSourceOptions, sum: string | undefined): void {
 		if (source.hash && source.sum && source.sum !== sum) {
-			throw new Error(`${source.hash.toUpperCase()} sum of download '${source.url}' mismatch!`)
+			throw new Error(
+				`${source.hash.toUpperCase()} sum of download '${source.url}' mismatch! Got "${sum}", expected "${source.sum}"`,
+			)
 		}
 	}
 }
