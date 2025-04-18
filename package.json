@@ -1,5 +1,5 @@
 {
-	"name": "cmake-js2",
+	"name": "cmake-js",
 	"description": "CMake.js - a Node.js native addon build tool",
 	"license": "MIT",
 	"keywords": [
@@ -39,7 +39,7 @@
 		"cmake-js-next": "./bin/cmake-js-next.mjs"
 	},
 	"engines": {
-		"node": ">= 18.16.0"
+		"node": ">= 14.15.0"
 	},
 	"dependencies": {
 		"axios": "^1.6.5",
@@ -75,25 +75,17 @@
 	},
 	"scripts": {
 		"test:old": "mocha tests",
-		"test:unit": "vitest -dir test-apps",
-		"test:cmake": "vitest -dir tests-cmake",
-		"lint": "eslint lib bin/cmake-js tests",
-		"demo:configure": "cmake --fresh -S . -B ./build -DBUILD_TESTS:BOOL=TRUE -DCMAKE_INSTALL_PREFIX:PATH=./install -G Ninja",
-		"demo:build": "cmake --build    ./build",
-		"demo:install": "cmake --install  ./build",
-		"demo:ctest": "ctest --test-dir ./build",
-		"demo:cpack": "cpack --config   ./build/CPackSourceConfig.cmake -B ./install",
-		"demo:cdist": "cpack --config   ./build/CPackConfig.cmake       -B ./install",
-		"api:pack-js": "cpack --config   ./build/CPackSourceConfig.cmake -B ./dist",
-		"api:pack-cmake": "cpack --config   ./build/CPackConfig.cmake       -B ./dist",
+		"test:unit": "vitest --dir test-apps",
+		"test:cmake": "vitest --dir tests-cmake",
+		"lint": "eslint lib bin/cmake-js bin tests tests-app tests-cmake rewrite/src",
 		"build": "tsc"
 	},
 	"files": [
 		"lib",
 		"bin",
-		"*.md",
-		"bindings.js",
-		"bindings.d.ts"
+		"share",
+		"rewrite",
+		"*.md"
 	],
 	"packageManager": "yarn@1.22.22+sha256.c17d3797fb9a9115bf375e31bfd30058cac6bc9c3b8807a3d8cb2094794b51ca"
 }

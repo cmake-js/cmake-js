@@ -9,8 +9,7 @@ include(CMakeJS)
 
 cmakejs_setup_node_api_c_library()
 
-add_library(addon SHARED "src/hello/addon.cc")
-target_link_libraries(addon PRIVATE cmake-js::cmake-js cmake-js::node-api)
-set_target_properties(addon PROPERTIES PREFIX "" SUFFIX ".node")
-set_target_properties(addon PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+cmakejs_create_node_api_addon(addon
+    src/hello/addon.cc
+)
 
