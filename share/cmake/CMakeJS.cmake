@@ -13,8 +13,7 @@ include(GNUInstallDirs)
 include(CMakeDependentOption)
 
 if (DEFINED CMAKE_JS_VERSION)
-  # HACK: this should be re-enabled before this is finalised
-  # message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, you should use cmake-js2 or cmake instead")
+  message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, you should use cmake-js-next or cmake directly instead")
 endif()
 
 #[=============================================================================[
