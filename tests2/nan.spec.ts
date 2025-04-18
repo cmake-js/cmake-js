@@ -36,8 +36,10 @@ function getArchsForRuntime(runtime: Omit<TargetOptions, 'runtimeArch'>): Target
 			]
 
 			// Only newer targets support arm64
-			if (runtime.runtime === 'node' && semver.gte(runtime.runtimeVersion, '20.0.0')) {
-				// TODO - include some electron versions too
+			if (
+				(runtime.runtime === 'node' && semver.gte(runtime.runtimeVersion, '20.0.0')) ||
+				runtime.runtime === 'electron'
+			) {
 				res.push({ ...runtime, runtimeArch: 'arm64' })
 			}
 

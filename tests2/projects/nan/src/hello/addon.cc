@@ -6,13 +6,17 @@
 // Required header
 #if __has_include(<nan.h>)
 
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 #include <node.h>
 #include <nan.h>
 
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 
 namespace vendor
 {
