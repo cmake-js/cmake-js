@@ -30,7 +30,7 @@ const RuntimePaths: Record<string, (targetOptions: TargetOptions) => RuntimePath
 				externalPath: `${NODE_MIRROR}/v${targetOptions.runtimeVersion}/`,
 				winLibs: [
 					{
-						dir: targetOptions.runtimeArch,
+						dir: targetOptions.runtimeArch === 'x86' ? '' : targetOptions.runtimeArch,
 						name: 'node.lib',
 					},
 				],
@@ -86,7 +86,7 @@ const RuntimePaths: Record<string, (targetOptions: TargetOptions) => RuntimePath
 			externalPath: `${ELECTRON_MIRROR}/v${targetOptions.runtimeVersion}/`,
 			winLibs: [
 				{
-					dir: targetOptions.runtimeArch,
+					dir: targetOptions.runtimeArch === 'x86' ? '' : targetOptions.runtimeArch,
 					name: 'node.lib',
 				},
 			],
