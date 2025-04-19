@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
-import fs from 'fs/promises'
+import fs from 'node:fs/promises'
 import semver from 'semver'
+import BuildDepsDownloader from '../rewrite/dist/buildDeps.mjs'
+import path from 'node:path'
+import os from 'node:os'
 
 /*
  * This file is a collection of helper functions for the cmake-js package.
@@ -26,6 +29,22 @@ switch (process.argv[2]) {
 		}
 
 		console.log(chooseCxxStandard(match[1], match[3]))
+		break
+	}
+	case 'nodejs_dev_headers': {
+		// Use the current runtime
+		const buildTarget = {
+			runtime: 'node',
+			runtimeVersion: process.versions.node,
+			runtimeArch: process.arch,
+		}
+
+		const depsStorageDir = path.join(os.homedir(), '.cmake-js') // TODO - xdg-dir?
+		const buildDepsDownloader = new BuildDepsDownloader(depsStorageDir, buildTarget, console.error)
+
+		await buildDepsDownloader.ensureDownloaded()
+
+		console.log(buildDepsDownloader.internalPath)
 		break
 	}
 	default:

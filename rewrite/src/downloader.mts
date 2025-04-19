@@ -4,6 +4,7 @@ import zlib from 'node:zlib'
 import tar from 'tar'
 import fs from 'node:fs/promises'
 import { Readable } from 'node:stream'
+import { LogProgressFn } from './buildDeps.mjs'
 
 interface DownloadSourceOptions {
 	url: string
@@ -12,6 +13,12 @@ interface DownloadSourceOptions {
 }
 
 export default class Downloader {
+	private readonly logProgress: LogProgressFn
+
+	constructor(logProgress: LogProgressFn) {
+		this.logProgress = logProgress
+	}
+
 	async downloadString(url: string): Promise<string> {
 		return axios
 			.get(url, {
@@ -31,7 +38,7 @@ export default class Downloader {
 					: 'Unknown'
 
 				// This is not amazing granularity, it is timed based every ~500ms
-				console.debug('DWNL', `\t${percentage}%`)
+				this.logProgress(`DWNL\t${percentage}%`)
 			},
 		})
 		const buffer: ArrayBuffer = await response.data

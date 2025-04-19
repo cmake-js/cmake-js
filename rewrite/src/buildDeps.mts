@@ -1,6 +1,7 @@
 import path from 'node:path'
 import urljoin from 'url-join'
-import * as fs from 'fs-extra'
+import fsSync from 'node:fs'
+import fs from 'node:fs/promises'
 import RuntimePaths, { RuntimePathsInfo, TargetOptions } from './runtimePaths.mjs'
 import Downloader from './downloader.mjs'
 
@@ -14,11 +15,14 @@ interface Stat {
 	isDirectory: () => boolean
 }
 
+export type LogProgressFn = (message: string) => void
+
 export default class BuildDepsDownloader {
 	private readonly storageDir: string
 	private readonly targetOptions: TargetOptions
 	private readonly downloader: Downloader
 	private readonly runtimePaths: RuntimePathsInfo
+	private readonly logProgress: LogProgressFn
 
 	get internalPath(): string {
 		const runtimeArchDirectory = this.targetOptions.runtime + '-' + this.targetOptions.runtimeArch
@@ -53,7 +57,7 @@ export default class BuildDepsDownloader {
 
 		function getStat(path: string): Stat {
 			try {
-				return fs.statSync(path)
+				return fsSync.statSync(path)
 			} catch (e) {
 				return {
 					isFile: () => false,
@@ -76,10 +80,11 @@ export default class BuildDepsDownloader {
 		return this.runtimePaths.headerOnly
 	}
 
-	constructor(storageDir: string, targetOptions: TargetOptions) {
+	constructor(storageDir: string, targetOptions: TargetOptions, logProgress: LogProgressFn) {
 		this.storageDir = storageDir
 		this.targetOptions = targetOptions
-		this.downloader = new Downloader()
+		this.downloader = new Downloader(logProgress)
+		this.logProgress = logProgress
 
 		this.runtimePaths = RuntimePaths[this.targetOptions.runtime]?.(this.targetOptions)
 		if (!this.runtimePaths) throw new Error('Unknown runtime: ' + this.targetOptions.runtime)
@@ -92,8 +97,8 @@ export default class BuildDepsDownloader {
 	}
 
 	async download(): Promise<void> {
-		console.log('DIST', 'Downloading distribution files to: ' + this.internalPath)
-		await fs.ensureDir(this.internalPath)
+		this.logProgress('DIST\tDownloading distribution files to: ' + this.internalPath)
+		await fs.mkdir(this.internalPath, { recursive: true })
 		const sums = await this._downloadShaSums()
 		await Promise.all([this._downloadLibs(sums), this._downloadTar(sums)])
 	}
@@ -101,7 +106,7 @@ export default class BuildDepsDownloader {
 	private async _downloadShaSums(): Promise<ShaSum[] | null> {
 		if (this.targetOptions.runtime === 'node') {
 			const sumUrl = urljoin(this.runtimePaths.externalPath, 'SHASUMS256.txt')
-			console.debug('DIST', '\t- ' + sumUrl)
+			this.logProgress('DIST\t- ' + sumUrl)
 			return (await this.downloader.downloadString(sumUrl))
 				.split('\n')
 				.map((line: string) => {
@@ -120,7 +125,7 @@ export default class BuildDepsDownloader {
 	private async _downloadTar(sums: ShaSum[] | null): Promise<void> {
 		const tarLocalPath = this.runtimePaths.tarPath
 		const tarUrl = urljoin(this.runtimePaths.externalPath, tarLocalPath)
-		console.debug('DIST', '\t- ' + tarUrl)
+		this.logProgress('DIST\t- ' + tarUrl)
 
 		await this.downloader.downloadTgz(
 			{
@@ -153,9 +158,9 @@ export default class BuildDepsDownloader {
 			const fn = dirs.name
 			const fPath = subDir ? urljoin(subDir, fn) : fn
 			const libUrl = urljoin(this.runtimePaths.externalPath, fPath)
-			console.debug('DIST', '\t- ' + libUrl)
+			this.logProgress('DIST\t- ' + libUrl)
 
-			await fs.ensureDir(path.join(this.internalPath, subDir))
+			await fs.mkdir(path.join(this.internalPath, subDir), { recursive: true })
 
 			await this.downloader.downloadFile(
 				{

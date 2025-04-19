@@ -264,13 +264,26 @@ Provides
 
 ]=============================================================================]#
 function(cmakejs_acquire_node_dev_headers)
-  set(NODE_DEV_API_DIR "" CACHE STRING "Node Dev Headers directory.")
 
   if(NOT DEFINED NODE_DEV_API_DIR OR NODE_DEV_API_DIR STREQUAL "")
-    message(FATAL_ERROR "NODE_DEV_API_DIR is not set. Please set it to the path of the NodeJS include directory.")
-  endif()
+    execute_process(
+      COMMAND "${NODE_EXECUTABLE}" "${CMAKEJS_HELPER_EXECUTABLE}" "nodejs_dev_headers"
+      WORKING_DIRECTORY ${_CMAKEJS_DIR}
+      OUTPUT_VARIABLE NODE_DEV_API_DIR
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 
-  message (STATUS "Using Node dev headers from ${NODE_DEV_API_DIR}")
+    if (NOT DEFINED NODE_DEV_API_DIR OR NODE_DEV_API_DIR STREQUAL "" OR NOT EXISTS "${NODE_DEV_API_DIR}")
+      message(FATAL_ERROR "Failed to find NodeJS dev headers. Make sure cmake-js is able to download them or specify a path to the NodeJS include directory with -DNODE_DEV_API_DIR=/path/to/node/include")
+      return()
+    endif()
+
+    message (STATUS "Auto-selected runtime headers from: ${NODE_DEV_API_DIR}")
+    set(NODE_DEV_API_DIR "${NODE_DEV_API_DIR}" CACHE STRING "Node Dev Headers directory." FORCE)
+  else()
+    set(NODE_DEV_API_DIR "" CACHE STRING "Node Dev Headers directory.")
+    message (STATUS "Using Node dev headers from ${NODE_DEV_API_DIR}")
+  endif()
 
   execute_process(
     COMMAND "${NODE_EXECUTABLE}" "${CMAKEJS_HELPER_EXECUTABLE}" "cxx_standard" "${NODE_DEV_API_DIR}"
@@ -514,7 +527,7 @@ function(cmakejs_setup_node_dev_library)
   # cmake-js::node-dev
   add_library                 (node-dev INTERFACE)
   add_library                 (cmake-js::node-dev ALIAS node-dev)
-  
+
   if (EXISTS "${NODE_DEV_API_DIR}/include/node/node.h")
     # most runtime headers are in this directory
     target_include_directories  (node-dev INTERFACE "${NODE_DEV_API_DIR}/include/node")
