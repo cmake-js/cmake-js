@@ -1,7 +1,7 @@
 import yargs, { ArgumentsCamelCase } from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import fs from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import { findCmake } from './findCmake.mjs'
 import { runCommand } from './processHelpers.mjs'
 

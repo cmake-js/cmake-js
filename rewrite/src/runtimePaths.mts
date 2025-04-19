@@ -70,7 +70,7 @@ const RuntimePaths: Record<string, (targetOptions: TargetOptions) => RuntimePath
 			}
 		}
 		return {
-			externalPath: `https://node-webkit.s3.amazonaws.com/v${targetOptions.runtimeVersion}/`,
+			externalPath: `${NWJS_MIRROR}/v${targetOptions.runtimeVersion}/`,
 			winLibs: [
 				{
 					dir: targetOptions.runtimeArch === 'x86' ? '' : targetOptions.runtimeArch,
