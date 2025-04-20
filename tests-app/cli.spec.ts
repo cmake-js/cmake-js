@@ -60,7 +60,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node',
-				'(/cmake-js/src/build) cmake --build .',
+				'(/cmake-js/src/build) cmake --build . --parallel',
 			])
 		})
 
@@ -77,7 +77,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node --test',
-				'(/cmake-js/src/build) cmake --build .',
+				'(/cmake-js/src/build) cmake --build . --parallel',
 			])
 		})
 
@@ -90,7 +90,7 @@ describe('cmake-js-next cli', () => {
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
 					`(${tempDir}) cmake ../../cmake-js/src -DNODE_EXECUTABLE=/path/to/current/node`,
-					`(${tempDir}) cmake --build .`,
+					`(${tempDir}) cmake --build . --parallel`,
 				])
 			})
 		})
@@ -104,7 +104,7 @@ describe('cmake-js-next cli', () => {
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
 					`(/cmake-js/src/${dirname}) cmake .. -DNODE_EXECUTABLE=/path/to/current/node`,
-					`(/cmake-js/src/${dirname}) cmake --build .`,
+					`(/cmake-js/src/${dirname}) cmake --build . --parallel`,
 				])
 			} finally {
 				await fs.rm(fullpath, { recursive: true, force: true })
@@ -124,7 +124,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3',
-				'(/cmake-js/src/build) cmake --build .',
+				'(/cmake-js/src/build) cmake --build . --parallel',
 			])
 		})
 
@@ -142,7 +142,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3 -DCMAKEJS_TARGET_RUNTIME_ARCH=xABC',
-				'(/cmake-js/src/build) cmake --build .',
+				'(/cmake-js/src/build) cmake --build . --parallel',
 			])
 		})
 	})
@@ -244,7 +244,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				//
-				'(/cmake-js/src/build) cmake --build .',
+				'(/cmake-js/src/build) cmake --build . --parallel',
 			])
 		})
 
@@ -261,7 +261,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				//
-				'(/cmake-js/src/build) cmake --build . --test',
+				'(/cmake-js/src/build) cmake --build . --parallel --test',
 			])
 		})
 
@@ -272,7 +272,7 @@ describe('cmake-js-next cli', () => {
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
 					//
-					`(${tempDir}) cmake --build .`,
+					`(${tempDir}) cmake --build . --parallel`,
 				])
 			})
 		})
@@ -288,7 +288,7 @@ describe('cmake-js-next cli', () => {
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
 					//
-					`(/cmake-js/src/${dirname}) cmake --build .`,
+					`(/cmake-js/src/${dirname}) cmake --build . --parallel`,
 				])
 			} finally {
 				await fs.rm(fullpath, { recursive: true, force: true })
@@ -300,6 +300,16 @@ describe('cmake-js-next cli', () => {
 
 			expect(res.error?.message).toMatch('Output directory does not exist')
 			expect(res.cmakeCommands).toHaveLength(0)
+		})
+
+		test('custom parallel arg', async () => {
+			const res = await invokeCmakeJs(['build', '--', '--parallel', '4'])
+
+			expect(res.error).toBe(null)
+			expect(res.cmakeCommands).toEqual([
+				//
+				'(/cmake-js/src/build) cmake --build . --parallel 4',
+			])
 		})
 	})
 

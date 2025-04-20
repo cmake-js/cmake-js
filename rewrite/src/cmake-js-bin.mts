@@ -110,6 +110,8 @@ async function cmakeBuild(args: ArgumentsCamelCase<CmakeBuildArgs>) {
 		customArgs.push('--config', 'Release')
 	}
 
+	if (!args._.includes('--parallel')) customArgs.push('--parallel')
+
 	await runCommand([cmakePath, '--build', '.', ...customArgs, ...args._.slice(1)], {
 		cwd: args.out,
 		silent: args.silent,
