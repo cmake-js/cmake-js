@@ -10,10 +10,10 @@ function trimTrailingSlash(str: string) {
 }
 
 const projectPath = trimTrailingSlash(fileURLToPath(new URL('../', import.meta.url)))
-const cmakeJsCliPath = fileURLToPath(new URL('../bin/cmake-js-next.mjs', import.meta.url))
+const cmakeJsCliPath = fileURLToPath(new URL('../bin/cmake-js.mjs', import.meta.url))
 const fakeCmakePath = fileURLToPath(new URL('./fake-cmake', import.meta.url))
 
-describe('cmake-js-next cli', () => {
+describe('cmake-js cli', () => {
 	async function parseFakeCmakeFile(filePath: string) {
 		const output = await fs.readFile(filePath, 'utf8')
 		return output

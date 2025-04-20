@@ -35,21 +35,16 @@
 		"url": "git://github.com/cmake-js/cmake-js.git"
 	},
 	"bin": {
-		"cmake-js": "./bin/cmake-js",
-		"cmake-js-next": "./bin/cmake-js-next.mjs"
+		"cmake-js": "./bin/cmake-js.mjs"
 	},
 	"engines": {
-		"node": ">= 14.15.0"
+		"node": ">= 18.16.0"
 	},
 	"dependencies": {
 		"axios": "^1.6.5",
 		"debug": "^4",
 		"env-paths": "^3.0.0",
-		"fs-extra": "^11.2.0",
-		"memory-stream": "^1.0.0",
 		"node-api-headers": "^1.1.0",
-		"npmlog": "^6.0.2",
-		"rc": "^1.2.7",
 		"semver": "^7.5.4",
 		"tar": "^6.2.1",
 		"url-join": "^4.0.1",
@@ -58,7 +53,6 @@
 	},
 	"devDependencies": {
 		"@tsconfig/node14": "^14.1.2",
-		"@types/fs-extra": "^11.0.4",
 		"@types/node": "^20.11.14",
 		"@types/semver": "^7.7.0",
 		"@types/tar": "^6.1.13",

@@ -13,7 +13,7 @@ include(GNUInstallDirs)
 include(CMakeDependentOption)
 
 if (DEFINED CMAKE_JS_VERSION)
-  message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, you should use cmake-js-next or cmake directly instead")
+  message(FATAL_ERROR "This CMake project has been updated to the module flow, and cannot be built with older cmake-js. Use the correct version of cmake-js or cmake directly")
 endif()
 
 set(CMAKEJS_TARGET_RUNTIME "" CACHE STRING "The target runtime to build for. This is used to determine the correct NodeJS headers to use.")

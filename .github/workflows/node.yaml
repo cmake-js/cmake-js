@@ -224,6 +224,6 @@ jobs:
         shell: bash
         run: |
           yarn --cwd tests-cmake/projects/node-api install --ignore-scripts
-          node ./bin/cmake-js-next.mjs autobuild --source ./tests-cmake/projects/node-api
+          node ./bin/cmake-js.mjs autobuild --source ./tests-cmake/projects/node-api
         env:
           CI: true

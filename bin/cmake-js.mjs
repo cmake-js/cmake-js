@@ -3,7 +3,7 @@
 
 const nodeMajor = process.versions.node.split('.')[0]
 if (nodeMajor < 18) {
-	console.error('cmake-js-next requires Node.js 18 or greater. Please update your Node.js installation.')
+	console.error('cmake-js requires Node.js 18 or greater. Please update your Node.js installation.')
 	process.exit(1)
 }
 
