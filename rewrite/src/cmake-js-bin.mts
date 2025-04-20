@@ -1,4 +1,4 @@
-import yargs, { ArgumentsCamelCase } from 'yargs'
+import yargs, { ArgumentsCamelCase, Options as YargsOptions } from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -29,6 +29,10 @@ interface BaseArgs {
 
 interface CmakeConfigureArgs extends BaseArgs {
 	source?: string
+
+	runtime?: string
+	runtimeVersion?: string
+	runtimeArch?: string
 }
 
 async function cmakeConfigure(args: ArgumentsCamelCase<CmakeConfigureArgs>) {
@@ -50,6 +54,18 @@ async function cmakeConfigure(args: ArgumentsCamelCase<CmakeConfigureArgs>) {
 		customArgs.push('-DNODE_EXECUTABLE=' + process.execPath)
 	}
 
+	if (args.runtime) {
+		customArgs.push(`-DCMAKEJS_TARGET_RUNTIME=${args.runtime}`)
+		if (args.runtimeVersion) {
+			customArgs.push(`-DCMAKEJS_TARGET_RUNTIME_VERSION=${args.runtimeVersion}`)
+		} else {
+			throw new Error('--runtimeVersion must be specified when --runtime is provided')
+		}
+		if (args.runtimeArch) {
+			customArgs.push(`-DCMAKEJS_TARGET_RUNTIME_ARCH=${args.runtimeArch}`)
+		}
+	}
+
 	// TODO - more here
 
 	await runCommand([cmakePath, pathToSourceFromOut, ...customArgs, ...args._.slice(1)], {
@@ -66,6 +82,18 @@ async function assertBuildDirExists(args: ArgumentsCamelCase<BaseArgs>) {
 		console.error('Output directory does not exist. Please run `cmake-js configure` first.')
 		process.exit(1)
 	}
+}
+
+async function cmakeAutoBuild(args: ArgumentsCamelCase<CmakeConfigureArgs>) {
+	await cmakeConfigure(args)
+	await cmakeBuild({
+		// Strip the args, as build and configure need different things, and we can't cater to both
+		out: args.out,
+		silent: args.silent,
+
+		_: [],
+		$0: args.$0,
+	} satisfies ArgumentsCamelCase<BaseArgs>)
 }
 
 interface CmakeBuildArgs extends BaseArgs {
@@ -133,6 +161,27 @@ async function cmakeClean(args: ArgumentsCamelCase<CmakeCleanArgs>) {
 // if (rawArgv[0].endsWith('cmake-js-bin.mts')) rawArgv.shift()
 // console.log(rawArgv)
 
+const configureOptions = {
+	source: {
+		// alias: 'd',
+		describe: 'Specify the source directory to compile, default is the current directory',
+		type: 'string',
+	} satisfies YargsOptions,
+	runtime: {
+		describe: 'Specify the runtime to build for. Default is node',
+		type: 'string',
+	} satisfies YargsOptions,
+	runtimeVersion: {
+		describe:
+			'Specify the runtime version to build for. Default is the current version. This must be specified if the runtime is specified',
+		type: 'string',
+	} satisfies YargsOptions,
+	runtimeArch: {
+		describe: 'Specify the runtime architecture to build for. Default is the current architecture',
+		type: 'string',
+	} satisfies YargsOptions,
+}
+
 const args = await yargs(hideBin(process.argv))
 	// .parserConfiguration({ // TODO - this would be nice to have
 	// 	'unknown-options-as-args': true,
@@ -140,22 +189,30 @@ const args = await yargs(hideBin(process.argv))
 	.usage('CMake.js ' + packageJson.version + '\n\nUsage: $0 [<command>] [options]')
 	.version(false)
 	.command(
-		'configure',
-		'Invoke cmake with the given arguments',
+		'autobuild',
+		'Invoke cmake with the given arguments to configure the project, then perform an automatic build\nYou can add any custom cmake args after `--`',
 		{
-			source: {
-				// alias: 'd',
-				describe: 'Specify the source directory to compile, default is the current directory',
-				type: 'string',
-			},
+			...configureOptions,
+		},
+		wrapCMakeCommand(cmakeAutoBuild),
+	)
+	.command(
+		'configure',
+		'Invoke cmake with the given arguments\nYou can add any custom cmake args after `--`',
+		{
+			...configureOptions,
 		},
 		wrapCMakeCommand(cmakeConfigure),
 	)
-	.command('build', 'Invoke `cmake --build` with the given arguments', {}, wrapCMakeCommand(cmakeBuild))
+	.command(
+		'build',
+		'Invoke `cmake --build` with the given arguments\nYou can add any custom cmake args after `--`',
+		{},
+		wrapCMakeCommand(cmakeBuild),
+	)
 	.command('clean', 'Clean the project directory', {}, wrapCMakeCommand(cmakeClean))
-	// .command('list-generators', 'List available generators', {}, wrapCommand(runListGenerators))
-	// .command('select-generator', 'Select the best available generators', {}, wrapCommand(runSelectGenerators))
-	.demandCommand()
+	.demandCommand(1)
+	.strict()
 	.options({
 		// // 		l: {
 		// // 			alias: 'log-level',

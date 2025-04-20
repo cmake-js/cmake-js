@@ -38,7 +38,15 @@ switch (process.argv[2]) {
 			runtime: 'node',
 			runtimeVersion: process.versions.node,
 			runtimeArch: process.arch,
-		} // TODO - respect env vars for overrides
+		}
+
+		// If the user specified a runtime, use that instead
+		if (process.argv[3] && process.argv[4]) {
+			buildTarget.runtime = process.argv[3]
+			buildTarget.runtimeVersion = process.argv[4]
+			// @ts-expect-error types don't align because runtimeArch is Architecture
+			buildTarget.runtimeArch = process.argv[5] || buildTarget.runtimeArch
+		}
 
 		let depsStorageDir = path.join(os.homedir(), '.cmake-js') // TODO - xdg-dir?
 		if (process.env.CMAKEJS_CACHE_DIR) {

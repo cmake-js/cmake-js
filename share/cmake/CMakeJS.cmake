@@ -16,6 +16,10 @@ if (DEFINED CMAKE_JS_VERSION)
   message(FATAL_ERROR "You cannot use the new cmake flow with the old cmake-js binary, you should use cmake-js-next or cmake directly instead")
 endif()
 
+set(CMAKEJS_TARGET_RUNTIME "" CACHE STRING "The target runtime to build for. This is used to determine the correct NodeJS headers to use.")
+set(CMAKEJS_TARGET_RUNTIME_VERSION "" CACHE STRING "The target runtime version to build for. This is used to determine the correct NodeJS headers to use.")
+set(CMAKEJS_TARGET_RUNTIME_ARCH "" CACHE STRING "The target runtime architecture to build for. This is used to determine the correct NodeJS headers to use.")
+
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Release' as none was specified.")
   set(CMAKE_BUILD_TYPE "Release" CACHE
@@ -267,7 +271,7 @@ function(cmakejs_acquire_node_dev_headers)
 
   if(NOT DEFINED NODE_DEV_API_DIR OR NODE_DEV_API_DIR STREQUAL "")
     execute_process(
-      COMMAND "${NODE_EXECUTABLE}" "${CMAKEJS_HELPER_EXECUTABLE}" "nodejs_dev_headers"
+      COMMAND "${NODE_EXECUTABLE}" "${CMAKEJS_HELPER_EXECUTABLE}" "nodejs_dev_headers" "${CMAKEJS_TARGET_RUNTIME}" "${CMAKEJS_TARGET_RUNTIME_VERSION}" "${CMAKEJS_TARGET_RUNTIME_ARCH}"
       WORKING_DIRECTORY ${_CMAKEJS_DIR}
       OUTPUT_VARIABLE NODE_DEV_API_DIR
       OUTPUT_STRIP_TRAILING_WHITESPACE
