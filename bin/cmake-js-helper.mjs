@@ -50,6 +50,7 @@ switch (process.argv[2]) {
 
 		let depsStorageDir = path.join(os.homedir(), '.cmake-js') // TODO - xdg-dir?
 		if (process.env.CMAKEJS_CACHE_DIR) {
+			// This is intended to be set by the user, not cmake, so is safe to be an env var
 			depsStorageDir = process.env.CMAKEJS_CACHE_DIR
 		}
 
