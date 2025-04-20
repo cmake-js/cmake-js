@@ -105,8 +105,6 @@ By exporting an interface library under cmake-js' own namespace - `cmake-js::cma
 
 If the module is appended via the CLI as above, then builders may activate `CMakeJS.cmake` programatically by calling `include(CMakeJS)` in their CMake project.
 
-Alternatively to using the module path on the CLI and activating the module programmatically, they can instead `include("${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/share/cmake/CMakeJS.cmake")` and the module will be activated on inclusion.
-
 `CMakeJS.cmake` exports the following CMake targets for linkage options:
 
 ```
