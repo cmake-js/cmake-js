@@ -173,7 +173,7 @@ jobs:
           fi
           rm -rf ${CMAKE_PATH}
 
-          // ensure cmake is no longer found
+          # ensure cmake is no longer found
           CMAKE_PATH=$(which cmake.exe)
           if [ -n "$CMAKE_PATH" ]; then
             echo "CMake still found in PATH"
