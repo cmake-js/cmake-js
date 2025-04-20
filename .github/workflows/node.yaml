@@ -173,12 +173,19 @@ jobs:
           fi
           rm -rf ${CMAKE_PATH}
 
+          // ensure cmake is no longer found
+          CMAKE_PATH=$(which cmake.exe)
+          if [ -n "$CMAKE_PATH" ]; then
+            echo "CMake still found in PATH"
+            exit 1
+          fi
         env:
           CI: true
 
       - name: run build
         shell: bash
         run: |
+          yarn --cwd tests-cmake/projects/node-api install --ignore-scripts
           node ./bin/cmake-js-next.mjs autobuild --source ./tests-cmake/projects/node-api
         env:
           CI: true
