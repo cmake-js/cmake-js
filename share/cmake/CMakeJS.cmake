@@ -721,20 +721,6 @@ function(cmakejs_create_node_api_addon name)
         endif()
     endif()
 
-    # TODO: This needs more/better validation...
-    if(DEFINED ARG_NAPI_VERSION AND (ARG_NAPI_VERSION LESS_EQUAL 0))
-        message(SEND_ERROR "NAPI_VERSION for ${name} is not a valid Integer number (${ARG_NAPI_VERSION})")
-        return()
-    endif()
-
-    if(NOT DEFINED ARG_NAPI_VERSION)
-        if(NOT DEFINED NAPI_VERSION)
-            # default NAPI version to use if none specified
-            set(NAPI_VERSION 8)
-        endif()
-        set(ARG_NAPI_VERSION ${NAPI_VERSION})
-    endif()
-
     if(ARG_ALIAS)
         set(name_alt "${ARG_ALIAS}")
     else()
@@ -836,10 +822,33 @@ function(cmakejs_create_node_api_addon name)
 
     cmakejs_nodejs_addon_add_definitions(${name}
       PUBLIC # These definitions are shared with anything that links to this addon
-      "NAPI_VERSION=${ARG_NAPI_VERSION}"
       "BUILDING_NODE_EXTENSION"
       "${_NAPI_GLOBAL_EXCEPTIONS_POLICY}"
     )
+
+    # If not using full node headers, propogate the NAPI_VERSION
+    if(NOT TARGET cmake-js::node-dev)
+      # TODO: This needs more/better validation...
+      if(DEFINED ARG_NAPI_VERSION AND (ARG_NAPI_VERSION LESS_EQUAL 0))
+        message(SEND_ERROR "NAPI_VERSION for ${name} is not a valid Integer number (${ARG_NAPI_VERSION})")
+        return()
+      endif()
+
+      if(NOT DEFINED ARG_NAPI_VERSION)
+        if(NOT DEFINED NAPI_VERSION)
+          # default NAPI version to use if none specified
+          set(NAPI_VERSION 8)
+        endif()
+        set(ARG_NAPI_VERSION ${NAPI_VERSION})
+      endif()
+
+      cmakejs_nodejs_addon_add_definitions(${name}
+        PUBLIC # These definitions are shared with anything that links to this addon
+        "NAPI_VERSION=${ARG_NAPI_VERSION}"
+      )
+    else()
+      message(STATUS "Node headers loaded. Skipping NAPI_VERSION...")
+    endif()
 
     # Global exceptions policy
     unset(_NAPI_GLOBAL_EXCEPTIONS_POLICY)
