@@ -175,11 +175,14 @@ jobs:
           Remove-Item -Path $CMAKE_PATH -Force
 
           # ensure cmake is no longer found
-          $CMAKE_PATH = (Get-Command cmake).Path
-          Write-Host "CMake found in PATH: $CMAKE_PATH"
-          if ($CMAKE_PATH -ne $null) {
-            Write-Host "CMake still found in PATH"
+          $CMAKE_PATH = $null
+          try {
+            $CMAKE_PATH = (Get-Command cmake -ErrorAction Stop).Path
+            Write-Host "CMake found in PATH: $CMAKE_PATH"
             exit 1
+          }
+          catch {
+            Write-Host "CMake successfully removed from PATH"
           }
         env:
           CI: true
