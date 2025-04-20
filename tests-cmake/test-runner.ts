@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { runCommand } from '../rewrite/src/processHelpers.mts'
+import { execFile, runCommand } from '../rewrite/src/processHelpers.mts'
 import { rimraf } from 'rimraf'
 import fs from 'node:fs/promises'
 import { expect } from 'vitest'
@@ -12,7 +12,12 @@ export class CmakeTestRunner {
 	readonly buildDir: string
 
 	public generator: string | null = null
+	public cmakePath: string | null = null
 	public nodeDevDirectory: string | null = null
+
+	private get cmakePathSafe(): string {
+		return this.cmakePath || 'cmake'
+	}
 
 	constructor(projectName: string) {
 		this.projectDir = fileURLToPath(new URL(path.join('./projects', projectName), import.meta.url))
@@ -25,25 +30,32 @@ export class CmakeTestRunner {
 		})
 	}
 
+	async getCmakeVersion() {
+		// Perform build
+		return execFile([this.cmakePathSafe, '--version'], {
+			cwd: this.buildDir,
+		})
+	}
+
 	async testInvokeCmakeDirectSimple(cmakeArgs: string[] = []) {
 		// make build dir
 		await rimraf(this.buildDir)
 		await fs.mkdir(this.buildDir)
 
 		// Prepare build
-		const cmakeCommand = ['cmake', '..', ...cmakeArgs]
+		const cmakeCommand = [this.cmakePathSafe, '..', ...cmakeArgs]
 		if (this.generator) cmakeCommand.push('-G', `"${this.generator}"`)
 		if (this.nodeDevDirectory) cmakeCommand.push('-D', `NODE_DEV_API_DIR="${this.nodeDevDirectory}"`)
 
 		await runCommand(cmakeCommand, {
 			cwd: this.buildDir,
 			env: {
-				CMAKE_JS_CACHE_DIR: NODE_DEV_CACHE_DIR,
+				CMAKEJS_CACHE_DIR: NODE_DEV_CACHE_DIR,
 			},
 		})
 
 		// Perform build
-		await runCommand(['cmake', '--build', '.'], {
+		await runCommand([this.cmakePathSafe, '--build', '.'], {
 			cwd: this.buildDir,
 		})
 	}

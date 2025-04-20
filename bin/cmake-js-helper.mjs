@@ -41,8 +41,8 @@ switch (process.argv[2]) {
 		} // TODO - respect env vars for overrides
 
 		let depsStorageDir = path.join(os.homedir(), '.cmake-js') // TODO - xdg-dir?
-		if (process.env.CMAKE_JS_CACHE_DIR) {
-			depsStorageDir = process.env.CMAKE_JS_CACHE_DIR
+		if (process.env.CMAKEJS_CACHE_DIR) {
+			depsStorageDir = process.env.CMAKEJS_CACHE_DIR
 		}
 
 		const buildDepsDownloader = new BuildDepsDownloader(depsStorageDir, buildTarget, console.error)

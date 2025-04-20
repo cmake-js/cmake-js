@@ -41,14 +41,23 @@ export async function runCommand(
 	})
 }
 
-export async function execFile(command: string[]): Promise<string> {
+export async function execFile(command: string[], options?: { cwd?: string }): Promise<string> {
 	return new Promise<string>(function (resolve, reject) {
-		execFileRaw(command[0], command.slice(1), function (err, stdout, stderr) {
-			if (err) {
-				reject(new Error(err.message + '\n' + (stdout || stderr)))
-			} else {
-				resolve(stdout)
-			}
-		})
+		if (!options) options = {}
+
+		execFileRaw(
+			command[0],
+			command.slice(1),
+			{
+				cwd: options.cwd,
+			},
+			function (err, stdout, stderr) {
+				if (err) {
+					reject(new Error(err.message + '\n' + (stdout || stderr)))
+				} else {
+					resolve(stdout)
+				}
+			},
+		)
 	})
 }

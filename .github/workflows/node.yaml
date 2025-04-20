@@ -31,8 +31,10 @@ jobs:
           # linux
           - os: ubuntu-22.04
             arch: x64
+            cmake-version-tests: true
           - os: ubuntu-24.04
             arch: x64
+            cmake-version-tests: true
           - os: ubuntu-22.04-arm
             arch: arm64
           - os: ubuntu-24.04-arm
@@ -76,6 +78,7 @@ jobs:
         env:
           CI: true
           npm_config_build_from_source: true
+          ENABLE_CMAKE_VERSION_TESTS: ${{ matrix.cmake-version-tests || false}}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
