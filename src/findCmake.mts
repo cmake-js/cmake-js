@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import which from 'which'
-import type { FindVisualStudioResult } from '../../lib/import/find-visualstudio.js'
+import type { FindVisualStudioResult } from '../lib/import/find-visualstudio.js'
 
 export async function findCmake(): Promise<string> {
 	const overridePath = process.env['CMAKEJS_CMAKE_PATH']
@@ -40,7 +40,7 @@ export async function findCmake(): Promise<string> {
 async function getTopSupportedVisualStudioGenerator() {
 	if (process.platform !== 'win32') throw new Error('Visual Studio Generator is only supported on Windows')
 
-	const findVisualStudioLib = await import('../../lib/import/find-visualstudio.js')
+	const findVisualStudioLib = await import('../lib/import/find-visualstudio.js')
 
 	let selectedVs: FindVisualStudioResult | null = null
 	try {

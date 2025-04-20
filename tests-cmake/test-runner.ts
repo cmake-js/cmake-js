@@ -99,7 +99,7 @@ export class CmakeTestRunner {
 	}
 }
 
-export function getGeneratorsForPlatform(): Array {
+export function getGeneratorsForPlatform(): Array<string | null> {
 	switch (process.platform) {
 		case 'darwin':
 		// TODO: This would be good, but Xcode requires an explicit compiler path to be defined

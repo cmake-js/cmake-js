@@ -4,7 +4,7 @@ import fs from 'node:fs/promises'
 import { findCmake } from './findCmake.mjs'
 import { runCommand } from './processHelpers.mjs'
 
-const packageJsonStr = await fs.readFile(new URL('../../package.json', import.meta.url))
+const packageJsonStr = await fs.readFile(new URL('../package.json', import.meta.url))
 const packageJson = JSON.parse(packageJsonStr.toString())
 
 function wrapCMakeCommand<T extends BaseArgs>(fn: (args: ArgumentsCamelCase<T>) => Promise<void>) {

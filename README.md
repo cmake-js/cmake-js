@@ -5,13 +5,15 @@
 
 ## About
 
-CMake.js is a Node.js native addon build tool which works (almost) _exactly_ like [node-gyp](https://github.com/nodejs/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
+CMake.js is a Node.js native addon build tool intended to be an alternative to [node-gyp](https://github.com/nodejs/node-gyp), but instead of [gyp](http://en.wikipedia.org/wiki/GYP_%28software%29), it is based on widely used [CMake](http://cmake.org) build system. It's compatible with the following runtimes:
 
-- Node.js 14.15+ since CMake.js v7.0.0 (for older runtimes please use an earlier version of CMake.js). Newer versions can produce builds targeting older runtimes
+- Node.js 18.17+ since CMake.js v8.0.0 (for older runtimes please use an earlier version of CMake.js). Newer versions can produce builds targeting older runtimes
 - [NW.js](https://github.com/nwjs/nw.js): all CMake.js based native modules are compatible with NW.js out-of-the-box, there is no [nw-gyp like magic](https://github.com/nwjs/nw.js/wiki/Using-Node-modules#3rd-party-modules-with-cc-addons) required
-- [Electron](https://github.com/electron/electron): out-of-the-box build support, [no post build steps required](https://github.com/electron/electron/blob/main/docs/tutorial/using-native-node-modules.md)
+- [Electron](https://github.com/electron/electron): out-of-the-box build support, [no post build steps required](https://github.com/electron/electron/blob/main/docs/tutorial/using-native-node-modules.md) in most cases.
 
-If you use `node-api` for your module instead of `nan` it should be able to run on all the runtimes above without needing to be built separately for each.
+We strongly recommend using the newer `Node-API` for your module instead of `NAN`, as that means one build will be able to run on all the runtimes above without needing to be built separately for each.
+
+CMake.js v8.0 has undergone a large rewrite to simplify its usage and become more friendly to those familiar with CMake. Check the migration guide below for help updating your existing project.
 
 ## Installation
 
@@ -26,81 +28,46 @@ cmake-js --help
 ```
 
 ```
+CMake.js 8.0.0-0
+
 Usage: cmake-js [<command>] [options]
 
 Commands:
-  cmake-js install                Install Node.js distribution files if needed
-  cmake-js configure              Configure CMake project
-  cmake-js print-configure        Print the configuration command
-  cmake-js print-cmakejs-src      Print the value of the CMAKE_JS_SRC variable
-  cmake-js print-cmakejs-include  Print the value of the CMAKE_JS_INC variable
-  cmake-js print-cmakejs-lib      Print the value of the CMAKE_JS_LIB variable
-  cmake-js build                  Build the project (will configure first if
-                                  required)
-  cmake-js print-build            Print the build command
-  cmake-js clean                  Clean the project directory
-  cmake-js print-clean            Print the clean command
-  cmake-js reconfigure            Clean the project directory then configure the
-                                  project
-  cmake-js rebuild                Clean the project directory then build the
-                                  project
-  cmake-js compile                Build the project, and if build fails, try a
-                                  full rebuild
+  cmake-js.mjs autobuild  Invoke cmake with the given arguments to configure the
+                           project, then perform an automatic build
+                          You can add any custom cmake args after `--`
+  cmake-js.mjs configure  Invoke cmake with the given arguments
+                          You can add any custom cmake args after `--`
+  cmake-js.mjs build      Invoke `cmake --build` with the given arguments
+                          You can add any custom cmake args after `--`
+  cmake-js.mjs clean      Clean the project directory
 
 Options:
-      --version          Show version number                           [boolean]
-  -h, --help             Show help                                     [boolean]
-  -l, --log-level        set log level (silly, verbose, info, http, warn,
-                         error), default is info                        [string]
-  -d, --directory        specify CMake project's directory (where CMakeLists.txt
-                         located)                                       [string]
-  -D, --debug            build debug configuration                     [boolean]
-  -B, --config           specify build configuration (Debug, RelWithDebInfo,
-                         Release), will ignore '--debug' if specified   [string]
-  -c, --cmake-path       path of CMake executable                       [string]
-  -m, --prefer-make      use Unix Makefiles even if Ninja is available (Posix)
-                                                                       [boolean]
-  -x, --prefer-xcode     use Xcode instead of Unix Makefiles           [boolean]
-  -g, --prefer-gnu       use GNU compiler instead of default CMake compiler, if
-                         available (Posix)                             [boolean]
-  -G, --generator        use specified generator                        [string]
-  -t, --toolset          use specified toolset                          [string]
-  -A, --platform         use specified platform name                    [string]
-  -T, --target           only build the specified target                [string]
-  -C, --prefer-clang     use Clang compiler instead of default CMake compiler,
-                         if available (Posix)                          [boolean]
-      --cc               use the specified C compiler                   [string]
-      --cxx              use the specified C++ compiler                 [string]
-  -r, --runtime          the runtime to use                             [string]
-  -v, --runtime-version  the runtime version to use                     [string]
-  -a, --arch             the architecture to build in                   [string]
-  -p, --parallel         the number of threads cmake can use            [number]
-      --CD               Custom argument passed to CMake in format:
-                         -D<your-arg-here>                              [string]
-  -i, --silent           Prevents CMake.js to print to the stdio       [boolean]
-  -O, --out              Specify the output directory to compile to, default is
-                         projectRoot/build                              [string]
+      --silent  Silence CMake output                  [boolean] [default: false]
+  -B, --dest    Specify the directory to write build output to, default is build
+                                                     [string] [default: "build"]
+      --help    Show help                                              [boolean]
 ```
 
 **Requirements:**
 
 - [CMake](http://www.cmake.org/download/)
+  - When using Visual C++ on Windows, they provide a suitable CMake binary that we will utilise.
 - A proper C/C++ compiler toolchain of the given platform
   - **Windows**:
     - [Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/). If you installed nodejs with the installer, you can install these when prompted.
-    - An alternate way is to install the [Chocolatey package manager](https://chocolatey.org/install), and run `choco install visualstudio2017-workload-vctools` in an Administrator Powershell
-    - If you have multiple versions installed, you can select a specific version with `npm config set msvs_version 2017` (Note: this will also affect `node-gyp`)
+    - An alternate way is to install the [Chocolatey package manager](https://chocolatey.org/install), and run `choco install visualstudio2019-workload-vctools` in an Administrator Powershell
   - **Unix/Posix**:
-    - Clang or GCC
-    - Ninja or Make (Ninja will be picked if both present)
+    - GCC or Clang
+    - Ninja or Make
 
 ## Usage
 
 ### General
 
-It is advised to use Node-API for new projects instead of NAN. It provides ABI stability making usage simpler and reducing maintainance.
+It is strong recommended to use Node-API for new projects instead of NAN. It provides ABI stability making usage simpler and reducing maintainance.
 
-In a nutshell. _(For more complete documentation please see [the first tutorial](https://github.com/cmake-js/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)_
+In a nutshell, look at the [test project](./tests-cmake/projects) we use for automated testing.
 
 - Install cmake-js for your module `npm install --save cmake-js`
 - Put a CMakeLists.txt file into your module root with this minimal required content:
@@ -109,39 +76,27 @@ In a nutshell. _(For more complete documentation please see [the first tutorial]
 cmake_minimum_required(VERSION 3.15...3.31)
 project(your-addon-name-here)
 
-add_compile_definitions(-DNAPI_VERSION=4)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/share/cmake")
+include(CMakeJS)
 
-file(GLOB SOURCE_FILES "your-source files-location-here")
+cmakejs_setup_node_api_c_library()
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_JS_INC})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB})
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+cmakejs_create_node_api_addon(addon
+  NAPI_VERSION 8
+  src/addon.cpp
+)
 
-if(MSVC AND CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
-  # Generate node.lib
-  execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
-endif()
 ```
 
 - Add the following into your package.json scripts section:
 
 ```json
 "scripts": {
-    "install": "cmake-js compile"
+    "install": "cmake-js autobuild"
   }
 ```
 
-- Add the following into your package.json, using the same NAPI_VERSION value you provided to cmake
-
-```json
-"binary": {
-    "napi_versions": [7]
-  },
-```
-
-#### Commandline
+### Commandline
 
 With cmake-js installed as a depdendency or devDependency of your module, you can access run commands directly with:
 
@@ -151,132 +106,37 @@ npx cmake-js --help
 yarn cmake-js --help
 ```
 
-Please refer to the `--help` for the lists of available commands (they are like commands in `node-gyp`).
+Please refer to the `--help` for the lists of available commands (they are like commands in `cmake`).
 
-You can override the project default runtimes via `--runtime` and `--runtime-version`, such as: `--runtime=electron --runtime-version=0.26.0`. See below for more info on runtimes.
+You can override the project default runtimes via `--runtime` and `--runtime-version`, such as: `--runtime=electron --runtime-version=31.0.0`. See below for more info on runtimes.
 
-### CMake Specific
+The commandline is intended to be a minimal wrapper over `cmake`. It is intended to help find `cmake` and provide some default arguments.
 
-`CMAKE_JS_VERSION` variable will reflect the actual CMake.js version. So CMake.js based builds could be detected, eg.:
+#### For users new to CMake
 
-```cmake
-if (CMAKE_JS_VERSION)
-    add_subdirectory(node_addon)
-else()
-    add_subdirectory(other_subproject)
-endif()
-```
+If you don't have prior experience with `cmake`, the commandline is written to be fairly simple.  
+If you get stuck, you can look for general cmake guidance online, as the syntax is almost identical.
 
-### NPM Config Integration
+`cmake-js autobuild` is the simplest command, it performs a configuration and build.  
+You can add a `--source some-path` to specify the folder containing the `CMakeLists.txt`.  
+You can add a `--dest some-path` to change from using the default `build` folder.  
+If you need to add any cmake arguments, you can do so after a `--` token. These will be forwarded to the configure step unchanged.
 
-You can set npm configuration options for CMake.js.
+If you need more granularity, you can split this into a `cmake-js configure` and `cmake-js build`.
 
-For all users (global):
+#### For users familiar with CMake
 
-```
-npm config set cmake_<key> <value> --global
-```
+If you already know how to use `cmake`, then the commandline should feel very familiar to you.
 
-For current user:
+- `cmake-js configure` is equivalent to a `cmake` invocation. It can take a few arguments, and will populate the defaults of them, and will populate a few defines based on these arguments.
 
-```
-npm config set cmake_<key> <value>
-```
+- `cmake-js build` is equivalent to `cmake --build`. It provides defaults for a few arguments, and not much else.
 
-CMake.js will set a variable named `"<key>"` to `<value>` (by using `-D<key>="<value>"` option). User settings will **overwrite** globals.
+- `cmake-js clean` is equivalent to `cmake --build --target clean`.
 
-UPDATE:
+- `cmake-js autobuild` is a configure and build. The build step of this is not configurable, this is a convenience script to make it an easy oneliner for new users.
 
-You can set CMake.js command line arguments with npm config using the following pattern:
-
-```
-npm config set cmake_js_G "Visual Studio 56 Win128"
-```
-
-Which sets the CMake generator, basically defaults to:
-
-```
-cmake-js -G "Visual Studio 56 Win128"
-```
-
-#### Example:
-
-Enter at command prompt:
-
-```
-npm config set cmake_Foo="bar"
-```
-
-Then write to your CMakeLists.txt the following:
-
-```cmake
-message (STATUS ${Foo})
-```
-
-This will print during configure:
-
-```
---- bar
-```
-
-### Custom CMake options
-
-You can add custom CMake options by beginning option name with `CD`.
-
-#### Example
-
-In command prompt:
-
-```
-cmake-js compile --CDFOO="bar"
-```
-
-Then in your CMakeLists.txt:
-
-```cmake
-message (STATUS ${FOO})
-```
-
-This will print during configure:
-
-```
---- bar
-```
-
-### Runtimes
-
-#### Important
-
-It is important to understand that this setting is to be configured in the **application's root package.json file**. If you're creating a native module targeting nw.js for example, then **do not specify anything** in your module's package.json. It's the actual application's decision to specify its runtime, your module's just compatible anything that was mentioned in the [About chapter](#about). Actually defining `cmake-js` key in your module's package.json file may lead to an error. Why? If you set it up to use nw.js 0.12.1 for example, then when it gets compiled during development time (to run its unit tests for example) it's gonna be compiled against io.js 1.2 runtime. But if you're having io.js 34.0.1 at the command line then, which is binary incompatible with 1.2, then your unit tests will fail for sure. So it is advised to not use cmake-js target settings in your module's package.json, because that way CMake.js will use that you have, and your tests will pass.
-
-#### Configuration
-
-If any of the `runtime`, `runtimeVersion`, or `arch` configuration parameters is not explicitly configured, sensible defaults will be auto-detected based on the JavaScript environment where CMake.js runs within.
-
-You can configure runtimes for compiling target for all depending CMake.js modules in an application. Define a `cmake-js` key in the application's root `package.json` file, eg.:
-
-```json
-{
-	"name": "ta-taram-taram",
-	"description": "pa-param-pam-pam",
-	"version": "1.0.0",
-	"main": "app.js",
-	"cmake-js": {
-		"runtime": "node",
-		"runtimeVersion": "0.12.0",
-		"arch": "ia32"
-	}
-}
-```
-
-Available settings:
-
-- **runtime**: application's target runtime, possible values are:
-  - `node`: Node.js
-  - `nw`: nw.js
-  - `electron`: Electron
-- **runtimeVersion**: version of the application's target runtime, for example: `0.12.1`
-- **arch**: architecture of application's target runtime (eg: `x64`, `ia32`, `arm64`, `arm`). _Notice: on non-Windows systems the C++ toolset's architecture's gonna be used despite this setting. If you don't specify this on Windows, then architecture of the main node runtime is gonna be used, so you have to choose a matching nw.js runtime._
+For all of the commands, you can provide custom arguments after a `--`. eg: `cmake-js configure --source="cmake-js-path-argument" -- -DCUSTOM_DEFINE=1`
 
 #### Node-API and `node-addon-api`
 
@@ -291,14 +151,13 @@ To compile a native module that uses only the
 [plain `C` Node-API calls](https://nodejs.org/api/n-api.html#n_api_node_api),
 follow the directions for plain `node` native modules.
 
-You must also add the following lines to your CMakeLists.txt, to allow for building on windows
+You must also add the following lines to your CMakeLists.txt, to make the correct headers available
 
 ```
-if(MSVC AND CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
-  # Generate node.lib
-  execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
-endif()
+cmakejs_setup_node_api_c_library()
 ```
+
+If you have any `cmakejs_setup_node_dev_library()` or `cmakejs_setup_node_nan_library()` lines, they should be removed to disable the old api and streamline the build.
 
 To compile a native module that uses the header-only C++ wrapper
 classes provided by
@@ -307,30 +166,31 @@ you need to make your package depend on it with:
 
     npm install --save node-addon-api
 
-cmake-js will then add it to the include search path automatically
+You must add the following to your CMakeLists.txt just below the `cmakejs_setup_node_api_c_library()` line, to configure the build to use it.
 
-You should add the following to your package.json, with the correct version number, so that cmake-js knows the module is node-api and that it can skip downloading the nodejs headers
-
-```json
-"binary": {
-    "napi_versions": [7]
-  },
 ```
+cmakejs_setup_node_api_cpp_library()
+```
+
+That is it, the necessary headers will be available to your module!
+
+You can see some [example projects](./tests-cmake/projects)
+
+#### NAN and v8 Api
+
+It is advised to not use this API unless necessary as it makes building and distributing your project more complex. Use the new `Node-API` instead if possible.
+
+To enable the v8 api, your CMakeLists.txt should contain `cmakejs_setup_node_dev_library()` before your addon is created.
+Optionally, you may want to `cmakejs_setup_node_nan_library()` too if you wish to use the NAN library which provides a slightly more stable abstraction of this api.
+
+You can see an [example](./tests-cmake/projects/nan)
 
 #### Electron
 
 On Windows, the [`win_delay_load_hook`](https://www.electronjs.org/docs/tutorial/using-native-node-modules#a-note-about-win_delay_load_hook) is required to be embedded in the module or it will fail to load in the render process.
-cmake-js will add the hook if the CMakeLists.txt contains the library `${CMAKE_JS_SRC}`.
+cmake-js will automatically add it to your module
 
 Without the hook, the module can only be called from the render process using the Electron [remote](https://github.com/electron/electron/blob/master/docs/api/remote.md) module.
-
-#### Runtime options in CMakeLists.txt
-
-The actual node runtime parameters are detectable in CMakeLists.txt files, the following variables are set:
-
-- **NODE_RUNTIME**: `"node"`, `"nw"`, `"electron"`
-- **NODE_RUNTIMEVERSION**: for example: `"0.12.1"`
-- **NODE_ARCH**: `"x64"`, `"ia32"`, `"arm64"`, `"arm"`
 
 #### Heroku
 
@@ -364,6 +224,61 @@ build environment.
 - [aws-iot-device-sdk-v2](https://github.com/aws/aws-iot-device-sdk-js-v2) AWS IoT Device SDK for JavaScript v2
 
 Open a PR to add your own project here.
+
+## Migration Guide
+
+CMake.js v8 is a large overhaul of the library, and requires a few manual steps to update your project.
+
+This will make your CMakeLists.txt simpler and will allow your IDE to load the project correctly without any weird tricks.
+
+In most cases, it is easiest to simply start the CMakeLists.txt again based off one of our examples.  
+Take a look at the [example projects](./tests-cmake/projects) for one that matches your project setup the closest. You can then skip to the end of the steps to update the scripts in your `package.json`
+
+To do it more manually, you should:
+
+1. Near the top of the file add:
+
+```
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/node_modules/cmake-js/share/cmake")
+include(CMakeJS)
+```
+
+2. If you have a line which adds `-std=c++14` or similar to `CXXFLAGS`, or some other way of setting the cxx standard, you can likely remove this, as this is done automatically for you based on the target
+3. `CMAKE_JS_INC` can be removed from the `include_directories` or `target_include_directories` function. This might result in the function call being unused and possible to be removed
+4. `CMAKE_JS_LIB` can be removed from the `target_link_libraries` function. This might result in the function call being unused and possible to be removed
+5. The `set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")` or similar line can be removed.
+6. The block containing the line `execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})` can be removed.
+7. The `add_library` line should be changed to `cmakejs_create_node_api_addon`, and the `SHARED` argument must be removed.
+8. Below the `include(CMakeJS)` line, and before the `cmakejs_create_node_api_addon(` call, you will need to add some of the following, depending on which api libraries your project uses:
+
+   - If using node-api: `cmakejs_setup_node_api_c_library()`
+   - If using node-addon-api: `cmakejs_setup_node_api_cpp_library()`
+   - If using the v8 api: `cmakejs_setup_node_dev_library()`
+   - If using NAN: `cmakejs_setup_node_nan_library()`
+
+9. Finally, update the `scripts` block in your package.json. Any command using `cmake-js` will need updating.
+   You should read the [Commandline](#Commandline) section above first as a primer. For any commands:
+   - `-l`, `--log-level`, `-D`, `--debug`, `-m`, `--prefer-make`, `-x`, `--prefer-xcode`, `-g`, `--prefer-gnu`, `-C`, `--prefer-clang` are no longer provided and should be removed
+   - `-O` or `--out` parameter can be changed to `-B` or `--dest`
+   - `-d` or `--directory` parameter can be changed to `-S` or `--source` and is only accepted in the `cmake-js configure` or `cmake-js autobuild` commands.
+   - `-B` or `--config` should be added after the `--` as `--config` to the `cmake-js build` command. The default behaviour is to build `Release`
+   - `-c` or `--cmake-path` can only be provided as an environment variable `CMAKEJS_CMAKE_PATH`
+   - `-G` or `--generator` should be added after the `--` as `-G` to the `cmake-js configure` or `cmake-js autobuild` commands. These are often not needed as the autoselection logic is usually sufficient
+   - `-t` or `--toolset` should be added after the `--` as `-T` to the `cmake-js configure` or `cmake-js autobuild` commands.
+   - `-A` or `--platform` should be added after the `--` as `-A` to the `cmake-js configure` or `cmake-js autobuild` commands.
+   - `-T` or `--target` should be added after the `--` as `-t` or `--target` to the `cmake-js build` command.
+   - `-cc` should be ???
+   - `-cxx` should be ???
+   - `-r` or `--runtime` should be added before the `--` as `--runtime` to the `cmake-js configure` or `cmake-js autobuild` commands.
+   - `-v` or `--runtime-version` should be added before the `--` as `--runtimeVersion` to the `cmake-js configure` or `cmake-js autobuild` commands.
+   - `-a` or `--arch` should be added before the `--` as `--runtimeArch` to the `cmake-js configure` or `cmake-js autobuild` commands.
+   - `-p` or `--parallel` should be added after the `--` as `--parallel` to the `cmake-js build` command. This is enabled by default now
+   - `-CD` or anything starting with `-CD` should be added after the `--` as `-D` to the `cmake-js configure` or `cmake-js autobuild` commands.
+   - `-i` or `--silent` should be added before the `--` as `--silent` to any command.
+
+Have any questions or think something was missed here? Open an issue and we will be happy to help!
+
+Do you use the `cmake-js` configuration block in your package.json? If so we want to hear from you to understand the use case. This didn't fit into the new design nicely, so we don't want to add it back unless it is solves a real problem.
 
 ## Changelog
 
