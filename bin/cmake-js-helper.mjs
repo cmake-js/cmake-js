@@ -4,8 +4,7 @@
 import fs from 'node:fs/promises'
 import semver from 'semver'
 import BuildDepsDownloader from '../rewrite/dist/buildDeps.mjs'
-import path from 'node:path'
-import os from 'node:os'
+import envPaths from 'env-paths'
 
 /*
  * This file is a collection of helper functions for the cmake-js package.
@@ -48,11 +47,8 @@ switch (process.argv[2]) {
 			buildTarget.runtimeArch = process.argv[5] || buildTarget.runtimeArch
 		}
 
-		let depsStorageDir = path.join(os.homedir(), '.cmake-js') // TODO - xdg-dir?
-		if (process.env.CMAKEJS_CACHE_DIR) {
-			// This is intended to be set by the user, not cmake, so is safe to be an env var
-			depsStorageDir = process.env.CMAKEJS_CACHE_DIR
-		}
+		// This is intended to be set by the user, not cmake, so is safe to be an env var
+		const depsStorageDir = process.env.CMAKEJS_CACHE_DIR || envPaths('cmake-js').cache
 
 		const buildDepsDownloader = new BuildDepsDownloader(depsStorageDir, buildTarget, console.error)
 
