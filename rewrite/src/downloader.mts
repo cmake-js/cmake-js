@@ -4,6 +4,7 @@ import zlib from 'node:zlib'
 import tar from 'tar'
 import fs from 'node:fs/promises'
 import { Readable } from 'node:stream'
+import { once } from 'node:events'
 import { LogProgressFn } from './buildDeps.mjs'
 
 interface DownloadSourceOptions {
@@ -76,6 +77,8 @@ export default class Downloader {
 		const extractor = tar.extract(tarOpts)
 		gunzip.pipe(extractor)
 
+		const finish = once(extractor, 'finish')
+
 		await new Promise((resolve, reject) => {
 			Readable.from(Buffer.from(fileBuffer))
 				.pipe(gunzip)
@@ -83,5 +86,7 @@ export default class Downloader {
 				.on('finish', resolve)
 				.on('error', reject)
 		})
+
+		await finish
 	}
 }
