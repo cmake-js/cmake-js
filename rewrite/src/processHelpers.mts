@@ -19,7 +19,7 @@ export async function runCommand(
 			stdio: options.silent ? 'ignore' : 'inherit',
 			env,
 			cwd: options.cwd,
-			// shell: true, // Because of windows
+			shell: true, // Because of windows
 		})
 		let ended = false
 		child.on('error', function (e) {
