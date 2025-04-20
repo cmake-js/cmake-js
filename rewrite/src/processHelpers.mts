@@ -2,12 +2,12 @@ import { spawn, execFile as execFileRaw } from 'node:child_process'
 
 export async function runCommand(
 	command: Array<string | number>,
-	options?: { silent?: boolean; cwd?: string },
+	options?: { silent?: boolean; cwd?: string; env?: Record<string, string> },
 ): Promise<void> {
 	return new Promise<void>(function (resolve, reject) {
 		if (!options) options = {}
 
-		const env = Object.assign({}, process.env)
+		const env = Object.assign({}, process.env, options.env)
 		if (env.Path && env.PATH) {
 			if (env.Path !== env.PATH) {
 				env.PATH = env.Path + ';' + env.PATH

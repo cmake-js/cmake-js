@@ -40,7 +40,11 @@ switch (process.argv[2]) {
 			runtimeArch: process.arch,
 		} // TODO - respect env vars for overrides
 
-		const depsStorageDir = path.join(os.homedir(), '.cmake-js') // TODO - xdg-dir?
+		let depsStorageDir = path.join(os.homedir(), '.cmake-js') // TODO - xdg-dir?
+		if (process.env.CMAKE_JS_CACHE_DIR) {
+			depsStorageDir = process.env.CMAKE_JS_CACHE_DIR
+		}
+
 		const buildDepsDownloader = new BuildDepsDownloader(depsStorageDir, buildTarget, console.error)
 
 		await buildDepsDownloader.ensureDownloaded()

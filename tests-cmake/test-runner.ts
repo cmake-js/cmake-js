@@ -5,6 +5,8 @@ import { rimraf } from 'rimraf'
 import fs from 'node:fs/promises'
 import { expect } from 'vitest'
 
+export const NODE_DEV_CACHE_DIR = fileURLToPath(new URL('../.cache', import.meta.url))
+
 export class CmakeTestRunner {
 	readonly projectDir: string
 	readonly buildDir: string
@@ -35,6 +37,9 @@ export class CmakeTestRunner {
 
 		await runCommand(cmakeCommand, {
 			cwd: this.buildDir,
+			env: {
+				CMAKE_JS_CACHE_DIR: NODE_DEV_CACHE_DIR,
+			},
 		})
 
 		// Perform build
