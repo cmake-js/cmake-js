@@ -3,6 +3,7 @@ import Downloader from '../rewrite/src/downloader.mts'
 import { CmakeTestRunner, NODE_DEV_CACHE_DIR } from '../tests-cmake/test-runner'
 import path from 'node:path'
 import fs from 'node:fs/promises'
+import { runCommand } from '../rewrite/src/processHelpers.mts'
 
 describe('CMake versions check', () => {
 	if (process.platform !== 'linux' || process.arch !== 'x64') {
@@ -52,6 +53,11 @@ describe('CMake versions check', () => {
 			})
 
 			test('node-api', async () => {
+				console.log('ls download')
+				await runCommand(['ls', downloadPath])
+				console.log('ls bin')
+				await runCommand(['ls', path.join(downloadPath, 'bin')])
+
 				const testRunner = new CmakeTestRunner('node-api')
 				testRunner.cmakePath = cmakeExecutable
 
