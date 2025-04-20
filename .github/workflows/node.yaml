@@ -28,7 +28,6 @@ jobs:
             arch: x64
           - os: macos-14
             arch: arm64
-            node-version: 16.x
           # linux
           - os: ubuntu-22.04
             arch: x64
@@ -39,15 +38,15 @@ jobs:
           - os: ubuntu-24.04-arm
             arch: arm64
           # linux-libc
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             arch: arm
             docker-arch: linux/arm/v7
-            docker-image: node:14-bullseye
+            docker-image: node:18-bookworm
           # linux-musl
           - os: ubuntu-latest
             arch: x64
             docker-arch: linux/amd64
-            docker-image: node:14-alpine
+            docker-image: node:18-alpine
             libc: musl
 
     steps:
@@ -58,14 +57,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           architecture: ${{ matrix.arch }}
-          node-version: ${{ matrix.node-version || '14.x' }}
+          node-version: ${{ matrix.node-version || '18.x' }}
+
+      - name: Cache cmakejs cache
+        if: ${{ !matrix.docker-arch }}
+        uses: actions/cache@v4
+        with:
+          key: ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.libc }}
+          path: |
+            .cache
 
       - name: run tests
         if: ${{ !matrix.docker-arch }}
         shell: bash
         run: |
-          npm install
-          npm test
+          yarn install
+          yarn build
+          yarn test:cmake
         env:
           CI: true
           npm_config_build_from_source: true
@@ -84,14 +92,138 @@ jobs:
             if command -v apt-get &> /dev/null
             then
               apt-get update
-              apt-get install -y cmake
+              apt-get install -y cmake ninja-build
             elif command -v apk &> /dev/null
             then
               apk update
-              apk add cmake make g++ gcc
+              apk add cmake make g++ gcc samurai
             fi
 
             cd /work
 
-            npm install
-            npm test
+            yarn install
+            yarn build
+            yarn test:cmake
+
+  test-cmake-versions:
+    name: Run tests against supported cmake versions
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Cache cmakejs cache
+        uses: actions/cache@v4
+        with:
+          key: cmake-versions-ubuntu
+          path: |
+            .cache
+
+      - name: run tests
+        shell: bash
+        run: |
+          yarn install
+          yarn build
+          yarn test:cmake-versions
+        env:
+          CI: true
+
+  test-cli:
+    name: Check cli on ${{ matrix.os }} and node ${{matrix.node}}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # TODO: enable this
+        # include:
+        #   # test with one windows version, for platform logic
+        #   - os: windows-latest
+        #     node: 20.x
+        #   # test with one macos, for platform logic
+        #   - os: macos-latest
+        #     node: 20.x
+        os: [ubuntu-latest]
+        node: [18.x, 20.x, 22.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: run tests
+        shell: bash
+        run: |
+          yarn install
+          yarn build
+          yarn test:unit
+        env:
+          CI: true
+
+  test-windows-msvc-cmake:
+    name: Check windows without system cmake
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-2022
+          - windows-2025
+          - windows-11-arm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: prepare
+        shell: powershell
+        run: |
+          yarn install
+          yarn build
+
+          $CMAKE_PATH = (Get-Command cmake).Path
+          if ($CMAKE_PATH -eq $null) {
+            Write-Host "CMake not found in PATH"
+            exit 1
+          }
+          Write-Host "CMake found in PATH: $CMAKE_PATH"
+          Remove-Item -Path $CMAKE_PATH -Force
+
+          if (Test-Path -Path c:/strawberry) {
+            Write-Host "Deleting c:/strawberry"
+            Remove-Item -Path c:/strawberry -Recurse -Force
+          }
+
+          # ensure cmake is no longer found
+          $CMAKE_PATH = $null
+          try {
+            $CMAKE_PATH = (Get-Command cmake -ErrorAction Stop).Path
+            Write-Host "CMake found in PATH: $CMAKE_PATH"
+            exit 1
+          }
+          catch {
+            Write-Host "CMake successfully removed from PATH"
+          }
+        env:
+          CI: true
+
+      - name: run build
+        shell: bash
+        run: |
+          yarn --cwd tests-cmake/projects/node-api install --ignore-scripts
+          node ./bin/cmake-js.mjs autobuild --source ./tests-cmake/projects/node-api
+        env:
+          CI: true
