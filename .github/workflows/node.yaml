@@ -124,11 +124,6 @@ jobs:
           path: |
             .cache
 
-      - name: Setup upterm session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
-
       - name: run tests
         shell: bash
         run: |

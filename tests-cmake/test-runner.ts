@@ -32,9 +32,7 @@ export class CmakeTestRunner {
 
 	async getCmakeVersion() {
 		// Perform build
-		return execFile([this.cmakePathSafe, '--version'], {
-			cwd: this.buildDir,
-		})
+		return execFile([this.cmakePathSafe, '--version'])
 	}
 
 	async testInvokeCmakeDirectSimple(cmakeArgs: string[] = []) {

@@ -53,11 +53,6 @@ describe('CMake versions check', () => {
 			})
 
 			test('node-api', async () => {
-				console.log('ls download')
-				await runCommand(['ls', downloadPath])
-				console.log('ls bin')
-				await runCommand(['ls', path.join(downloadPath, 'bin')])
-
 				const testRunner = new CmakeTestRunner('node-api')
 				testRunner.cmakePath = cmakeExecutable
 
@@ -65,7 +60,8 @@ describe('CMake versions check', () => {
 				const versionStr = await testRunner.getCmakeVersion()
 				expect(versionStr).toContain(`cmake version ${cmakeVersion}\n`)
 
-				// await testRunner.testInvokeCmakeDirectSimple()
+				await testRunner.prepareProject()
+				await testRunner.testInvokeCmakeDirectSimple()
 			})
 
 			test('nan', async () => {
@@ -76,7 +72,8 @@ describe('CMake versions check', () => {
 				const versionStr = await testRunner.getCmakeVersion()
 				expect(versionStr).toContain(`cmake version ${cmakeVersion}\n`)
 
-				// await testRunner.testInvokeCmakeDirectSimple()
+				await testRunner.prepareProject()
+				await testRunner.testInvokeCmakeDirectSimple()
 			})
 		})
 	}
