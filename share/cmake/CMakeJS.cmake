@@ -314,9 +314,11 @@ function(cmakejs_create_node_api_addon name)
       PREFIX ""
       SUFFIX ".node"
 
-      ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/lib" # Actually we might not need to enforce an opinion here!
+      # Maybe this could/should be different, but I am having issues with different 
+      # scenarios using different outputs without a reason I can spot
+      ARCHIVE_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}" # Actually we might not need to enforce an opinion here!
       LIBRARY_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}" # Instead, we call 'cmakejs_create_addon_bindings()'
-      RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}/bin" # on this target, and the user can just 'require()' that file!
+      RUNTIME_OUTPUT_DIRECTORY "${CMAKEJS_BINARY_DIR}" # on this target, and the user can just 'require()' that file!
 
       # # Conventional C++-style debug settings might be useful to have...
       # Getting Javascript bindings to grep different paths is tricky, though!
