@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-check
 
 import fs from 'node:fs/promises'
 import semver from 'semver'
@@ -37,7 +38,7 @@ switch (process.argv[2]) {
 			runtime: 'node',
 			runtimeVersion: process.versions.node,
 			runtimeArch: process.arch,
-		}
+		} // TODO - respect env vars for overrides
 
 		const depsStorageDir = path.join(os.homedir(), '.cmake-js') // TODO - xdg-dir?
 		const buildDepsDownloader = new BuildDepsDownloader(depsStorageDir, buildTarget, console.error)

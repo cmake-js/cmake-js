@@ -432,12 +432,12 @@ function(cmakejs_setup_node_api_c_library)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers/${FILE}")
       message(DEBUG "Found Node-API C header: ${FILE}")
       target_sources(node-api INTERFACE
-        FILE_SET node_api_INTERFACE_HEADERS
-        TYPE HEADERS
-        BASE_DIRS
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-          $<INSTALL_INTERFACE:include>
-        FILES
+        # FILE_SET node_api_INTERFACE_HEADERS
+        # TYPE HEADERS
+        # BASE_DIRS
+        #   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        #   $<INSTALL_INTERFACE:include>
+        # FILES
           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-api-headers/${FILE}>
           $<INSTALL_INTERFACE:include/node-api-headers/${FILE}>
       )
@@ -455,7 +455,7 @@ function(cmakejs_setup_node_api_c_library)
     RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers" # Having trouble setting this correctly
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-api-headers" # this issue stems from their package.json, not our code... but guess who needs to fix it now :)
-    FILE_SET node_api_INTERFACE_HEADERS
+    # FILE_SET node_api_INTERFACE_HEADERS
   )
 endfunction()
 
@@ -488,12 +488,12 @@ function(cmakejs_setup_node_api_cpp_library)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api/${FILE}")
       message(DEBUG "Found Node-API C++ header: ${FILE}")
       target_sources(node-addon-api INTERFACE
-        FILE_SET node_addon_api_INTERFACE_HEADERS
-        TYPE HEADERS
-        BASE_DIRS
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-          $<INSTALL_INTERFACE:include>
-        FILES
+        # FILE_SET node_addon_api_INTERFACE_HEADERS
+        # TYPE HEADERS
+        # BASE_DIRS
+        #   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        #   $<INSTALL_INTERFACE:include>
+        # FILES
           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-addon-api/${FILE}>
           $<INSTALL_INTERFACE:include/node-addon-api/${FILE}>
       )
@@ -511,7 +511,7 @@ function(cmakejs_setup_node_api_cpp_library)
     RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api"
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-addon-api"
-    FILE_SET node_addon_api_INTERFACE_HEADERS
+    # FILE_SET node_addon_api_INTERFACE_HEADERS
   )
 endfunction()
 
@@ -552,12 +552,12 @@ function(cmakejs_setup_node_dev_library)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-dev/${FILE}")
       message(DEBUG "Found NAN C++ header: ${FILE}")
       target_sources(node-dev INTERFACE
-        FILE_SET node_dev_INTERFACE_HEADERS
-        TYPE HEADERS
-        BASE_DIRS
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-          $<INSTALL_INTERFACE:include>
-        FILES
+        # FILE_SET node_dev_INTERFACE_HEADERS
+        # TYPE HEADERS
+        # BASE_DIRS
+        #   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        #   $<INSTALL_INTERFACE:include>
+        # FILES
           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-dev/${FILE}>
           $<INSTALL_INTERFACE:include/node-dev/${FILE}>
       )
@@ -575,7 +575,7 @@ function(cmakejs_setup_node_dev_library)
     RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-dev"
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-dev"
-    FILE_SET node_dev_INTERFACE_HEADERS
+    # FILE_SET node_dev_INTERFACE_HEADERS
   )
 endfunction()
 
@@ -600,12 +600,12 @@ function(cmakejs_setup_node_nan_library)
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/include/node-nan/${FILE}")
       message(DEBUG "Found NAN C++ header: ${FILE}")
       target_sources(node-nan INTERFACE
-        FILE_SET node_nan_INTERFACE_HEADERS
-        TYPE HEADERS
-        BASE_DIRS
-          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-          $<INSTALL_INTERFACE:include>
-        FILES
+        # FILE_SET node_nan_INTERFACE_HEADERS
+        # TYPE HEADERS
+        # BASE_DIRS
+        #   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        #   $<INSTALL_INTERFACE:include>
+        # FILES
           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/node-nan/${FILE}>
           $<INSTALL_INTERFACE:include/node-nan/${FILE}>
       )
@@ -623,7 +623,7 @@ function(cmakejs_setup_node_nan_library)
     RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-nan"
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/node-nan"
-    FILE_SET node_nan_INTERFACE_HEADERS
+    # FILE_SET node_nan_INTERFACE_HEADERS
   )
 endfunction()
 
