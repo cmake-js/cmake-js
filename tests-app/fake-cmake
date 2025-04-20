@@ -13,7 +13,7 @@ if [ ! -f "$CMAKE_JS_TEST_OUTPUT_FILE" ]; then
 fi
 
 # Append arguments to CMAKE_JS_TEST_OUTPUT_FILE
-echo "($PWD) cmake $@" >> "$CMAKE_JS_TEST_OUTPUT_FILE"
+echo "cmake $@" >> "$CMAKE_JS_TEST_OUTPUT_FILE"
 
 # If CMAKE_JS_TEST_EXIT_CODE is set and not empty, exit with that code
 if [ -n "$CMAKE_JS_TEST_EXIT_CODE" ]; then

@@ -1,7 +1,6 @@
 import yargs, { ArgumentsCamelCase, Options as YargsOptions } from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import fs from 'node:fs/promises'
-import path from 'node:path'
 import { findCmake } from './findCmake.mjs'
 import { runCommand } from './processHelpers.mjs'
 
@@ -23,7 +22,7 @@ function wrapCMakeCommand<T extends BaseArgs>(fn: (args: ArgumentsCamelCase<T>) 
 }
 
 interface BaseArgs {
-	out: string
+	dest: string
 	silent: boolean
 }
 
@@ -38,16 +37,11 @@ interface CmakeConfigureArgs extends BaseArgs {
 async function cmakeConfigure(args: ArgumentsCamelCase<CmakeConfigureArgs>) {
 	const cmakePath = await findCmake()
 
-	await fs.mkdir(args.out, { recursive: true })
-
-	// Source needs to be relative to the output directory, due to the change in cwd
-	const pathToSourceFromOut = args.source
-		? path.isAbsolute(args.source)
-			? args.source
-			: path.relative(args.out, path.resolve(args.source))
-		: path.relative(args.out, process.cwd())
+	await fs.mkdir(args.dest, { recursive: true })
 
 	const customArgs: string[] = []
+
+	if (!args._.includes('-B')) customArgs.push('-B', args.dest)
 
 	// If we know the executable path for certain, we can inject it to avoid it searching
 	if (process.execPath.endsWith('/node') || process.execPath.endsWith('/node.exe')) {
@@ -66,15 +60,14 @@ async function cmakeConfigure(args: ArgumentsCamelCase<CmakeConfigureArgs>) {
 		}
 	}
 
-	await runCommand([cmakePath, pathToSourceFromOut, ...customArgs, ...args._.slice(1)], {
-		cwd: args.out,
+	await runCommand([cmakePath, ...customArgs, ...args._.slice(1)], {
 		silent: args.silent,
 	})
 }
 
 async function assertBuildDirExists(args: ArgumentsCamelCase<BaseArgs>) {
 	try {
-		const s = await fs.stat(args.out)
+		const s = await fs.stat(args.dest)
 		if (!s.isDirectory()) throw new Error('Not a directory')
 	} catch (e) {
 		console.error('Output directory does not exist. Please run `cmake-js configure` first.')
@@ -86,7 +79,7 @@ async function cmakeAutoBuild(args: ArgumentsCamelCase<CmakeConfigureArgs>) {
 	await cmakeConfigure(args)
 	await cmakeBuild({
 		// Strip the args, as build and configure need different things, and we can't cater to both
-		out: args.out,
+		dest: args.dest,
 		silent: args.silent,
 
 		_: [],
@@ -112,8 +105,7 @@ async function cmakeBuild(args: ArgumentsCamelCase<CmakeBuildArgs>) {
 
 	if (!args._.includes('--parallel')) customArgs.push('--parallel')
 
-	await runCommand([cmakePath, '--build', '.', ...customArgs, ...args._.slice(1)], {
-		cwd: args.out,
+	await runCommand([cmakePath, '--build', args.dest, ...customArgs, ...args._.slice(1)], {
 		silent: args.silent,
 	})
 }
@@ -129,8 +121,7 @@ async function cmakeClean(args: ArgumentsCamelCase<CmakeCleanArgs>) {
 
 	const customArgs: string[] = []
 
-	await runCommand([cmakePath, '--build', '.', '--target', 'clean', ...customArgs, ...args._.slice(1)], {
-		cwd: args.out,
+	await runCommand([cmakePath, '--build', args.dest, '--target', 'clean', ...customArgs, ...args._.slice(1)], {
 		silent: args.silent,
 	})
 }
@@ -159,7 +150,7 @@ async function cmakeClean(args: ArgumentsCamelCase<CmakeCleanArgs>) {
 
 const configureOptions = {
 	source: {
-		// alias: 'd',
+		alias: 'S',
 		describe: 'Specify the source directory to compile, default is the current directory',
 		type: 'string',
 	} satisfies YargsOptions,
@@ -213,9 +204,9 @@ await yargs(hideBin(process.argv))
 			type: 'boolean',
 			default: false,
 		},
-		out: {
-			alias: 'o',
-			describe: 'Specify the output directory to compile to, default is projectRoot/build',
+		dest: {
+			alias: 'B',
+			describe: 'Specify the directory to write build output to, default is build',
 			type: 'string',
 			default: 'build',
 		},

@@ -59,8 +59,8 @@ describe('cmake-js-next cli', () => {
 
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
-				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node',
-				'(/cmake-js/src/build) cmake --build . --parallel',
+				'cmake -B build -DNODE_EXECUTABLE=/path/to/current/node',
+				'cmake --build build --parallel',
 			])
 		})
 
@@ -76,8 +76,8 @@ describe('cmake-js-next cli', () => {
 
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
-				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node --test',
-				'(/cmake-js/src/build) cmake --build . --parallel',
+				'cmake -B build -DNODE_EXECUTABLE=/path/to/current/node --test',
+				'cmake --build build --parallel',
 			])
 		})
 
@@ -85,12 +85,12 @@ describe('cmake-js-next cli', () => {
 			await temporaryDirectoryTask(async (tempDir) => {
 				await fs.rm(tempDir, { recursive: true })
 
-				const res = await invokeCmakeJs(['autobuild', '--out', tempDir])
+				const res = await invokeCmakeJs(['autobuild', '--dest', tempDir])
 
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
-					`(${tempDir}) cmake ../../cmake-js/src -DNODE_EXECUTABLE=/path/to/current/node`,
-					`(${tempDir}) cmake --build . --parallel`,
+					`cmake -B ${tempDir} -DNODE_EXECUTABLE=/path/to/current/node`,
+					`cmake --build ${tempDir} --parallel`,
 				])
 			})
 		})
@@ -99,12 +99,12 @@ describe('cmake-js-next cli', () => {
 			const dirname = nanoid()
 			const fullpath = new URL(`../${dirname}`, import.meta.url)
 			try {
-				const res = await invokeCmakeJs(['autobuild', '--out', dirname])
+				const res = await invokeCmakeJs(['autobuild', '--dest', dirname])
 
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
-					`(/cmake-js/src/${dirname}) cmake .. -DNODE_EXECUTABLE=/path/to/current/node`,
-					`(/cmake-js/src/${dirname}) cmake --build . --parallel`,
+					`cmake -B ${dirname} -DNODE_EXECUTABLE=/path/to/current/node`,
+					`cmake --build ${dirname} --parallel`,
 				])
 			} finally {
 				await fs.rm(fullpath, { recursive: true, force: true })
@@ -123,8 +123,8 @@ describe('cmake-js-next cli', () => {
 
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
-				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3',
-				'(/cmake-js/src/build) cmake --build . --parallel',
+				'cmake -B build -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3',
+				'cmake --build build --parallel',
 			])
 		})
 
@@ -141,8 +141,8 @@ describe('cmake-js-next cli', () => {
 
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
-				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3 -DCMAKEJS_TARGET_RUNTIME_ARCH=xABC',
-				'(/cmake-js/src/build) cmake --build . --parallel',
+				'cmake -B build -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3 -DCMAKEJS_TARGET_RUNTIME_ARCH=xABC',
+				'cmake --build build --parallel',
 			])
 		})
 	})
@@ -154,7 +154,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				//
-				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node',
+				'cmake -B build -DNODE_EXECUTABLE=/path/to/current/node',
 			])
 		})
 
@@ -169,20 +169,19 @@ describe('cmake-js-next cli', () => {
 			const res = await invokeCmakeJs(['configure', '--', '--test'])
 
 			expect(res.error).toBe(null)
-			expect(res.cmakeCommands).toEqual([
-				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node --test',
-			])
+			expect(res.cmakeCommands).toEqual(['cmake -B build -DNODE_EXECUTABLE=/path/to/current/node --test'])
 		})
 
 		test('absolute build dir', async () => {
 			await temporaryDirectoryTask(async (tempDir) => {
 				await fs.rm(tempDir, { recursive: true })
 
-				const res = await invokeCmakeJs(['configure', '--out', tempDir])
+				const res = await invokeCmakeJs(['configure', '--dest', tempDir])
 
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
-					`(${tempDir}) cmake ../../cmake-js/src -DNODE_EXECUTABLE=/path/to/current/node`,
+					//
+					`cmake -B ${tempDir} -DNODE_EXECUTABLE=/path/to/current/node`,
 				])
 			})
 		})
@@ -191,12 +190,12 @@ describe('cmake-js-next cli', () => {
 			const dirname = nanoid()
 			const fullpath = new URL(`../${dirname}`, import.meta.url)
 			try {
-				const res = await invokeCmakeJs(['configure', '--out', dirname])
+				const res = await invokeCmakeJs(['configure', '--dest', dirname])
 
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
 					//
-					`(/cmake-js/src/${dirname}) cmake .. -DNODE_EXECUTABLE=/path/to/current/node`,
+					`cmake -B ${dirname} -DNODE_EXECUTABLE=/path/to/current/node`,
 				])
 			} finally {
 				await fs.rm(fullpath, { recursive: true, force: true })
@@ -215,7 +214,7 @@ describe('cmake-js-next cli', () => {
 
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
-				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3',
+				'cmake -B build -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3',
 			])
 		})
 
@@ -232,7 +231,7 @@ describe('cmake-js-next cli', () => {
 
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
-				'(/cmake-js/src/build) cmake .. -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3 -DCMAKEJS_TARGET_RUNTIME_ARCH=xABC',
+				'cmake -B build -DNODE_EXECUTABLE=/path/to/current/node -DCMAKEJS_TARGET_RUNTIME=test123 -DCMAKEJS_TARGET_RUNTIME_VERSION=1.2.3 -DCMAKEJS_TARGET_RUNTIME_ARCH=xABC',
 			])
 		})
 	})
@@ -244,7 +243,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				//
-				'(/cmake-js/src/build) cmake --build . --parallel',
+				'cmake --build build --parallel',
 			])
 		})
 
@@ -261,18 +260,18 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				//
-				'(/cmake-js/src/build) cmake --build . --parallel --test',
+				'cmake --build build --parallel --test',
 			])
 		})
 
 		test('absolute build dir', async () => {
 			await temporaryDirectoryTask(async (tempDir) => {
-				const res = await invokeCmakeJs(['build', '--out', tempDir])
+				const res = await invokeCmakeJs(['build', '--dest', tempDir])
 
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
 					//
-					`(${tempDir}) cmake --build . --parallel`,
+					`cmake --build ${tempDir} --parallel`,
 				])
 			})
 		})
@@ -283,12 +282,12 @@ describe('cmake-js-next cli', () => {
 			try {
 				await fs.mkdir(fullpath, { recursive: true })
 
-				const res = await invokeCmakeJs(['build', '--out', dirname])
+				const res = await invokeCmakeJs(['build', '--dest', dirname])
 
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
 					//
-					`(/cmake-js/src/${dirname}) cmake --build . --parallel`,
+					`cmake --build ${dirname} --parallel`,
 				])
 			} finally {
 				await fs.rm(fullpath, { recursive: true, force: true })
@@ -296,7 +295,7 @@ describe('cmake-js-next cli', () => {
 		})
 
 		test('missing build dir', async () => {
-			const res = await invokeCmakeJs(['build', '--out', 'tmp/fake-dir'])
+			const res = await invokeCmakeJs(['build', '--dest', 'tmp/fake-dir'])
 
 			expect(res.error?.message).toMatch('Output directory does not exist')
 			expect(res.cmakeCommands).toHaveLength(0)
@@ -308,7 +307,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				//
-				'(/cmake-js/src/build) cmake --build . --parallel 4',
+				'cmake --build build --parallel 4',
 			])
 		})
 	})
@@ -320,7 +319,7 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				//
-				'(/cmake-js/src/build) cmake --build . --target clean',
+				'cmake --build build --target clean',
 			])
 		})
 
@@ -337,18 +336,18 @@ describe('cmake-js-next cli', () => {
 			expect(res.error).toBe(null)
 			expect(res.cmakeCommands).toEqual([
 				//
-				'(/cmake-js/src/build) cmake --build . --target clean --test',
+				'cmake --build build --target clean --test',
 			])
 		})
 
 		test('absolute build dir', async () => {
 			await temporaryDirectoryTask(async (tempDir) => {
-				const res = await invokeCmakeJs(['clean', '--out', tempDir])
+				const res = await invokeCmakeJs(['clean', '--dest', tempDir])
 
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
 					//
-					`(${tempDir}) cmake --build . --target clean`,
+					`cmake --build ${tempDir} --target clean`,
 				])
 			})
 		})
@@ -359,12 +358,12 @@ describe('cmake-js-next cli', () => {
 			try {
 				await fs.mkdir(new URL(`../${dirname}`, import.meta.url), { recursive: true })
 
-				const res = await invokeCmakeJs(['clean', '--out', dirname])
+				const res = await invokeCmakeJs(['clean', '--dest', dirname])
 
 				expect(res.error).toBe(null)
 				expect(res.cmakeCommands).toEqual([
 					//
-					`(/cmake-js/src/${dirname}) cmake --build . --target clean`,
+					`cmake --build ${dirname} --target clean`,
 				])
 			} finally {
 				await fs.rm(fullpath, { recursive: true, force: true })
@@ -372,7 +371,7 @@ describe('cmake-js-next cli', () => {
 		})
 
 		test('missing build dir', async () => {
-			const res = await invokeCmakeJs(['clean', '--out', 'tmp/fake-dir'])
+			const res = await invokeCmakeJs(['clean', '--dest', 'tmp/fake-dir'])
 
 			expect(res.error?.message).toMatch('Output directory does not exist')
 			expect(res.cmakeCommands).toHaveLength(0)
