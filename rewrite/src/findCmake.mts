@@ -45,7 +45,7 @@ async function getTopSupportedVisualStudioGenerator() {
 	let selectedVs: FindVisualStudioResult | null = null
 	try {
 		selectedVs = await findVisualStudioLib.default.findVisualStudio(
-			process.versions.node, // TODO - other runtimes?
+			process.versions.node,
 			undefined, // TODO: does this need to respect: npm config msvs_version,
 		)
 	} catch (e) {

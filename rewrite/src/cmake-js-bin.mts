@@ -66,8 +66,6 @@ async function cmakeConfigure(args: ArgumentsCamelCase<CmakeConfigureArgs>) {
 		}
 	}
 
-	// TODO - more here
-
 	await runCommand([cmakePath, pathToSourceFromOut, ...customArgs, ...args._.slice(1)], {
 		cwd: args.out,
 		silent: args.silent,
@@ -112,8 +110,6 @@ async function cmakeBuild(args: ArgumentsCamelCase<CmakeBuildArgs>) {
 		customArgs.push('--config', 'Release')
 	}
 
-	// TODO - stuff here?
-
 	await runCommand([cmakePath, '--build', '.', ...customArgs, ...args._.slice(1)], {
 		cwd: args.out,
 		silent: args.silent,
@@ -130,8 +126,6 @@ async function cmakeClean(args: ArgumentsCamelCase<CmakeCleanArgs>) {
 	await assertBuildDirExists(args)
 
 	const customArgs: string[] = []
-
-	// TODO - stuff here?
 
 	await runCommand([cmakePath, '--build', '.', '--target', 'clean', ...customArgs, ...args._.slice(1)], {
 		cwd: args.out,
@@ -182,10 +176,7 @@ const configureOptions = {
 	} satisfies YargsOptions,
 }
 
-const args = await yargs(hideBin(process.argv))
-	// .parserConfiguration({ // TODO - this would be nice to have
-	// 	'unknown-options-as-args': true,
-	// })
+await yargs(hideBin(process.argv))
 	.usage('CMake.js ' + packageJson.version + '\n\nUsage: $0 [<command>] [options]')
 	.version(false)
 	.command(
@@ -214,35 +205,6 @@ const args = await yargs(hideBin(process.argv))
 	.demandCommand(1)
 	.strict()
 	.options({
-		// // 		l: {
-		// // 			alias: 'log-level',
-		// // 			demand: false,
-		// // 			describe: 'set log level (' + logLevels.join(', ') + '), default is info',
-		// // 			type: 'string',
-		// // 		},
-		// config: {
-		// 	// alias: 'B',
-		// 	demand: false,
-		// 	describe: "specify build configuration (Debug, RelWithDebInfo, Release), will ignore '--debug' if specified",
-		// 	type: 'string',
-		// },
-		// generator: {
-		// 	// alias: 'G',
-		// 	demand: false,
-		// 	describe: 'use specified generator',
-		// 	type: 'string',
-		// },
-		// // 		A: {
-		// // 			alias: 'platform',
-		// // 			demand: false,
-		// // 			describe: 'use specified platform name',
-		// // 			type: 'string',
-		// // 		},
-		// target: {
-		// 	// alias: 'T',
-		// 	demand: false,
-		// 	describe: 'only build the specified target',
-		// 	type: 'string',
 		silent: {
 			// alias: 'silent',
 			describe: 'Silence CMake output',
