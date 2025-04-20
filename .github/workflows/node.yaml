@@ -50,11 +50,11 @@ jobs:
             libc: musl
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js
         if: ${{ !matrix.docker-arch }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           architecture: ${{ matrix.arch }}
           node-version: ${{ matrix.node-version || '18.x' }}
@@ -79,7 +79,7 @@ jobs:
           npm_config_build_from_source: true
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         if: matrix.docker-arch
       - name: run tests (in docker)
         uses: addnab/docker-run-action@v3

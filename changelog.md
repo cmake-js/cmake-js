@@ -1,4 +1,9 @@
-# v7.3.0 - 15/01/23
+# v7.3.1 - 17/04/25
+
+- fix(windows): support windows arm64 (Thanks to @jaycex)
+- fix(windows): support newer visual studio installations
+
+# v7.3.0 - 15/01/24
 
 - feat(windows): replace custom libnode.def generation with version from node-api-headers
 - fix: support for vs2015 with nodejs 18 and older (#317)
