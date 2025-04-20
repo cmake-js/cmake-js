@@ -793,6 +793,12 @@ function(cmakejs_create_node_api_addon name)
       message(STATUS "Node Addon API (C++) library not loaded. Skipping...")
       set(_cmakejs_node_api_cpp_missing_logged TRUE)
     endif()
+    if(TARGET cmake-js::node-dev)
+      target_link_libraries(${name} PRIVATE cmake-js::node-dev)
+    endif()
+    if(TARGET cmake-js::node-nan)
+      target_link_libraries(${name} PRIVATE cmake-js::node-nan)
+    endif()
 
     set_property(
       TARGET ${name}
