@@ -1,9 +1,9 @@
 {
 	"extends": "@tsconfig/node14/tsconfig.json",
-	"include": ["rewrite/src/**/*.ts", "rewrite/src/**/*.mts"],
+	"include": ["src/**/*.ts", "src/**/*.mts"],
 	"exclude": ["node_modules/**", "src/**/*spec.ts", "src/**/__tests__/*", "src/**/__mocks__/*", "scratch/**"],
 	"compilerOptions": {
-		"outDir": "./rewrite/dist",
+		"outDir": "./dist",
 		"baseUrl": "./",
 		"paths": {
 			"*": ["./node_modules/*"]

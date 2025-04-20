@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'vitest'
-import Downloader from '../rewrite/src/downloader.mts'
+import Downloader from '../src/downloader.mts'
 import { CmakeTestRunner, NODE_DEV_CACHE_DIR } from '../tests-cmake/test-runner'
 import path from 'node:path'
 import fs from 'node:fs/promises'

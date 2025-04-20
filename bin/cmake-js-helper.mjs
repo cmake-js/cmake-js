@@ -3,7 +3,7 @@
 
 import fs from 'node:fs/promises'
 import semver from 'semver'
-import BuildDepsDownloader from '../rewrite/dist/buildDeps.mjs'
+import BuildDepsDownloader from '../dist/buildDeps.mjs'
 import envPaths from 'env-paths'
 import debug from 'debug'
 

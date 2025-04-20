@@ -8,4 +8,4 @@ if (nodeMajor < 18) {
 }
 
 // Call into the compiled ts code
-await import('../rewrite/dist/cmake-js-bin.mjs')
+await import('../dist/cmake-js-bin.mjs')

@@ -1,6 +1,5 @@
-import { beforeAll, describe, test } from 'vitest'
+import { beforeAll, beforeEach, describe, test } from 'vitest'
 import { appendSystemCmakeArgs, CmakeTestRunner, getGeneratorsForPlatform } from './test-runner'
-import { beforeEach } from 'node:test'
 
 describe('node-addon-api', () => {
 	const testRunner = new CmakeTestRunner('node-addon-api')

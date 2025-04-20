@@ -1,10 +1,10 @@
 import { beforeAll, beforeEach, describe, test } from 'vitest'
 import { appendSystemCmakeArgs, CmakeTestRunner, getGeneratorsForPlatform, NODE_DEV_CACHE_DIR } from './test-runner'
-import BuildDepsDownloader from '../rewrite/src/buildDeps.mjs'
-import { TargetOptions } from '../rewrite/src/runtimePaths.mjs'
+import BuildDepsDownloader from '../src/buildDeps.mjs'
+import { TargetOptions } from '../src/runtimePaths.mjs'
 import semver from 'semver'
 
-const runtimesAndVersions: Omit<TargetOptions, 'runtimeArch'>[] = [
+const runtimesAndVersions: Omit[] = [
 	{ runtime: 'node', runtimeVersion: '14.15.0' },
 	{ runtime: 'node', runtimeVersion: '16.10.0' },
 	{ runtime: 'node', runtimeVersion: '18.16.1' },
@@ -24,7 +24,7 @@ if (process.platform !== 'win32') {
 	)
 }
 
-function getArchsForRuntime(runtime: Omit<TargetOptions, 'runtimeArch'>): TargetOptions[] {
+function getArchsForRuntime(runtime: Omit): TargetOptions[] {
 	switch (process.platform) {
 		case 'linux':
 			return [{ ...runtime, runtimeArch: process.arch }]

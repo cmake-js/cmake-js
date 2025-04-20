@@ -72,19 +72,18 @@
 		"vitest": "^3.1.1"
 	},
 	"scripts": {
-		"cmake-js-bin": "tsx rewrite/src/cmake-js-bin.mjs",
 		"test:old": "mocha tests",
 		"test:unit": "vitest --dir tests-app",
 		"test:cmake": "vitest --dir tests-cmake",
 		"test:cmake-versions": "vitest --dir tests-cmake-versions",
-		"lint": "eslint lib bin/cmake-js bin tests tests-app tests-cmake rewrite/src",
+		"lint": "eslint lib bin tests-app tests-cmake tests-cmake-versions src",
 		"build": "tsc"
 	},
 	"files": [
 		"lib",
 		"bin",
 		"share",
-		"rewrite",
+		"dist",
 		"*.md"
 	],
 	"packageManager": "yarn@1.22.22+sha256.c17d3797fb9a9115bf375e31bfd30058cac6bc9c3b8807a3d8cb2094794b51ca"

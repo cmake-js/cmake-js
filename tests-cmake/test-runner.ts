@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { execFile, runCommand } from '../rewrite/src/processHelpers.mts'
+import { execFile, runCommand } from '../src/processHelpers.mts'
 import { rimraf } from 'rimraf'
 import fs from 'node:fs/promises'
 import { expect } from 'vitest'
@@ -35,13 +35,18 @@ export class CmakeTestRunner {
 		return execFile([this.cmakePathSafe, '--version'])
 	}
 
-	async testInvokeCmakeDirectSimple(cmakeArgs: string[] = []) {
+	async testInvokeCmakeDirectCustom(options: {
+		cmakeArgs: string[]
+		expectedLaunchResult: boolean | null
+		sourceDir?: string
+		//
+	}) {
 		// make build dir
 		await rimraf(this.buildDir)
 		await fs.mkdir(this.buildDir)
 
 		// Prepare build
-		const configureCommand = [this.cmakePathSafe, '..', ...cmakeArgs]
+		const configureCommand = [this.cmakePathSafe, options.sourceDir || '..', ...options.cmakeArgs]
 		if (this.generator) configureCommand.push('-G', `"${this.generator}"`)
 		if (this.nodeDevDirectory) configureCommand.push('-D', `NODE_DEV_API_DIR="${this.nodeDevDirectory}"`)
 
@@ -59,30 +64,42 @@ export class CmakeTestRunner {
 		await runCommand(buildCommand, {
 			cwd: this.buildDir,
 		})
+
+		if (options.expectedLaunchResult !== null) {
+			// Make sure addon is loadable
+			const addonPath =
+				process.platform === 'win32'
+					? path.join(this.buildDir, 'Release/addon.node')
+					: path.join(this.buildDir, 'addon.node')
+
+			const launched = await runCommand(['node', addonPath], {
+				cwd: this.buildDir,
+				silent: !options.expectedLaunchResult, // Silence output as it's errors are 'normal'
+			}).then(
+				() => true,
+				() => false,
+			)
+
+			expect(launched).toBe(options.expectedLaunchResult)
+		}
+	}
+
+	async testInvokeCmakeDirectSimple(cmakeArgs: string[] = []) {
+		await this.testInvokeCmakeDirectCustom({
+			cmakeArgs,
+			expectedLaunchResult: null,
+		})
 	}
 
 	async testInvokeCmakeDirect(cmakeArgs: string[] = [], launchCheckShouldFail = false) {
-		await this.testInvokeCmakeDirectSimple(cmakeArgs)
-
-		// Make sure addon is loadable
-		const addonPath =
-			process.platform === 'win32'
-				? path.join(this.buildDir, 'Release/addon.node')
-				: path.join(this.buildDir, 'addon.node')
-
-		const launched = await runCommand(['node', addonPath], {
-			cwd: this.buildDir,
-			silent: launchCheckShouldFail, // Silence output as it's errors are 'normal'
-		}).then(
-			() => true,
-			() => false,
-		)
-
-		expect(launched).toBe(!launchCheckShouldFail)
+		await this.testInvokeCmakeDirectCustom({
+			cmakeArgs,
+			expectedLaunchResult: !launchCheckShouldFail,
+		})
 	}
 }
 
-export function getGeneratorsForPlatform(): Array<string | null> {
+export function getGeneratorsForPlatform(): Array {
 	switch (process.platform) {
 		case 'darwin':
 		// TODO: This would be good, but Xcode requires an explicit compiler path to be defined

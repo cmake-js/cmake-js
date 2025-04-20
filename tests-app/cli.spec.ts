@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { describe, expect, test } from 'vitest'
-import { execFile } from '../rewrite/src/processHelpers.mjs'
+import { execFile } from '../src/processHelpers.mjs'
 import { temporaryDirectoryTask, temporaryFileTask } from 'tempy'
 import fs from 'node:fs/promises'
 import { nanoid } from 'nanoid'
