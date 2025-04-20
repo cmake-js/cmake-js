@@ -112,6 +112,11 @@ You can override the project default runtimes via `--runtime` and `--runtime-ver
 
 The commandline is intended to be a minimal wrapper over `cmake`. It is intended to help find `cmake` and provide some default arguments.
 
+#### Tips
+
+To build a multiarch binary for macos, you can use add `-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"` to the end of the configure command.
+eg `cmake-js autobuild -- -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"`
+
 #### For users new to CMake
 
 If you don't have prior experience with `cmake`, the commandline is written to be fairly simple.  
@@ -176,7 +181,7 @@ That is it, the necessary headers will be available to your module!
 
 You can see some [example projects](./tests-cmake/projects)
 
-#### NAN and v8 Api
+#### NAN and v8 API
 
 It is advised to not use this API unless necessary as it makes building and distributing your project more complex. Use the new `Node-API` instead if possible.
 
@@ -184,6 +189,9 @@ To enable the v8 api, your CMakeLists.txt should contain `cmakejs_setup_node_dev
 Optionally, you may want to `cmakejs_setup_node_nan_library()` too if you wish to use the NAN library which provides a slightly more stable abstraction of this api.
 
 You can see an [example](./tests-cmake/projects/nan)
+
+When using the v8 API, CMake.js needs to download the API headers during the compilation process. The headers change for each release of Node.js (including minor versions), so they can't be included in the NPM package. These will be downloaded into a cmake-js folder your user cache directory (exact path varies depneding on os). If you need to run builds offline, you can pre-populate this directory.  
+Alternatively, if you want to fetch the headers from a local mirror, you can set `NVM_NODEJS_ORG_MIRROR` (or `ELECTRON_MIRROR` for electron) to change where they are downloaded from.
 
 #### Electron
 
