@@ -3,7 +3,6 @@ import Downloader from '../rewrite/src/downloader.mts'
 import { CmakeTestRunner, NODE_DEV_CACHE_DIR } from '../tests-cmake/test-runner'
 import path from 'node:path'
 import fs from 'node:fs/promises'
-import { runCommand } from '../rewrite/src/processHelpers.mts'
 
 describe('CMake versions check', () => {
 	if (process.platform !== 'linux' || process.arch !== 'x64') {
@@ -15,6 +14,7 @@ describe('CMake versions check', () => {
 	}
 
 	const cmakeVersions = [
+		'4.0.1',
 		'3.31.7',
 		'3.30.8',
 		'3.25.3',
@@ -77,6 +77,4 @@ describe('CMake versions check', () => {
 			})
 		})
 	}
-
-	// TODO
 })
