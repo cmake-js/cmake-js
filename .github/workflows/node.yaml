@@ -161,24 +161,24 @@ jobs:
             .cache
 
       - name: prepare
-        shell: bash
+        shell: powershell
         run: |
           yarn install
           yarn build
 
-          CMAKE_PATH=$(which cmake.exe)
-          if [ -z "$CMAKE_PATH" ]; then
-            echo "CMake not found in PATH"
+          $CMAKE_PATH = (Get-Command cmake).Path
+          if ($CMAKE_PATH -eq $null) {
+            Write-Host "CMake not found in PATH"
             exit 1
-          fi
-          rm -rf ${CMAKE_PATH}
+          }
+          Remove-Item -Path $CMAKE_PATH -Force
 
           # ensure cmake is no longer found
-          CMAKE_PATH=$(which cmake.exe)
-          if [ -n "$CMAKE_PATH" ]; then
-            echo "CMake still found in PATH"
+          $CMAKE_PATH = (Get-Command cmake).Path
+          if ($CMAKE_PATH -ne $null) {
+            Write-Host "CMake still found in PATH"
             exit 1
-          fi
+          }
         env:
           CI: true
 
