@@ -44,15 +44,21 @@ export async function runCommand(
 	})
 }
 
-export async function execFile(command: string[], options?: { cwd?: string }): Promise<string> {
+export async function execFile(
+	command: string[],
+	options?: { cwd?: string; env?: Record<string, string | undefined> },
+): Promise<string> {
 	return new Promise<string>(function (resolve, reject) {
 		if (!options) options = {}
+
+		const env = Object.assign({}, process.env, options.env)
 
 		execFileRaw(
 			command[0],
 			command.slice(1),
 			{
 				cwd: options.cwd,
+				env,
 			},
 			function (err, stdout, stderr) {
 				if (err) {

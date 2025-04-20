@@ -71,6 +71,7 @@
 		"node-addon-api": "^6.1.0",
 		"prettier": "^3.2.2",
 		"rimraf": "^5.0.10",
+		"tempy": "^3.1.0",
 		"tsx": "^4.19.3",
 		"typescript": "~5.3.3",
 		"vitest": "^3.1.1"
@@ -78,7 +79,7 @@
 	"scripts": {
 		"cmake-js-bin": "tsx rewrite/src/cmake-js-bin.mjs",
 		"test:old": "mocha tests",
-		"test:unit": "vitest --dir test-apps",
+		"test:unit": "vitest --dir tests-app",
 		"test:cmake": "vitest --dir tests-cmake",
 		"test:cmake-versions": "vitest --dir tests-cmake-versions",
 		"lint": "eslint lib bin/cmake-js bin tests tests-app tests-cmake rewrite/src",

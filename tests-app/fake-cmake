@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Ensure CMAKE_JS_TEST_OUTPUT is set and file exists
+if [ -z "$CMAKE_JS_TEST_OUTPUT_FILE" ]; then
+    echo "Error: CMAKE_JS_TEST_OUTPUT_FILE environment variable is not set"
+    exit 1
+fi
+
+# Check if the file exists
+if [ ! -f "$CMAKE_JS_TEST_OUTPUT_FILE" ]; then
+    echo "Error: Output file $CMAKE_JS_TEST_OUTPUT_FILE does not exist"
+    exit 1
+fi
+
+# Append arguments to CMAKE_JS_TEST_OUTPUT_FILE
+echo "($PWD) cmake $@" >> "$CMAKE_JS_TEST_OUTPUT_FILE"
+
+# If CMAKE_JS_TEST_EXIT_CODE is set and not empty, exit with that code
+if [ -n "$CMAKE_JS_TEST_EXIT_CODE" ]; then
+    exit $CMAKE_JS_TEST_EXIT_CODE
+fi
+
+# Default exit with success
+exit 0
