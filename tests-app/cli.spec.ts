@@ -202,6 +202,16 @@ describe('cmake-js-next cli', () => {
 			}
 		})
 
+		test('source dir', async () => {
+			const res = await invokeCmakeJs(['configure', '--source', 'src'])
+
+			expect(res.error).toBe(null)
+			expect(res.cmakeCommands).toEqual([
+				//
+				'cmake src -B build -DNODE_EXECUTABLE=/path/to/current/node',
+			])
+		})
+
 		test('with runtime', async () => {
 			const res = await invokeCmakeJs(['configure', '--runtime', 'test123'])
 

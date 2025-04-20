@@ -41,6 +41,8 @@ async function cmakeConfigure(args: ArgumentsCamelCase<CmakeConfigureArgs>) {
 
 	const customArgs: string[] = []
 
+	if (args.source) customArgs.push(args.source)
+
 	if (!args._.includes('-B')) customArgs.push('-B', args.dest)
 
 	// If we know the executable path for certain, we can inject it to avoid it searching
