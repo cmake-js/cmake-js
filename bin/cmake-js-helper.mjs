@@ -5,6 +5,7 @@ import fs from 'node:fs/promises'
 import semver from 'semver'
 import BuildDepsDownloader from '../rewrite/dist/buildDeps.mjs'
 import envPaths from 'env-paths'
+import debug from 'debug'
 
 /*
  * This file is a collection of helper functions for the cmake-js package.
@@ -50,7 +51,7 @@ switch (process.argv[2]) {
 		// This is intended to be set by the user, not cmake, so is safe to be an env var
 		const depsStorageDir = process.env.CMAKEJS_CACHE_DIR || envPaths('cmake-js').cache
 
-		const buildDepsDownloader = new BuildDepsDownloader(depsStorageDir, buildTarget, console.error)
+		const buildDepsDownloader = new BuildDepsDownloader(depsStorageDir, buildTarget, debug('cmake-js:buildDeps'))
 
 		await buildDepsDownloader.ensureDownloaded()
 
