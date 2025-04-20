@@ -171,10 +171,12 @@ jobs:
             Write-Host "CMake not found in PATH"
             exit 1
           }
+          Write-Host "CMake found in PATH: $CMAKE_PATH"
           Remove-Item -Path $CMAKE_PATH -Force
 
           # ensure cmake is no longer found
           $CMAKE_PATH = (Get-Command cmake).Path
+          Write-Host "CMake found in PATH: $CMAKE_PATH"
           if ($CMAKE_PATH -ne $null) {
             Write-Host "CMake still found in PATH"
             exit 1
