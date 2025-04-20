@@ -15,7 +15,10 @@ export async function runCommand(
 			delete env.Path
 		}
 
-		const child = spawn(String(command[0]), command.slice(1) as string[], {
+		let baseCommand = String(command[0])
+		if (process.platform === 'win32') baseCommand = `"${baseCommand}"`
+
+		const child = spawn(baseCommand, command.slice(1) as string[], {
 			stdio: options.silent ? 'ignore' : 'inherit',
 			env,
 			cwd: options.cwd,

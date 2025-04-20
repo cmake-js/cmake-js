@@ -79,6 +79,11 @@ async function cmakeBuild(args: ArgumentsCamelCase<CmakeBuildArgs>) {
 
 	const customArgs: string[] = []
 
+	if (process.platform === 'win32' && !args._.includes('--config')) {
+		// Default to release config unless specified
+		customArgs.push('--config', 'Release')
+	}
+
 	// TODO - stuff here?
 
 	await runCommand([cmakePath, '--build', '.', ...customArgs, ...args._.slice(1)], {

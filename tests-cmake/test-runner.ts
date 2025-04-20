@@ -41,11 +41,11 @@ export class CmakeTestRunner {
 		await fs.mkdir(this.buildDir)
 
 		// Prepare build
-		const cmakeCommand = [this.cmakePathSafe, '..', ...cmakeArgs]
-		if (this.generator) cmakeCommand.push('-G', `"${this.generator}"`)
-		if (this.nodeDevDirectory) cmakeCommand.push('-D', `NODE_DEV_API_DIR="${this.nodeDevDirectory}"`)
+		const configureCommand = [this.cmakePathSafe, '..', ...cmakeArgs]
+		if (this.generator) configureCommand.push('-G', `"${this.generator}"`)
+		if (this.nodeDevDirectory) configureCommand.push('-D', `NODE_DEV_API_DIR="${this.nodeDevDirectory}"`)
 
-		await runCommand(cmakeCommand, {
+		await runCommand(configureCommand, {
 			cwd: this.buildDir,
 			env: {
 				CMAKEJS_CACHE_DIR: NODE_DEV_CACHE_DIR,
@@ -53,7 +53,10 @@ export class CmakeTestRunner {
 		})
 
 		// Perform build
-		await runCommand([this.cmakePathSafe, '--build', '.'], {
+		const buildCommand = [this.cmakePathSafe, '--build', '.']
+		if (process.platform === 'win32') buildCommand.push('--config', 'Release')
+
+		await runCommand(buildCommand, {
 			cwd: this.buildDir,
 		})
 	}
