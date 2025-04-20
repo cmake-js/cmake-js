@@ -1,18 +1,10 @@
 import { beforeAll, describe, expect, test } from 'vitest'
 import Downloader from '../rewrite/src/downloader.mts'
-import { CmakeTestRunner, NODE_DEV_CACHE_DIR } from './test-runner'
+import { CmakeTestRunner, NODE_DEV_CACHE_DIR } from '../tests-cmake/test-runner'
 import path from 'node:path'
 import fs from 'node:fs/promises'
 
 describe('CMake versions check', () => {
-	if (!process.env.ENABLE_CMAKE_VERSION_TESTS) {
-		test('Skipped - disabled', () => {
-			// Tests are skipped unless explicitly enabld
-			expect(true).toBe(true)
-		})
-		return
-	}
-
 	if (process.platform !== 'linux' || process.arch !== 'x64') {
 		test('Unsupported platform', () => {
 			// Tests are skipped unless explicitly enabld

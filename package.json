@@ -80,6 +80,7 @@
 		"test:old": "mocha tests",
 		"test:unit": "vitest --dir test-apps",
 		"test:cmake": "vitest --dir tests-cmake",
+		"test:cmake-versions": "vitest --dir tests-cmake-versions",
 		"lint": "eslint lib bin/cmake-js bin tests tests-app tests-cmake rewrite/src",
 		"build": "tsc"
 	},
