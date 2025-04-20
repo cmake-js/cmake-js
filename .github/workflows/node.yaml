@@ -166,7 +166,19 @@ jobs:
           yarn install
           yarn build
 
-          which cmake.exe
+          CMAKE_PATH=$(which cmake.exe)
+          if [ -z "$CMAKE_PATH" ]; then
+            echo "CMake not found in PATH"
+            exit 1
+          fi
+          rm -rf ${CMAKE_PATH}
 
+        env:
+          CI: true
+
+      - name: run build
+        shell: bash
+        run: |
+          node ./bin/cmake-js-next.mjs autobuild --source ./tests-cmake/projects/node-api
         env:
           CI: true
