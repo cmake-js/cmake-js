@@ -371,6 +371,19 @@ The least "painful" way of addressing this is to use heroku's multipack facility
 The `heroku-buildpack-multi` will run each buildpack in order allowing the node application to reference CMake in the Heroku
 build environment.
 
+## Using external C/C++ libraries
+
+Because you are using CMake, there are many ways to load libraries in your CMakeLists.txt.  
+Various places on the internet and in the CMake docs will suggest various approaches you can take. Common ones are:
+* [conan](https://vcpkg.io/) (This may not work properly currently, we hope to improve support in a future release)
+* [vcpkg](https://conan.io/) (This may not work properly currently, we hope to improve support in a future release)
+* [hunter](https://github.com/cpp-pm/hunter)
+* [CMake ExternalProject](https://cmake.org/cmake/help/latest/module/ExternalProject.html)
+* If on linux, using system libraries from the system package-manager
+* Importing as a git submodule
+
+We aim to be agnostic about how to use CMake, so it should be possible to use whatever approach you desire.
+
 ## Real examples
 
 - [@julusian/jpeg-turbo](https://github.com/julusian/node-jpeg-turbo) - A Node-API wrapping around libjpeg-turbo. cmake-js was a good fit here, as libjpeg-turbo provides cmake files that can be used, and would be hard to replicate correctly in node-gyp
