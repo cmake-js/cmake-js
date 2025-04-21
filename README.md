@@ -100,8 +100,6 @@ Options:
 
 It is advised to use Node-API for new projects instead of NAN. It provides ABI stability making usage simpler and reducing maintainance.
 
-In a nutshell. _(For more complete documentation please see [the first tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN).)_
-
 - Install cmake-js for your module `npm install --save cmake-js`
 - Put a CMakeLists.txt file into your module root with this minimal required content:
 
@@ -346,7 +344,7 @@ To make compatible your NW.js application with any NAN CMake.js based modules, w
 }
 ```
 
-That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with NW.js out-of-the-box. For more complete documentation please see [the third tutorial](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js).
+That's it. There is nothing else to do either on the application's or on the module's side, CMake.js modules are compatible with NW.js out-of-the-box.
 
 #### Heroku
 
@@ -372,13 +370,6 @@ The least "painful" way of addressing this is to use heroku's multipack facility
 
 The `heroku-buildpack-multi` will run each buildpack in order allowing the node application to reference CMake in the Heroku
 build environment.
-
-## Tutorials
-
-- [TUTORIAL 01 Creating a native module by using CMake.js and NAN](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-01-Creating-a-native-module-by-using-CMake.js-and-NAN)
-- [TUTORIAL 02 Creating CMake.js based native addons with Qt Creator](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-02-Creating-CMake.js-based-native-addons-with-QT-Creator)
-- [TUTORIAL 03 Using CMake.js based native modules with NW.js](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-03-Using-CMake.js-based-native-modules-with-nw.js)
-- [TUTORIAL 04 Creating CMake.js based native modules with Boost dependency](https://github.com/unbornchikken/cmake-js/wiki/TUTORIAL-04-Creating-CMake.js-based-native-modules-with-Boost-dependency)
 
 ## Real examples
 
