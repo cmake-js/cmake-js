@@ -107,7 +107,7 @@ It is advised to use Node-API for new projects instead of NAN. It provides ABI s
 cmake_minimum_required(VERSION 3.15...3.31)
 project(your-addon-name-here)
 
-add_compile_definitions(-DNAPI_VERSION=4)
+add_compile_definitions(NAPI_VERSION=4)
 
 file(GLOB SOURCE_FILES "your-source files-location-here")
 
