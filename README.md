@@ -109,7 +109,7 @@ project(your-addon-name-here)
 
 add_compile_definitions(-DNAPI_VERSION=4)
 
-file(GLOB SOURCE_FILES "your-source files-location-here")
+file(GLOB SOURCE_FILES "your-source-files-location-here")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
@@ -375,8 +375,8 @@ build environment.
 
 Because you are using CMake, there are many ways to load libraries in your CMakeLists.txt.  
 Various places on the internet and in the CMake docs will suggest various approaches you can take. Common ones are:
-* [conan](https://vcpkg.io/) (This may not work properly currently, we hope to improve support in a future release)
-* [vcpkg](https://conan.io/) (This may not work properly currently, we hope to improve support in a future release)
+* [conan](https://conan.io/) (This may not work properly currently; we hope to improve support in a future release)
+* [vcpkg](https://vcpkg.io/) (This may not work properly currently; we hope to improve support in a future release)
 * [hunter](https://github.com/cpp-pm/hunter)
 * [CMake ExternalProject](https://cmake.org/cmake/help/latest/module/ExternalProject.html)
 * If on linux, using system libraries from the system package-manager
