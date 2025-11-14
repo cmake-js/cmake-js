@@ -1,3 +1,7 @@
+# v7.4.0 - 14/11/25
+
+- feat(windows): support msvc 2026 (Thanks to @Norgerkaj)
+
 # v7.3.1 - 17/04/25
 
 - fix(windows): support windows arm64 (Thanks to @jaycex)
