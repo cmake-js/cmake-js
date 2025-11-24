@@ -51,7 +51,7 @@ jobs:
             libc: musl
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Use Node.js
         if: ${{ !matrix.docker-arch }}
